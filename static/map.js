@@ -130,6 +130,7 @@ function initialize() {
         map.setCenter(initialUserPos);
         // distanceFromCenter=  google.maps.geometry.spherical.computeDistanceBetween(centerOfWorld, initialUserPos);
         overlay = new ywotOverlay(map);
+
         // console.log('distancefrom center in pix:', pixelDistanceFromCenter);
 
 
