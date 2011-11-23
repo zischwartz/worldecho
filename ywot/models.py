@@ -5,7 +5,7 @@ from django.http import Http404
 from lib.jsonfield import DictField
 
 class World(models.Model):
-    name = models.TextField(unique=True, max_length=512)
+    name = models.CharField(unique=True, max_length=512)
         # Creating this index for much faster world lookups from World.get_or_create,
         # which are very common.
         # CREATE INDEX CONCURRENTLY world_name_upper ON ywot_world(UPPER(name));
