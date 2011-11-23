@@ -647,11 +647,7 @@ YourWorld.World = function() {
 
     //same as doGoToCoord, but for pixels....
     var doGoToPix = function(x, y) {
-        // y *= -4; // inverting the setcoords transform
-        // x *= 4;
-        // y += 2; // Put the target in the middle of the user-tile instead of the corner
-        // x += 2;
-        // TODO: How can we encapusulate this whole feature better?
+
         if (!_state.goToCoord.initted) {
             _state.goToCoord.cancel = function() {
                 clearInterval(_state.goToCoord.interval);

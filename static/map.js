@@ -128,15 +128,9 @@ function initialize() {
       // });
 
         map.setCenter(initialUserPos);
-
         // distanceFromCenter=  google.maps.geometry.spherical.computeDistanceBetween(centerOfWorld, initialUserPos);
-        // console.log('distancefrom center in meters:');
-        // console.log(distanceFromCenter);
-
         overlay = new ywotOverlay(map);
-
-        // console.log('distancefrom center in pix:');
-        // console.log(pixelDistanceFromCenter);
+        // console.log('distancefrom center in pix:', pixelDistanceFromCenter);
 
 
     }, function() {
