@@ -39,7 +39,7 @@ function makeScrollable(container, scrollBy) {
         // console.log('scrollby', dx, dy);
         
         //should be disabled when nara's bug fix totally works
-        map.panBy(dx, dy); //well that was easy -z
+        // map.panBy(dx, dy); //well that was easy -z
         
         scrollBy(dx, dy);                        
     };

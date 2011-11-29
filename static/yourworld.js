@@ -667,7 +667,7 @@ YourWorld.World = function() {
                     // $(document).unbind('mousedown', _state.goToCoord.cancel);
                     });
             _state.goToCoord.initted = true;
-        }
+        } 
 
 
         console.log('centerCOOrds',getCenterCoords());
