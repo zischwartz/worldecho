@@ -43,6 +43,7 @@ class World(models.Model):
         return self.name
     
     def get_absolute_url(self):
+        MEDIA_ROOT
         return '/' + self.name
 
 class Tile(models.Model):
