@@ -47,8 +47,11 @@ class World(models.Model):
         return '/' + self.name
 
 class Tile(models.Model):
-    ROWS = 8
-    COLS = 16
+    # ROWS = 8
+    # COLS = 16
+    ROWS = 10
+    COLS = 10
+    
     LEN = ROWS*COLS
     
     world = models.ForeignKey(World)

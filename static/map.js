@@ -61,6 +61,19 @@ var darkMapStyle=[
   }
 ];
 
+
+
+var config = new Object;
+
+// config.num_rows = 8;
+// config.num_cols = 16;
+config.num_rows = 10;
+config.num_cols = 10;
+
+config.default_content = Array(config.num_rows*config.num_cols+1).join('#');
+
+
+
 var darkMapType = new google.maps.StyledMapType(darkMapStyle,
   {name: "Dark Maps"});
 
@@ -71,16 +84,38 @@ function CoordMapType(tileSize) {
   CoordMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
     console.log(coord)
     var div = ownerDocument.createElement('DIV');
-    div.innerHTML = coord;
+    // div.innerHTML = coord;
     div.style.width = this.tileSize.width + 'px';
     div.style.height = this.tileSize.height + 'px';
-    div.style.fontSize = '10';
-    div.style.borderStyle = 'solid';
-    div.style.borderWidth = '1px';
-    div.style.borderColor = '#AAAAAA';
+    // div.style.fontSize = '10';
+    // div.style.borderStyle = 'solid';
+    // div.style.borderWidth = '1px';
+    // div.style.borderColor = '#AAAAAA';
 
-    var testtext = $("<br><span>A B C D E F G H I J K L M N O P</span>");
-    $(div).append(testtext);
+
+
+
+    var html = [];
+    var content = config.default_content;
+
+
+    html.push('<table width="100%" height="100%" cellspacing="0" cellpadding="0" border="0"><tbody>');
+    // y goes down, x goes right
+    var c, charY, charX;
+    var contentPos = 0;
+    for (charY=0; charY<config.num_rows; charY++) {
+      html.push('<tr>');
+      for (charX=0; charX<config.num_cols; charX++) {
+        c = content.charAt(contentPos);
+        // c = YourWorld.helpers.escapeChar(c);
+        html.push('<td>' + c + '</td>');
+        contentPos++;
+      }
+      html.push('</tr>');
+    }
+    html.push('</tbody></table>');
+
+    $(div).append(html.join(''));
     return div;
   };
  
@@ -150,7 +185,7 @@ function initialize() {
       // distanceFromCenter=  google.maps.geometry.spherical.computeDistanceBetween(centerOfWorld, initialUserPos);
        
 
-      map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(500, 500)));
+      map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(250, 250)));
 
       google.maps.event.addListener(map, 'bounds_changed', function() {
 
