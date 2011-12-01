@@ -186,6 +186,8 @@ YourWorld.World = function() {
     var initialUserPos, pixelWorldCenter, pixelUser;
     var darkMapType = new google.maps.StyledMapType(darkMapStyle, {name: "Dark Maps"});
 
+    function CoordMapType(tileSize) { this.tileSize = tileSize;}
+
     var mapInitialize= function() {
         var myOptions = {
             zoom: 18,
@@ -229,6 +231,18 @@ YourWorld.World = function() {
     handleNoGeolocation(false);
   } 
 };//end mapInitialize
+
+
+CoordMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
+    console.log(coord)
+    var div = ownerDocument.createElement('DIV');
+    div.innerHTML = coord;
+    div.style.width = this.tileSize.width + 'px';
+    div.style.height = this.tileSize.height + 'px';
+    div.style.fontSize = '15px';
+    // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = '#AAFFFF';
+    return div;
+    } //end CoordMapType getTile
 
 
     var rememberTile = function(tileY, tileX, tileObj) {
