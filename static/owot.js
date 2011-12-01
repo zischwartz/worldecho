@@ -121,7 +121,7 @@ YourWorld.Config = function(container) {
     var map_tile_x = 256;
     var map_tile_y = 256;
 
-    var default_char= '#';
+    var default_char= '_';
 
     // Auto-generated settings
     var span = document.createElement('span');
@@ -240,60 +240,23 @@ YourWorld.World = function() {
     CoordMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
         // console.log(coord);
         var div = ownerDocument.createElement('DIV');
-        // div.innerHTML = coord;
+        div.innerHTML = coord;
         
         projection=map.getProjection(); 
         var zfactor=Math.pow(2,zoom);
 
         //from coords, we need to get latlng, and pixel xy
-        var top=projection.fromPointToLatLng(new google.maps.Point(coord.x*256/zfactor,coord.y*256/zfactor));
-        // var bot=projection.fromPointToLatLng(new google.maps.Point((coord.x+1)*256/zfactor,(coord.y+1)*256/zfactor));
-
-        // console.log(top);
-        // div.innerHTML+= top;
-        // div.innerHTML+= '<br>and<br>';
-        // offset_ltlng =google.maps.geometry.spherical.computeOffset(top, 256, 90); //this 256 is METERS
-        // div.innerHTML+=offset_ltlng;
-
-        // console.log(projection.fromLatLngDivPixel( top ));
-        // div.innerHTML+= google.maps.geometry.spherical.computeDistanceBetween(top, offset_ltlng);
-
-        // take this.tileSize.width and height, 
-        //make sure they're in kilometers
-        // computeOffset(from:LatLng, distance:number, heading:number, radius?:number)
-            //computeOffset(from:LatLng, distance:number, heading:number, radius?:number)
-            //returns ltlng
-
-        //take those two latlongs, convert to pixels
-        //and render.
-
-
-        // dist=  google.maps.geometry.spherical.computeDistanceBetween(centerOfWorld, initialUserPos);
-
-
-        // overlayProjection.fromLatLngToDivPixel 
-
-
-
-        // console.log(this);
-        // getTile(1,1);
-        // tile = YourWorld.Tile.create(tileY, tileX, _config, tileContainer);
-        // tile=YourWorld.Tile.create(1, 1, _config, div);
-        // console.log('tile sez');
-
-
-        // console.log(YourWorld.Tile.create(1, 1, _config, div));
-
-
-        // overlayProjection=this.prototype.getProjection();
-        // var sw = overlayProjection.fromLatLngToDivPixel(this.bounds_.getSouthWest());
-        // var ne = overlayProjection.fromLatLngToDivPixel(this.bounds_.getNorthEast());
+        var topleft=projection.fromPointToLatLng(new google.maps.Point(coord.x*256/zfactor,coord.y*256/zfactor));
         
         div.style.width = this.tileSize.width + 'px';
         div.style.height = this.tileSize.height + 'px';
         div.style.fontSize = '15px';
 
-        div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = '#AAFFFF';
+        tile = getOrCreateTile(1,1);
+        div.innerHTML=tile.HTMLcontent();
+
+        // div.innerHTML= topleft;
+        // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = '#AAFFFF';
         return div;
     } //end CoordMapType getTile
 
@@ -331,15 +294,17 @@ YourWorld.World = function() {
         tileContainer.style.left = (_config.tileWidth())*(tileX) + _state.offsetX + 'px';
         //tileContainer.style.width = _config.tileWidth() + 'px';
         tile = YourWorld.Tile.create(tileY, tileX, _config, tileContainer);
-        
+
         rememberTile(tileY, tileX, tile);
-        _container[0].appendChild(tileContainer); // a little faster than using jquery
+        // _container[0].appendChild(tileContainer); // a little faster than using jquery
         _state.numTiles++;
         if ((_state.numTiles % 1000) === 0) { // lower this?
             setTimeout(cleanUpTiles, 0);
         }
+
         return tile;
     };
+
 
     var getOrCreateTile = function(tileY, tileX) {
         // Returns the tile at given coords, creating if necessary
@@ -1556,6 +1521,17 @@ YourWorld.Tile = function() {
 		node.innerHTML = getDefaultHTML(config);
 		_content = config.defaultContent();
 		
+        //breaking the rules
+        obj.HTMLnode= function()
+        {
+            return node;
+        }
+
+        obj.HTMLcontent= function()
+        {
+            return node.innerHTML;
+        }
+
 		return obj;
 	}; // end of Tile.create
 	return obj;
