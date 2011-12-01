@@ -67,8 +67,11 @@ var config = new Object;
 
 // config.num_rows = 8;
 // config.num_cols = 16;
-config.num_rows = 10;
-config.num_cols = 10;
+config.num_rows = 12;
+config.num_cols = 12;
+
+config.map_tile_x = 250;
+config.map_tile_y = 250;
 
 config.default_content = Array(config.num_rows*config.num_cols+1).join('#');
 
@@ -87,17 +90,17 @@ function CoordMapType(tileSize) {
     // div.innerHTML = coord;
     div.style.width = this.tileSize.width + 'px';
     div.style.height = this.tileSize.height + 'px';
-    // div.style.fontSize = '10';
+    div.style.fontSize = '15px';
     // div.style.borderStyle = 'solid';
     // div.style.borderWidth = '1px';
-    // div.style.borderColor = '#AAAAAA';
+    // div.style.borderColor = '#AAFFFF';
 
 
 
 
     var html = [];
-    var content = config.default_content;
-
+    // var content = config.default_content;
+    var content = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod              eiusmodeiusmode ieiusmodeiusmodeiusm podeiu aod foeeoeoey";
 
     html.push('<table width="100%" height="100%" cellspacing="0" cellpadding="0" border="0"><tbody>');
     // y goes down, x goes right
@@ -108,7 +111,7 @@ function CoordMapType(tileSize) {
       for (charX=0; charX<config.num_cols; charX++) {
         c = content.charAt(contentPos);
         // c = YourWorld.helpers.escapeChar(c);
-        html.push('<td>' + c + '</td>');
+        html.push('<td >' + c + '</td>');
         contentPos++;
       }
       html.push('</tr>');
@@ -134,7 +137,8 @@ var pixelWorldCenter, pixelUser;
 
 function initialize() {
   var myOptions = {
-    zoom: 16,
+    zoom: 18,
+    // zoom: 16,
     // zoom: 11,
     // disableDoubleClickZoom : true,
     scrollwheel: false,
@@ -185,7 +189,7 @@ function initialize() {
       // distanceFromCenter=  google.maps.geometry.spherical.computeDistanceBetween(centerOfWorld, initialUserPos);
        
 
-      map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(250, 250)));
+      map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(config.map_tile_x, config.map_tile_y)));
 
       google.maps.event.addListener(map, 'bounds_changed', function() {
 
