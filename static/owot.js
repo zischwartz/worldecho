@@ -118,10 +118,10 @@ YourWorld.Config = function(container) {
     var num_rows = 14;
     var num_cols = 18;
 
-    var map_tile_x = 250;
-    var map_tile_y = 250;
+    var map_tile_x = 256;
+    var map_tile_y = 256;
 
-    var default_char= '_';
+    var default_char= '#';
 
     // Auto-generated settings
     var span = document.createElement('span');
@@ -195,7 +195,7 @@ YourWorld.World = function() {
             disableDoubleClickZoom : true,
             scrollwheel: false,
             // draggable: false,
-            disableDefaultUI: true,
+            // disableDefaultUI: true,
             panControl: false, 
             // zoomControl: false,
             streetViewControl: false,
@@ -216,12 +216,15 @@ YourWorld.World = function() {
                 initialUserPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
                 var marker = new google.maps.Marker({ map: map, position: initialUserPos, });
                 map.setCenter(initialUserPos);
-                // map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(_config.mapTileX(), _config.mapTileY())));
-                map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(500, 500, 'meters', 'meters')));
+
+                // we could figure out size based on zoom here...
+                map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(_config.mapTileX(), _config.mapTileY())));
+                // map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(250, 100, )));
+                // console.log(map.overlayMapTypes);
 
                 google.maps.event.addListener(map, 'bounds_changed', function() { bounds = map.getBounds(); });
         
-        
+            
         }, function() {
       handleNoGeolocation(true);
     }, 
@@ -234,15 +237,64 @@ YourWorld.World = function() {
 };//end mapInitialize
 
 
-CoordMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
-    console.log(coord);
-    var div = ownerDocument.createElement('DIV');
-    div.innerHTML = coord;
-    div.style.width = this.tileSize.width + 'px';
-    div.style.height = this.tileSize.height + 'px';
-    div.style.fontSize = '15px';
-    // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = '#AAFFFF';
-    return div;
+    CoordMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
+        // console.log(coord);
+        var div = ownerDocument.createElement('DIV');
+        // div.innerHTML = coord;
+        
+        projection=map.getProjection(); 
+        var zfactor=Math.pow(2,zoom);
+
+        //from coords, we need to get latlng, and pixel xy
+        var top=projection.fromPointToLatLng(new google.maps.Point(coord.x*256/zfactor,coord.y*256/zfactor));
+        // var bot=projection.fromPointToLatLng(new google.maps.Point((coord.x+1)*256/zfactor,(coord.y+1)*256/zfactor));
+
+        // console.log(top);
+        // div.innerHTML+= top;
+        // div.innerHTML+= '<br>and<br>';
+        // offset_ltlng =google.maps.geometry.spherical.computeOffset(top, 256, 90); //this 256 is METERS
+        // div.innerHTML+=offset_ltlng;
+
+        // console.log(projection.fromLatLngDivPixel( top ));
+        // div.innerHTML+= google.maps.geometry.spherical.computeDistanceBetween(top, offset_ltlng);
+
+        // take this.tileSize.width and height, 
+        //make sure they're in kilometers
+        // computeOffset(from:LatLng, distance:number, heading:number, radius?:number)
+            //computeOffset(from:LatLng, distance:number, heading:number, radius?:number)
+            //returns ltlng
+
+        //take those two latlongs, convert to pixels
+        //and render.
+
+
+        // dist=  google.maps.geometry.spherical.computeDistanceBetween(centerOfWorld, initialUserPos);
+
+
+        // overlayProjection.fromLatLngToDivPixel 
+
+
+
+        // console.log(this);
+        // getTile(1,1);
+        // tile = YourWorld.Tile.create(tileY, tileX, _config, tileContainer);
+        // tile=YourWorld.Tile.create(1, 1, _config, div);
+        // console.log('tile sez');
+
+
+        // console.log(YourWorld.Tile.create(1, 1, _config, div));
+
+
+        // overlayProjection=this.prototype.getProjection();
+        // var sw = overlayProjection.fromLatLngToDivPixel(this.bounds_.getSouthWest());
+        // var ne = overlayProjection.fromLatLngToDivPixel(this.bounds_.getNorthEast());
+        
+        div.style.width = this.tileSize.width + 'px';
+        div.style.height = this.tileSize.height + 'px';
+        div.style.fontSize = '15px';
+
+        div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = '#AAFFFF';
+        return div;
     } //end CoordMapType getTile
 
 
@@ -1099,6 +1151,7 @@ CoordMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
         _state.offsetX = parseInt(_container.width()/2, 10);
         _state.offsetY = parseInt(_container.height()/2, 10);
         _state.numTiles = 0;
+        
         renderMandatoryTiles();
 
         mapInitialize();

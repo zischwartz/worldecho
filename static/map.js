@@ -63,6 +63,7 @@ function CoordMapType(tileSize) {
     div.style.height = this.tileSize.height + 'px';
     div.style.fontSize = '15px';
     // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = '#AAFFFF';
+    
     YourWorld.Tile.create(coord.y, coord.x, _config, tileContainer);
     
     //Lifted from Tile.makeDefaultHTML
@@ -99,8 +100,7 @@ var testpos = new google.maps.LatLng(40.750313,-74.001396); // chelsea
 
 var haveOffset = 0;
 
-var initialUserPos;
-var pixelWorldCenter, pixelUser;
+var initialUserPos, pixelWorldCenter, pixelUser;
 
 function initialize() {
   var myOptions = {
@@ -144,12 +144,8 @@ function initialize() {
     // console.log('initialUserPos', initialUserPos)
 
 
-    var marker = new google.maps.Marker({
-                map: map,
-                position: initialUserPos,
-        });
-
-      map.setCenter(initialUserPos);
+    var marker = new google.maps.Marker({ map: map, position: initialUserPos, });
+    map.setCenter(initialUserPos);
 
 
       // distanceFromCenter=  google.maps.geometry.spherical.computeDistanceBetween(centerOfWorld, initialUserPos);
