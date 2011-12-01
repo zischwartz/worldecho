@@ -63,18 +63,50 @@ var darkMapStyle=[
 
 
 
-var config = new Object;
+Config = function(container) {
+// YourWorld.Config = function(container) {
+    // Configuration settings. Dynamically generated to suit container style.
+    // Using getters because I really don't want to modify these
+    var obj = {};
 
-// config.num_rows = 8;
-// config.num_cols = 16;
-config.num_rows = 12;
-config.num_cols = 12;
+    //// Private
+    // These must match server settings:
+    var num_rows = 14;
+    var num_cols = 18;
 
-config.map_tile_x = 250;
-config.map_tile_y = 250;
+    var map_tile_x = 250;
+    var map_tile_y = 250;
 
-config.default_content = Array(config.num_rows*config.num_cols+1).join('#');
+    var default_char= '_';
 
+    // Auto-generated settings
+    var span = document.createElement('span');
+    span.style.visibility = 'hidden';
+    container.append(span);
+    span.innerHTML = 'X';
+    var char_height = $(span).height();
+    var char_width = $(span).width();
+    var tile_height = char_height*num_rows;
+    var tile_width = char_width*num_cols;
+    $(span).remove();
+    var default_content = Array(num_rows*num_cols+1).join(default_char);
+
+    //// Public
+    obj.numRows = function() { return num_rows;};
+    obj.numCols = function() { return num_cols;};
+    obj.charHeight = function() { return char_height;};
+    obj.charWidth = function() { return char_width;};
+    obj.tileHeight = function() { return tile_height;};
+    obj.tileWidth = function() { return tile_width;};
+    obj.defaultContent = function() { return default_content;};
+    obj.mapTileX = function() {return map_tile_x;};
+    obj.mapTileY = function() {return map_tile_y;};
+
+    return obj;
+};
+
+
+var config = new Config($('#mapcanvas'));
 
 
 var darkMapType = new google.maps.StyledMapType(darkMapStyle,
@@ -87,7 +119,7 @@ function CoordMapType(tileSize) {
   CoordMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
     console.log(coord)
     var div = ownerDocument.createElement('DIV');
-    // div.innerHTML = coord;
+    div.innerHTML = coord;
     div.style.width = this.tileSize.width + 'px';
     div.style.height = this.tileSize.height + 'px';
     div.style.fontSize = '15px';
@@ -96,19 +128,17 @@ function CoordMapType(tileSize) {
     // div.style.borderColor = '#AAFFFF';
 
 
-
-
     var html = [];
-    // var content = config.default_content;
-    var content = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod              eiusmodeiusmode ieiusmodeiusmodeiusm podeiu aod foeeoeoey";
+    var content = config.defaultContent();
+    // var content = "#1 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod aa deiusmo deiusmode ieiusmo de iusmo deiusm pod aod foeeoeoeyLorem ipsum dolor sit amet, consectetur adipcing a zLrem psum DOL sit amet, Con secteTur adip!cing elit, sed do eiusmod";
 
     html.push('<table width="100%" height="100%" cellspacing="0" cellpadding="0" border="0"><tbody>');
     // y goes down, x goes right
     var c, charY, charX;
     var contentPos = 0;
-    for (charY=0; charY<config.num_rows; charY++) {
+    for (charY=0; charY<config.numRows(); charY++) {
       html.push('<tr>');
-      for (charX=0; charX<config.num_cols; charX++) {
+      for (charX=0; charX<config.numCols(); charX++) {
         c = content.charAt(contentPos);
         // c = YourWorld.helpers.escapeChar(c);
         html.push('<td >' + c + '</td>');
@@ -139,11 +169,10 @@ function initialize() {
   var myOptions = {
     zoom: 18,
     // zoom: 16,
-    // zoom: 11,
-    // disableDoubleClickZoom : true,
+    disableDoubleClickZoom : true,
     scrollwheel: false,
     // draggable: false,
-    // disableDefaultUI: true,
+    disableDefaultUI: true,
     panControl: false, 
     // zoomControl: false,
     streetViewControl: false,
@@ -189,7 +218,7 @@ function initialize() {
       // distanceFromCenter=  google.maps.geometry.spherical.computeDistanceBetween(centerOfWorld, initialUserPos);
        
 
-      map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(config.map_tile_x, config.map_tile_y)));
+      map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(config.mapTileX(), config.mapTileY())));
 
       google.maps.event.addListener(map, 'bounds_changed', function() {
 
