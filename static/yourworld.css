@@ -18,6 +18,8 @@ body {
     width: 100%;
     height: 100%;
     position: fixed !important;
+    color: white;
+    font-family: monospace;
 }
 
 #mapcanvas b
