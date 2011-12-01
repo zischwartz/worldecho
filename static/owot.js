@@ -216,7 +216,8 @@ YourWorld.World = function() {
                 initialUserPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
                 var marker = new google.maps.Marker({ map: map, position: initialUserPos, });
                 map.setCenter(initialUserPos);
-                map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(_config.mapTileX(), _config.mapTileY())));
+                // map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(_config.mapTileX(), _config.mapTileY())));
+                map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(500, 500, 'meters', 'meters')));
 
                 google.maps.event.addListener(map, 'bounds_changed', function() { bounds = map.getBounds(); });
         
@@ -234,7 +235,7 @@ YourWorld.World = function() {
 
 
 CoordMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
-    console.log(coord)
+    console.log(coord);
     var div = ownerDocument.createElement('DIV');
     div.innerHTML = coord;
     div.style.width = this.tileSize.width + 'px';

@@ -4,6 +4,7 @@ from django.http import Http404
 
 from lib.jsonfield import DictField
 
+
 class World(models.Model):
     name = models.CharField(unique=True, max_length=255)
         # Creating this index for much faster world lookups from World.get_or_create,
@@ -15,6 +16,8 @@ class World(models.Model):
     public_readable = models.BooleanField(default=True) # Otherwise whitelist
     public_writable = models.BooleanField(default=True) # Otherwise whitelist
     properties = DictField(default={})
+    default_char = models.CharField(max_length=1, default=' ')
+
     # properties:
     #  - features: {} 
     #      - 'go_to_coord' true/false
@@ -53,12 +56,17 @@ class Tile(models.Model):
     COLS = 18
     
     LEN = ROWS*COLS
-    
     world = models.ForeignKey(World)
+
     content = models.CharField(default=' '*LEN,  max_length=LEN)
+    echos = models.CharField(default='0'*LEN,  max_length=LEN)
     tileY = models.IntegerField()
     tileX = models.IntegerField()
     properties = DictField(default={})
+
+    tileLat = models.FloatField()
+    tileLng = models.FloatField()
+    
     # properties:
     # - protected (bool)
     # - cell_props[charY][charX] = {}
