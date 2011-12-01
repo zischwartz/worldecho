@@ -78,6 +78,9 @@ function CoordMapType(tileSize) {
     div.style.borderStyle = 'solid';
     div.style.borderWidth = '1px';
     div.style.borderColor = '#AAAAAA';
+
+    var testtext = $("<br><span>A B C D E F G H I J K L M N O P</span>");
+    $(div).append(testtext);
     return div;
   };
  
@@ -153,7 +156,8 @@ function initialize() {
 
           bounds = map.getBounds();
           console.log(bounds);
-          overlay = new ywotOverlay(map, srcImage, bounds);
+
+          // overlay = new ywotOverlay(map, srcImage, bounds);
 
 
       });
@@ -184,7 +188,6 @@ function ywotOverlay(map, image, bounds) {
 
 ywotOverlay.prototype = new google.maps.OverlayView();
 
-
 ywotOverlay.prototype.onAdd = function() {
 
   // Note: an overlay's receipt of onAdd() indicates that
@@ -205,8 +208,8 @@ ywotOverlay.prototype.onAdd = function() {
   img.style.height = "100%";
   // div.appendChild(img);
 
-  var testtext = $("<span>A B C D E F G H I J K L M N O P</span>");
-  $(div).append(testtext);
+  // var testtext = $("<span>A B C D E F G H I J K L M N O P</span>");
+  // $(div).append(testtext);
 
   // Set the overlay's div_ property to this DIV
   this.div_ = div;
