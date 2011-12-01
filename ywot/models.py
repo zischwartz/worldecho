@@ -49,8 +49,8 @@ class World(models.Model):
 class Tile(models.Model):
     # ROWS = 8
     # COLS = 16
-    ROWS = 10
-    COLS = 10
+    ROWS = 14
+    COLS = 18
     
     LEN = ROWS*COLS
     
