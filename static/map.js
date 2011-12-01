@@ -1,65 +1,4 @@
-var darkMapStyle=[
-  {
-    stylers: [
-      { invert_lightness: true }
-    ]
-  },{
-    featureType: "landscape",
-    stylers: [
-      { visibility: "simplified" }
-    ]
-  },{
-    featureType: "poi",
-    stylers: [
-      { lightness: -50 }
-    ]
-  },{
-    featureType: "road",
-    elementType: "labels",
-    stylers: [
-      { lightness: -40 }
-    ]
-  },{
-    featureType: "transit",
-    elementType: "labels",
-    stylers: [
-      { gamma: 2.04 },
-      { lightness: -33 }
-    ]
-  },{
-    featureType: "road.arterial",
-    stylers: [
-      { hue: "#00e5ff" },
-      { gamma: 0.47 },
-      { lightness: -21 }
-    ]
-  },{
-    featureType: "road.highway",
-    stylers: [
-      { lightness: -56 }
-    ]
-  },{
-    featureType: "road.local",
-    elementType: "labels",
-    stylers: [
-      { visibility: "on" },
-      { lightness: -40 }
-    ]
-  },{
-    featureType: "poi",
-    elementType: "labels",
-    stylers: [
-      { lightness: -10 }
-    ]
-  },{
-    featureType: "transit",
-    elementType: "labels",
-    stylers: [
-      { visibility: "on" },
-      { lightness: -18 }
-    ]
-  }
-];
+
 
 
 
@@ -123,36 +62,34 @@ function CoordMapType(tileSize) {
     div.style.width = this.tileSize.width + 'px';
     div.style.height = this.tileSize.height + 'px';
     div.style.fontSize = '15px';
-    // div.style.borderStyle = 'solid';
-    // div.style.borderWidth = '1px';
-    // div.style.borderColor = '#AAFFFF';
+    // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = '#AAFFFF';
+    YourWorld.Tile.create(coord.y, coord.x, _config, tileContainer);
+    
+    //Lifted from Tile.makeDefaultHTML
+    // var html = [];
+    // var content = config.defaultContent();
+    // // var content = "#1 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod aa deiusmo deiusmode ieiusmo de iusmo deiusm pod aod foeeoeoeyLorem ipsum dolor sit amet, consectetur adipcing a zLrem psum DOL sit amet, Con secteTur adip!cing elit, sed do eiusmod";
 
+    // html.push('<table width="100%" height="100%" cellspacing="0" cellpadding="0" border="0"><tbody>');
+    // // y goes down, x goes right
+    // var c, charY, charX;
+    // var contentPos = 0;
+    // for (charY=0; charY<config.numRows(); charY++) {
+    //   html.push('<tr>');
+    //   for (charX=0; charX<config.numCols(); charX++) {
+    //     c = content.charAt(contentPos);
+    //     // c = YourWorld.helpers.escapeChar(c);
+    //     html.push('<td >' + c + '</td>');
+    //     contentPos++;
+    //   }
+    //   html.push('</tr>');
+    // }
+    // html.push('</tbody></table>');
 
-    var html = [];
-    var content = config.defaultContent();
-    // var content = "#1 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod aa deiusmo deiusmode ieiusmo de iusmo deiusm pod aod foeeoeoeyLorem ipsum dolor sit amet, consectetur adipcing a zLrem psum DOL sit amet, Con secteTur adip!cing elit, sed do eiusmod";
-
-    html.push('<table width="100%" height="100%" cellspacing="0" cellpadding="0" border="0"><tbody>');
-    // y goes down, x goes right
-    var c, charY, charX;
-    var contentPos = 0;
-    for (charY=0; charY<config.numRows(); charY++) {
-      html.push('<tr>');
-      for (charX=0; charX<config.numCols(); charX++) {
-        c = content.charAt(contentPos);
-        // c = YourWorld.helpers.escapeChar(c);
-        html.push('<td >' + c + '</td>');
-        contentPos++;
-      }
-      html.push('</tr>');
-    }
-    html.push('</tbody></table>');
-
-    $(div).append(html.join(''));
+    // $(div).append(html.join(''));
     return div;
   };
  
-
 
 var map;
 
