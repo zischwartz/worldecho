@@ -1,4 +1,85 @@
-darkMapStyle=[
+darkMapStyle = [
+  {
+    stylers: [
+      { saturation: -55 },
+      { gamma: 0.69 },
+      { lightness: -76 }
+    ]
+  },{
+    featureType: "water",
+    stylers: [
+      { saturation: -63 }
+    ]
+  },{
+    featureType: "landscape",
+    stylers: [
+      { hue: "#00ffc4" },
+      { saturation: -78 }
+    ]
+  },{
+    featureType: "road",
+    elementType: "labels",
+    stylers: [
+      { hue: "#0077ff" },
+      { saturation: -81 },
+      { lightness: -10 },
+      { gamma: 1.29 }
+    ]
+  },{
+    featureType: "poi.medical",
+    stylers: [
+      { visibility: "off" }
+    ]
+  },{
+    featureType: "poi.business",
+    elementType: "labels",
+    stylers: [
+      { visibility: "off" }
+    ]
+  },{
+    featureType: "road",
+    elementType: "geometry",
+    stylers: [
+      { hue: "#007fff" },
+      { saturation: -75 }
+    ]
+  },{
+    featureType: "poi",
+    stylers: [
+      { visibility: "simplified" }
+    ]
+  },{
+    featureType: "poi.park",
+    elementType: "labels",
+    stylers: [
+      { visibility: "on" },
+      { saturation: -40 },
+      { lightness: 2 },
+      { gamma: 1.29 }
+    ]
+  },{
+    featureType: "poi.attraction",
+    elementType: "labels",
+    stylers: [
+      { lightness: -16 },
+      { gamma: 1.4 },
+      { visibility: "simplified" }
+    ]
+  },{
+    featureType: "transit",
+    elementType: "labels",
+    stylers: [
+      { visibility: "on" },
+      { saturation: 67 },
+      { lightness: -16 },
+      { gamma: 1.21 },
+      { hue: "#ff004c" }
+    ]
+  }
+]
+
+ 
+darkMapStyle_old=[
   {
     stylers: [
       { invert_lightness: true }
