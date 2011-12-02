@@ -162,6 +162,8 @@ YourWorld.Config = function(container) {
 };
 
 var _tileByCoord;
+
+var TextLayer;
 //making this public for now, so we can test more easily
 
 YourWorld.World = function() {
@@ -230,14 +232,20 @@ YourWorld.World = function() {
                 map.setCenter(initialUserPos);
 
                 // we could figure out size based on zoom here...
-                map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(_config.mapTileX(), _config.mapTileY())));
-
-
+                // map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(_config.mapTileX(), _config.mapTileY())));
                 // map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(250, 100, )));
                 // console.log(map.overlayMapTypes);
-
                 google.maps.event.addListener(map, 'bounds_changed', function() { bounds = map.getBounds(); });
-        
+                
+            
+                TextLayer = new missouristate.web.TileOverlay(
+                    function(x, y, z) { return "http://search.missouristate.edu/map/tilesets/baselayer/" + z + "_" + x + "_" + y + ".png"; },
+                    {
+                        'map': map, // optional. google.maps.Map reference.
+                        'visible': true, //optional. boolean. controls initial display of the layer.
+                    }
+                );                
+
             
         }, function() {
       handleNoGeolocation(true);
@@ -250,7 +258,7 @@ YourWorld.World = function() {
   } 
 };//end mapInitialize
     
-    CoordMapType.prototype = new google.maps.OverlayView();
+    // CoordMapType.prototype = new google.maps.OverlayView();
 
 
     CoordMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
