@@ -493,13 +493,15 @@ TileOverlay.prototype.redraw = function () {
                 !this.settings.tilesDrawn["_" + x]["_" + y])) {
 
                 // var img = document.createElement("IMG");
-                var div = document.createElement("DIV");
+                // var div = document.createElement("DIV");
                 
                 // div.innerHTML ="ABCD";
-                div.innerHTML = 
 
-                div.className = "textile";
-                div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = 'red';
+                tile = YourWorld.World.getOrCreateTile(viewportBounds.getNorthEast().x, viewportBounds.getNorthEast().y);
+
+                div=tile.HTMLnode();
+                // div.className = "textile";
+                // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = 'red';
 
 
                 google.maps.event.addDomListenerOnce(div, "error",

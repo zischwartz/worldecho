@@ -107,8 +107,13 @@ YourWorld.helpers = function() {
 		return true;
 	};
   
+
+
     return obj;
 }();
+
+
+
 
 YourWorld.Config = function(container) {
 // YourWorld.Config = function(container) {
@@ -289,7 +294,6 @@ YourWorld.World = function() {
         return div;
 
     } //end CoordMapType getTile
-
 
     var rememberTile = function(tileY, tileX, tileObj) {
         if (_tileByCoord[tileY] === undefined) {
@@ -1424,6 +1428,10 @@ YourWorld.World = function() {
 
 
     };
+
+    // Breaking the rules
+    obj.getOrCreateTile = getOrCreateTile;
+
     
     return obj;
 
