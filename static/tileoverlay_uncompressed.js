@@ -494,10 +494,13 @@ TileOverlay.prototype.redraw = function () {
 
                 // var img = document.createElement("IMG");
                 // var div = document.createElement("DIV");
+                // var imgSrc = this.settings.getTileUrl(x, y, z);
                 
                 // div.innerHTML ="ABCD";
 
-                tile = YourWorld.World.getOrCreateTile(viewportBounds.getNorthEast().x, viewportBounds.getNorthEast().y);
+                // this actually won't work in the long run, as it's zoom dependent. 
+                //need to tilecoord, shouldn't be too hard!
+                tile = YourWorld.World.getOrCreateTile(x,y);
 
                 div=tile.HTMLnode();
                 // div.className = "textile";
