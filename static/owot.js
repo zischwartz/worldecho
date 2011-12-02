@@ -152,7 +152,7 @@ YourWorld.Config = function(container) {
 };
 
 var _tileByCoord;
-
+//making this public for now, so we can test more easily
 
 YourWorld.World = function() {
     // The whole wild world. Initialize with `init`.
@@ -386,7 +386,7 @@ YourWorld.World = function() {
                 var minX = minVisX;// - deltaX;
                 var maxY = maxVisY;// - (deltaY*(numDown+2.0)); // Add two because we might only see 1px of TL
                 var maxX = maxVisX;// + (deltaX*(numAcross+2.0));
-              //  console.log([minY, minX, maxY, maxX]);
+               // console.log([minY, minX, maxY, maxX]);
                 return [minY, minX, maxY, maxX];
 
             }

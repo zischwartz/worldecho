@@ -106,3 +106,8 @@ class Whitelist(models.Model):
     class Meta:
         unique_together=[['user', 'world']]
     
+
+
+from django.contrib import admin
+admin.site.register(World)
+admin.site.register(Tile)
