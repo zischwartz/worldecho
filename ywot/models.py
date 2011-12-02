@@ -60,12 +60,12 @@ class Tile(models.Model):
 
     content = models.CharField(default=' '*LEN,  max_length=LEN)
     echos = models.CharField(default='0'*LEN,  max_length=LEN)
-    tileY = models.IntegerField()
-    tileX = models.IntegerField()
+    tileY = models.FloatField()
+    tileX = models.FloatField()
     properties = DictField(default={})
 
-    tileLat = models.FloatField()
-    tileLng = models.FloatField()
+    # tileLat = models.FloatField()
+    # tileLng = models.FloatField()
     
     # properties:
     # - protected (bool)

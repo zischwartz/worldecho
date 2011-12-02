@@ -160,7 +160,7 @@ YourWorld.World = function() {
 
     // Private
     var _container = null; // the element containing this world
-     _tileByCoord = {}; // all tile objects indexed by Y and X
+    _tileByCoord = {}; // all tile objects indexed by Y and X
     var _edits = []; // local edits queued to be sent to server, [tileY, tileX, charY, charX, t, s]
     var _state = {
         selected: null, // TD node of current cursor position
@@ -315,6 +315,42 @@ YourWorld.World = function() {
     
     var getMandatoryBounds = function() {
         // Returns [minY, minX, maxY, maxX] of mandatory rendered rectangle
+        
+        if (map)
+        {
+
+            if (map.getBounds())
+            {
+                mapBounds= map.getBounds();
+
+                // console.log('BOUNDS', mapBounds);
+
+                var minVisY = mapBounds.getNorthEast().lat();
+                var minVisX = mapBounds.getSouthWest().lng();
+
+                // console.log(_tileByCoord);
+
+                //find appropriate tiles with
+                // Object.keys(_tileByCoord);
+
+
+                // var numDown = Math.ceil(_container.height()/_config.tileHeight());
+                // var numAcross= Math.ceil(_container.width()/_config.tileWidth());
+
+                var minY = minVisY - 1; // one tile of padding around what's visible
+                var minX = minVisX - 1;
+                var maxY = minVisY + numDown + 2; // Add two because we might only see 1px of TL
+                var maxX = minVisX + numAcross + 2;
+
+                // console.log([minY, minX, maxY, maxX]);
+        //         return [minY, minX, maxY, maxX];
+
+            }
+        }
+
+        // return;
+        // console.log(map);
+
         var minVisY = Math.floor((_container.scrollTop() - _state.offsetY) / _config.tileHeight());
         var minVisX = Math.floor((_container.scrollLeft() - _state.offsetX) / _config.tileWidth());
         var numDown = Math.ceil(_container.height()/_config.tileHeight());
@@ -491,7 +527,7 @@ YourWorld.World = function() {
     };
     
     var fetchUpdates = function() {
-        return;
+
         // Get updates for rendered tiles
         // Skip if user is inactive for over a minute:
         if ((new Date().getTime() - _state.lastEvent) > 30000) {
@@ -502,20 +538,26 @@ YourWorld.World = function() {
         _ui.paused.hide();
         var bounds = getMandatoryBounds();
         //  maybe we can mess with this
-        jQuery.ajax({
-            type: 'GET',
-            url: window.location.pathname,
-            data: { fetch: 1, 
-                    min_tileY: bounds[0],
-                    min_tileX: bounds[1],
-                    max_tileY: bounds[2],
-                    max_tileX: bounds[3],
-                    v: 3 // version
-                    },
-            success: updateData,
-            dataType: 'json',
-            error: updateError
-        });
+
+        if (bounds)
+        {
+            jQuery.ajax({
+                type: 'GET',
+                url: window.location.pathname,
+                data: { fetch: 1, 
+                        min_tileY: bounds[0],
+                        min_tileX: bounds[1],
+                        max_tileY: bounds[2],
+                        max_tileX: bounds[3],
+                        v: 3 // version
+                        },
+                success: updateData,
+                dataType: 'json',
+                error: updateError
+            });            
+               
+        }
+        return;
     };
     
     var moveCursor = function(dir, opt_from) {
