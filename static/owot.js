@@ -2,6 +2,7 @@
 // Current Editor: Zach
 // Original Author: Andrew Badr <andrewbadr@gmail.com>
 
+
 var YourWorld = {};
 
 // Shortcut for public API
@@ -149,7 +150,7 @@ YourWorld.Config = function(container) {
     return obj;
 };
 
-
+var _tileByCoord;
 
 
 YourWorld.World = function() {
@@ -159,7 +160,7 @@ YourWorld.World = function() {
 
     // Private
     var _container = null; // the element containing this world
-    var _tileByCoord = {}; // all tile objects indexed by Y and X
+     _tileByCoord = {}; // all tile objects indexed by Y and X
     var _edits = []; // local edits queued to be sent to server, [tileY, tileX, charY, charX, t, s]
     var _state = {
         selected: null, // TD node of current cursor position
@@ -240,7 +241,7 @@ YourWorld.World = function() {
     CoordMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
         // console.log(coord);
         var div = ownerDocument.createElement('DIV');
-        div.innerHTML = coord;
+        // div.innerHTML = coord;
         
         projection=map.getProjection(); 
         var zfactor=Math.pow(2,zoom);
@@ -252,10 +253,11 @@ YourWorld.World = function() {
         div.style.height = this.tileSize.height + 'px';
         div.style.fontSize = '15px';
 
-        tile = getOrCreateTile(1,1);
-        div.innerHTML=tile.HTMLcontent();
+        div.innerHTML= topleft;
+        tile = getOrCreateTile(topleft.lat(),topleft.lng());
+        div.innerHTML+=tile.HTMLcontent();
 
-        // div.innerHTML= topleft;
+        // div.innerHTML= topleft.lat();
         // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = '#AAFFFF';
         return div;
     } //end CoordMapType getTile
@@ -472,6 +474,7 @@ YourWorld.World = function() {
     };
    
     var sendEdits = function() {
+        console.log('sending edits');
         // Send local edits to the server
         if (!_edits.length) {
             return;
@@ -488,6 +491,7 @@ YourWorld.World = function() {
     };
     
     var fetchUpdates = function() {
+        return;
         // Get updates for rendered tiles
         // Skip if user is inactive for over a minute:
         if ((new Date().getTime() - _state.lastEvent) > 30000) {
@@ -1002,7 +1006,8 @@ YourWorld.World = function() {
 
     var setSelected = function(el) {
         // Sets the character TD element that is the active cursor position, or null
-        
+        console.log('selected', el);
+
         //// Setup
         // Unset current
         if (_state.selected) {
@@ -1044,6 +1049,7 @@ YourWorld.World = function() {
     var typeChar = function(s) {
         // Updates the tile text. 
         // Param `s` is a character that was typed
+        console.log('typeChar---', s);
 
         // Validate and parse
         if (!_state.canWrite) {
