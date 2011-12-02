@@ -48,7 +48,7 @@ YourWorld.helpers = function() {
     };
 
 
-    
+    // Wondering if this should be changed as well
     obj.getCellCoords = function(td) {
         // Given a TD node, returns [tileY, tileX, charY, charX] of that TD
         td = $(td);
@@ -253,9 +253,14 @@ YourWorld.World = function() {
         div.style.height = this.tileSize.height + 'px';
         div.style.fontSize = '15px';
 
-        div.innerHTML= topleft;
+        //div.innerHTML= topleft;
         tile = getOrCreateTile(topleft.lat(),topleft.lng());
-        div.innerHTML+=tile.HTMLcontent();
+        div.innerHTML=tile.HTMLcontent();
+        //console.log(div.innerHTML);
+        
+        // Commented out the LatLong just to see if the tables would show up, and now they do.
+        // Except it seems like jQuery doesn't detect the tables, event-wise?
+        // If you click it selects either a DIV or a Canvas, not the TD
 
         // div.innerHTML= topleft.lat();
         // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = '#AAFFFF';
@@ -313,6 +318,7 @@ YourWorld.World = function() {
         return getTile(tileY, tileX) || createTile(tileY, tileX);
     };
     
+    // Below is Martin's code... giving credit where credit is due :)
     var getMandatoryBounds = function() {
         // Returns [minY, minX, maxY, maxX] of mandatory rendered rectangle
         
@@ -324,42 +330,82 @@ YourWorld.World = function() {
                 mapBounds= map.getBounds();
 
                 // console.log('BOUNDS', mapBounds);
-
-                var minVisY = mapBounds.getNorthEast().lat();
-                var minVisX = mapBounds.getSouthWest().lng();
-
-                // console.log(_tileByCoord);
-
-                //find appropriate tiles with
-                // Object.keys(_tileByCoord);
-
-
-                // var numDown = Math.ceil(_container.height()/_config.tileHeight());
-                // var numAcross= Math.ceil(_container.width()/_config.tileWidth());
-
-                var minY = minVisY - 1; // one tile of padding around what's visible
-                var minX = minVisX - 1;
-                var maxY = minVisY + numDown + 2; // Add two because we might only see 1px of TL
-                var maxX = minVisX + numAcross + 2;
-
-                // console.log([minY, minX, maxY, maxX]);
-        //         return [minY, minX, maxY, maxX];
+				var minVisY, maxVisY;
+				var minVisX, maxVisX;
+                var topBound = mapBounds.getNorthEast().lat();
+                var leftBound = mapBounds.getSouthWest().lng();
+                var numDown = Math.ceil(_container.height()/_config.mapTileY());
+                var numAcross= Math.ceil(_container.width()/_config.mapTileX());
+//this function should probably go somewhere else
+				Array.prototype.unique =
+				  function() {
+				    var a = [];
+				    var l = this.length;
+				    for(var i=0; i<l; i++) {
+				      for(var j=i+1; j<l; j++) {
+				        // If this[i] is found later in the array
+				        if (this[i] === this[j])
+				          j = ++i;
+				      }
+				      a.push(this[i]);
+				    }
+				    return a;
+				  };
+/////////////////////////////////////////
+				function sortNumberDes(a,b){ return b - a; }
+				function sortNumber(a,b){ return a - b; }
+				
+				var tilesY = Object.keys(_tileByCoord).sort(sortNumberDes);
+				var tilesX = [];
+				var dif = 100;
+				for (var i = 0; i < tilesY.length; i++) {
+					
+					tilesX = tilesX.concat( Object.keys(_tileByCoord[tilesY[i]]));
+					
+					var t = parseFloat(tilesY[i]);
+					var d = Math.abs(topBound-t); 
+					if (d < dif) { 
+						dif = d;
+						minVisY = t; 
+						maxVisY = parseFloat(tilesY[i+numDown]);						
+						}
+				}
+					
+				if (isNaN(maxVisY)) {maxVisY = parseFloat(tilesY[tilesY.length-1]);}
+				
+				tilesX = tilesX.unique().sort(sortNumber);
+				dif = 100;
+				for (var i = 0; i < tilesX.length; i++) {
+					var t = parseFloat(tilesX[i]);
+					var d = Math.abs(leftBound-t); 
+					if (d < dif) { 
+						dif = d;
+						minVisX = t; 
+						maxVisX = parseFloat(tilesX[i+numAcross]);
+						}
+				}
+				if (isNaN(maxVisX)) {maxVisX = parseFloat(tilesX[tilesX.length-1]);}
+				
+				
+    			var minY = minVisY;// + deltaY; // one tile of padding around what's visible
+                var minX = minVisX;// - deltaX;
+                var maxY = maxVisY;// - (deltaY*(numDown+2.0)); // Add two because we might only see 1px of TL
+                var maxX = maxVisX;// + (deltaX*(numAcross+2.0));
+              //  console.log([minY, minX, maxY, maxX]);
+                return [minY, minX, maxY, maxX];
 
             }
         }
 
-        // return;
-        // console.log(map);
-
-        var minVisY = Math.floor((_container.scrollTop() - _state.offsetY) / _config.tileHeight());
-        var minVisX = Math.floor((_container.scrollLeft() - _state.offsetX) / _config.tileWidth());
-        var numDown = Math.ceil(_container.height()/_config.tileHeight());
-        var numAcross = Math.ceil(_container.width()/_config.tileWidth());
-        var minY = minVisY - 1; // one tile of padding around what's visible
-        var minX = minVisX - 1;
-        var maxY = minVisY + numDown + 2; // Add two because we might only see 1px of TL
-        var maxX = minVisX + numAcross + 2;
-        return [minY, minX, maxY, maxX];
+        // var minVisY = Math.floor((_container.scrollTop() - _state.offsetY) / _config.tileHeight());
+        // var minVisX = Math.floor((_container.scrollLeft() - _state.offsetX) / _config.tileWidth());
+        // var numDown = Math.ceil(_container.height()/_config.tileHeight());
+        // var numAcross = Math.ceil(_container.width()/_config.tileWidth());
+        // var minY = minVisY - 1; // one tile of padding around what's visible
+        // var minX = minVisX - 1;
+        // var maxY = minVisY + numDown + 2; // Add two because we might only see 1px of TL
+        // var maxX = minVisX + numAcross + 2;
+        // return [minY, minX, maxY, maxX];
     };
     
     var setCoords = function() {
@@ -1049,6 +1095,7 @@ YourWorld.World = function() {
     var setSelected = function(el) {
         // Sets the character TD element that is the active cursor position, or null
         console.log('selected', el);
+        // So here's the whole problem: this is supposed to be a TD, but instead it's an empty DIV
 
         //// Setup
         // Unset current
@@ -1063,6 +1110,7 @@ YourWorld.World = function() {
         }
         // Check permissions
         var YX_yx = YourWorld.helpers.getCellCoords(el);
+        // This may need to be changed?
         var tile = getTile(YX_yx[0],  YX_yx[1]);
         if (!tile.initted()) {
             return;
@@ -1232,6 +1280,8 @@ YourWorld.World = function() {
         // Capture clicks to set the cursor location
         _container.click(function(ev) {
            setSelected(ev.target);
+           // Uncommenting below reveals that the DIV actually has no contents, which is why selecting isn't returning TDs
+           //console.log(ev);
            _state.lastClick = ev.target;
         });
         
