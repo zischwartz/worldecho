@@ -2,6 +2,7 @@
 // Current Editor: Zach
 // Original Author: Andrew Badr <andrewbadr@gmail.com>
 
+var tester;
 
 var YourWorld = {};
 
@@ -123,18 +124,27 @@ YourWorld.Config = function(container) {
     var map_tile_x = 256;
     var map_tile_y = 256;
 
-    var default_char= '_';
+    var default_char= '#';
 
     // Auto-generated settings
-    var span = document.createElement('span');
-    span.style.visibility = 'hidden';
-    container.append(span);
-    span.innerHTML = 'X';
-    var char_height = $(span).height();
-    var char_width = $(span).width();
-    var tile_height = char_height*num_rows;
-    var tile_width = char_width*num_cols;
-    $(span).remove();
+    //not working
+
+    // var span = document.createElement('span');
+    // span.style.visibility = 'hidden';
+    // container.append(span);
+    // span.innerHTML = 'X';
+    // var char_height = $(span).height();
+    // var char_width = $(span).width();
+    // var tile_height = char_height*num_rows;
+    // var tile_width = char_width*num_cols;
+    // $(span).remove();
+
+
+    //or we can just set it for now
+    var tile_height = 256;
+    var tile_width = 256;
+
+
     var default_content = Array(num_rows*num_cols+1).join(default_char);
 
     //// Public
@@ -221,6 +231,8 @@ YourWorld.World = function() {
 
                 // we could figure out size based on zoom here...
                 map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(_config.mapTileX(), _config.mapTileY())));
+
+
                 // map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(250, 100, )));
                 // console.log(map.overlayMapTypes);
 
@@ -237,30 +249,37 @@ YourWorld.World = function() {
     handleNoGeolocation(false);
   } 
 };//end mapInitialize
+    
+    CoordMapType.prototype = new google.maps.OverlayView();
 
 
     CoordMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
         // console.log(coord);
         var div = ownerDocument.createElement('DIV');
         // div.innerHTML = coord;
-        
+        // panes = map.getPanes();
+        // console.log(panes);
+
         projection=map.getProjection(); 
         var zfactor=Math.pow(2,zoom);
 
         //from coords, we need to get latlng, and pixel xy
         var topleft=projection.fromPointToLatLng(new google.maps.Point(coord.x*256/zfactor,coord.y*256/zfactor));
         
-        div.style.width = this.tileSize.width + 'px';
-        div.style.height = this.tileSize.height + 'px';
-        div.style.fontSize = '15px';
+        // div.style.width = this.tileSize.width + 'px';
+        // div.style.height = this.tileSize.height + 'px';
+        // div.style.fontSize = '15px';
 
-        div.innerHTML= topleft;
+        // div.innerHTML= topleft;
         tile = getOrCreateTile(topleft.lat(),topleft.lng());
-        div.innerHTML+=tile.HTMLcontent();
+        
+        // div.innerHTML+=tile.HTMLcontent();
+        div = tile.HTMLnode();
 
         // div.innerHTML= topleft.lat();
-        // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = '#AAFFFF';
+        // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = 'red';
         return div;
+
     } //end CoordMapType getTile
 
 
@@ -288,18 +307,27 @@ YourWorld.World = function() {
 
     var createTile = function(tileY, tileX) {
         // The World wraps each Tile object in a custom container div.
+        console.log('creating tile');
+        //these attributes aren't making it into the dom
         var tile, tileContainer;
         tileContainer = document.createElement('div');
         $.data(tileContainer, 'tileY', tileY);
         $.data(tileContainer, 'tileX', tileX);
         tileContainer.className = 'tilecont';
-        tileContainer.style.top = (_config.tileHeight())*(tileY) + _state.offsetY + 'px';
-        tileContainer.style.left = (_config.tileWidth())*(tileX) + _state.offsetX + 'px';
-        //tileContainer.style.width = _config.tileWidth() + 'px';
+        // tileContainer.style.top = (_config.tileHeight())*(tileY) + _state.offsetY + 'px';
+        // tileContainer.style.left = (_config.tileWidth())*(tileX) + _state.offsetX + 'px';
+        tileContainer.style.width = _config.tileWidth() + 'px';
+        tileContainer.style.height = _config.tileHeight() + 'px';
+        
+        tester = _config;
+        
+        // tileContainer.style.color = 'red';
         tile = YourWorld.Tile.create(tileY, tileX, _config, tileContainer);
 
         rememberTile(tileY, tileX, tile);
-        // _container[0].appendChild(tileContainer); // a little faster than using jquery
+        // _container[0].appendChild(tileContainer); // a little faster than using jquery 
+        //we're handling this in google maps getTile
+
         _state.numTiles++;
         if ((_state.numTiles % 1000) === 0) { // lower this?
             setTimeout(cleanUpTiles, 0);
@@ -551,11 +579,13 @@ YourWorld.World = function() {
     };
    
     var sendEdits = function() {
-        console.log('sending edits');
         // Send local edits to the server
         if (!_edits.length) {
             return;
         }
+
+        console.log('sending edits f0real');
+
         jQuery.ajax({
             type: 'POST',
             url: window.location.pathname,
@@ -568,6 +598,7 @@ YourWorld.World = function() {
     };
     
     var fetchUpdates = function() {
+        console.log('fetching updates...');
 
         // Get updates for rendered tiles
         // Skip if user is inactive for over a minute:
@@ -582,6 +613,8 @@ YourWorld.World = function() {
 
         if (bounds)
         {
+            console.log('has bounds, fetching Updates');
+
             jQuery.ajax({
                 type: 'GET',
                 url: window.location.pathname,
@@ -1273,6 +1306,7 @@ YourWorld.World = function() {
         
         // Capture clicks to set the cursor location
         _container.click(function(ev) {
+            // console.log('SETTING SELECTED');
            setSelected(ev.target);
            _state.lastClick = ev.target;
         });
@@ -1283,16 +1317,20 @@ YourWorld.World = function() {
         _container.css('-moz-user-select', '-moz-none'); // FF
         
         // Turn on scrolling
-        _ui.scrolling = makeScrollable(_container, function(dx, dy) {
-                scrollLeftBy(dx);
-                scrollUpBy(dy);
-        });
+        // I don't think we need this -z
+        // _ui.scrolling = makeScrollable(_container, function(dx, dy) {
+        //         scrollLeftBy(dx);
+        //         scrollUpBy(dy);
+        // });
         
         // Push and pull data
         setInterval(sendEdits, 1997);
-        //setInterval(fetchUpdates, 2999); // Changed to happen after success/failure
+        // TODO reenable
+        // setInterval(fetchUpdates, 2999); // Changed to happen after success/failure
         setInterval(renderMandatoryTiles, 197);
-        fetchUpdates();
+
+
+        // fetchUpdates();  //this was active, and the above intervalled one was commented out...
         
         //// Add menu options
         var s, i;
@@ -1607,7 +1645,7 @@ YourWorld.Tile = function() {
 		};
 
 		// Init
-		node.style.backgroundColor = '#eee';
+		// node.style.backgroundColor = '#eee';
 		node.innerHTML = getDefaultHTML(config);
 		_content = config.defaultContent();
 		

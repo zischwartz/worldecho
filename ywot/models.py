@@ -6,7 +6,7 @@ from lib.jsonfield import DictField
 
 
 class World(models.Model):
-    name = models.CharField(unique=True, max_length=255)
+    name = models.CharField(unique=True, max_length=255, blank=True)
         # Creating this index for much faster world lookups from World.get_or_create,
         # which are very common.
         # CREATE INDEX CONCURRENTLY world_name_upper ON ywot_world(UPPER(name));
@@ -15,7 +15,7 @@ class World(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     public_readable = models.BooleanField(default=True) # Otherwise whitelist
     public_writable = models.BooleanField(default=True) # Otherwise whitelist
-    properties = DictField(default={})
+    properties = DictField(default={}, blank=True)
     default_char = models.CharField(max_length=1, default=' ')
 
     # properties:
