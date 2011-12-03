@@ -116,6 +116,7 @@ def yourworld(request, namespace):
     return req_render_to_response(request, 'yourworld.html', {
         'settings': settings,
         'state': simplejson.dumps(state),
+        'world': world,
     })
     
 def fetch_updates(request, world):

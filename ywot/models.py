@@ -18,6 +18,8 @@ class World(models.Model):
     properties = DictField(default={}, blank=True)
     default_char = models.CharField(max_length=1, default=' ')
 
+    prompt = models.TextField(blank=True)
+
     # properties:
     #  - features: {} 
     #      - 'go_to_coord' true/false
