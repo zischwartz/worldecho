@@ -479,6 +479,7 @@ TileOverlay.prototype.redraw = function () {
 
     //Loop through all of the possible viewport tiles and
     //see if we need to draw new tiles
+    console.log('viewportTileCoordsSouthWest', viewportTileCoordsSouthWest);
     for (var x = viewportTileCoordsSouthWest.x;
         x <= viewportTileCoordsNorthEast.x;
         x++) {
@@ -500,9 +501,17 @@ TileOverlay.prototype.redraw = function () {
 
                 // this actually won't work in the long run, as it's zoom dependent. 
                 //need to tilecoord, shouldn't be too hard!
-                tile = YourWorld.World.getOrCreateTile(x,y);
+       
+                // pixelCoordinate = worldCoordinate * 2^zoomLevel
+
+
+                wx=x / Math.pow(2, z);
+                wy=y / Math.pow(2, z);
+                tile = YourWorld.World.getOrCreateTile(wx , wy);
 
                 div=tile.HTMLnode();
+
+                // div.innerHTML= wx + ' x ' + wy + 'z:' +z; 
                 // div.className = "textile";
                 // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = 'red';
 
