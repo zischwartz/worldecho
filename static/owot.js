@@ -1338,7 +1338,7 @@ YourWorld.World = function() {
         // Push and pull data
         setInterval(sendEdits, 1997);
         // TODO reenable
-        // setInterval(fetchUpdates, 2999); // Changed to happen after success/failure
+        setInterval(fetchUpdates, 2999); // Changed to happen after success/failure
         setInterval(renderMandatoryTiles, 197);
 
 

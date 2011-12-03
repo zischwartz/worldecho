@@ -479,7 +479,7 @@ TileOverlay.prototype.redraw = function () {
 
     //Loop through all of the possible viewport tiles and
     //see if we need to draw new tiles
-    console.log('viewportTileCoordsSouthWest', viewportTileCoordsSouthWest);
+
     for (var x = viewportTileCoordsSouthWest.x;
         x <= viewportTileCoordsNorthEast.x;
         x++) {
@@ -493,8 +493,10 @@ TileOverlay.prototype.redraw = function () {
                 (!this.settings.tilesDrawn["_" + x] ||
                 !this.settings.tilesDrawn["_" + x]["_" + y])) {
 
-                // var img = document.createElement("IMG");
                 // var div = document.createElement("DIV");
+
+                //original
+                // var img = document.createElement("IMG");
                 // var imgSrc = this.settings.getTileUrl(x, y, z);
                 
                 // div.innerHTML ="ABCD";
