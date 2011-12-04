@@ -300,7 +300,7 @@ var bignum= 1000000000000000;
         div = tile.HTMLnode();
 
         //for debug
-        // $(div).prepend("<div style='position:absolute; color:red'>"+coord+"</div>");
+        $(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
 
         // div.innerHTML= topleft.lat()*bignum + ' x'+topleft.lng()*bignum ;
         // div.innerHTML= coord;
