@@ -59,7 +59,7 @@ YourWorld.helpers = function() {
         var tileY = $.data(tile, 'tileY');
         var tileX = $.data(tile, 'tileX');
         var YX_yx = [tileY, tileX, charY, charX];
-		console.log(YX_yx);
+		//console.log(YX_yx);
         return YX_yx;
     };
 
@@ -107,13 +107,8 @@ YourWorld.helpers = function() {
 		return true;
 	};
   
-
-
     return obj;
 }();
-
-
-
 
 YourWorld.Config = function(container) {
 // YourWorld.Config = function(container) {
@@ -129,7 +124,7 @@ YourWorld.Config = function(container) {
     var map_tile_x = 256;
     var map_tile_y = 256;
 
-    var default_char= '#';
+    var default_char= '_';
 
     // Auto-generated settings
     //not working
@@ -240,8 +235,8 @@ YourWorld.World = function() {
                 // map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(_config.mapTileX(), _config.mapTileY())));
                 // map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(250, 100, )));
                 // console.log(map.overlayMapTypes);
+
                 google.maps.event.addListener(map, 'bounds_changed', function() { bounds = map.getBounds(); });
-                
             
                 TextLayer = new missouristate.web.TileOverlay(
                     function(x, y, z) { return "http://search.missouristate.edu/map/tilesets/baselayer/" + z + "_" + x + "_" + y + ".png"; },
@@ -273,18 +268,18 @@ YourWorld.World = function() {
         // panes = map.getPanes();
         // console.log(panes);
 
-        projection=map.getProjection(); 
-        var zfactor=Math.pow(2,zoom);
+        //projection=map.getProjection(); 
+        //var zfactor=Math.pow(2,zoom);
 
         //from coords, we need to get latlng, and pixel xy
-        var topleft=projection.fromPointToLatLng(new google.maps.Point(coord.x*256/zfactor,coord.y*256/zfactor));
+        //var topleft=projection.fromPointToLatLng(new google.maps.Point(coord.x*256/zfactor,coord.y*256/zfactor));
         
         // div.style.width = this.tileSize.width + 'px';
         // div.style.height = this.tileSize.height + 'px';
         // div.style.fontSize = '15px';
 
         // div.innerHTML= topleft;
-        tile = getOrCreateTile(topleft.lat(),topleft.lng());
+        tile = getOrCreateTile(coord.x, coord.y);
         
         // div.innerHTML+=tile.HTMLcontent();
         div = tile.HTMLnode();
@@ -354,23 +349,30 @@ YourWorld.World = function() {
         return getTile(tileY, tileX) || createTile(tileY, tileX);
     };
     
+    // Below is Martin's code... giving credit where credit is due :)
     var getMandatoryBounds = function() {
         // Returns [minY, minX, maxY, maxX] of mandatory rendered rectangle
         
-        if (map)
+        /*if (map)
         {
 
             if (map.getBounds())
             {
                 mapBounds= map.getBounds();
 
-                // console.log('BOUNDS', mapBounds);
+                //console.log(mapBounds);
 				var minVisY, maxVisY;
 				var minVisX, maxVisX;
-                var topBound = mapBounds.getNorthEast().lat();
-                var leftBound = mapBounds.getSouthWest().lng();
+                //var topBound = mapBounds.getNorthEast().lat();
+                //var leftBound = mapBounds.getSouthWest().lng();
+                
+                var z = map.getZoom();
+                var topBound = FromLatLngToTileCoordinates(mapBounds.getNorthEast(), z).y;
+                var leftBound = FromLatLngToTileCoordinates(mapBounds.getNorthEast(), z).x;
+                
                 var numDown = Math.ceil(_container.height()/_config.mapTileY());
                 var numAcross= Math.ceil(_container.width()/_config.mapTileX());
+                
 //this function should probably go somewhere else
 				Array.prototype.unique =
 				  function() {
@@ -387,6 +389,7 @@ YourWorld.World = function() {
 				    return a;
 				  };
 /////////////////////////////////////////
+
 				function sortNumberDes(a,b){ return b - a; }
 				function sortNumber(a,b){ return a - b; }
 				
@@ -430,17 +433,17 @@ YourWorld.World = function() {
                 return [minY, minX, maxY, maxX];
 
             }
-        }
+        }*/
 
-        // var minVisY = Math.floor((_container.scrollTop() - _state.offsetY) / _config.tileHeight());
-        // var minVisX = Math.floor((_container.scrollLeft() - _state.offsetX) / _config.tileWidth());
-        // var numDown = Math.ceil(_container.height()/_config.tileHeight());
-        // var numAcross = Math.ceil(_container.width()/_config.tileWidth());
-        // var minY = minVisY - 1; // one tile of padding around what's visible
-        // var minX = minVisX - 1;
-        // var maxY = minVisY + numDown + 2; // Add two because we might only see 1px of TL
-        // var maxX = minVisX + numAcross + 2;
-        // return [minY, minX, maxY, maxX];
+        var minVisY = Math.floor((_container.scrollTop() - _state.offsetY) / _config.tileHeight());
+        var minVisX = Math.floor((_container.scrollLeft() - _state.offsetX) / _config.tileWidth());
+        var numDown = Math.ceil(_container.height()/_config.tileHeight());
+        var numAcross = Math.ceil(_container.width()/_config.tileWidth());
+        var minY = minVisY - 1; // one tile of padding around what's visible
+        var minX = minVisX - 1;
+        var maxY = minVisY + numDown + 2; // Add two because we might only see 1px of TL
+        var maxX = minVisX + numAcross + 2;
+        return [minY, minX, maxY, maxX];
     };
     
     var setCoords = function() {
@@ -591,13 +594,11 @@ YourWorld.World = function() {
     };
    
     var sendEdits = function() {
+        console.log('sending edits');
         // Send local edits to the server
         if (!_edits.length) {
             return;
         }
-
-        console.log('sending edits f0real');
-
         jQuery.ajax({
             type: 'POST',
             url: window.location.pathname,
@@ -610,7 +611,7 @@ YourWorld.World = function() {
     };
     
     var fetchUpdates = function() {
-        console.log('fetching updates...');
+        //console.log('fetching updates...');
 
         // Get updates for rendered tiles
         // Skip if user is inactive for over a minute:
@@ -625,7 +626,7 @@ YourWorld.World = function() {
 
         if (bounds)
         {
-            console.log('has bounds, fetching Updates');
+            //console.log('has bounds, fetching Updates');
 
             jQuery.ajax({
                 type: 'GET',
@@ -1149,9 +1150,10 @@ YourWorld.World = function() {
         }
         // Check permissions
         var YX_yx = YourWorld.helpers.getCellCoords(el);
-		console.log(YX_yx);
         var tile = getTile(YX_yx[0],  YX_yx[1]);
+        //console.log([tile.TopLeftY, tile.TopLeftX]);
         if (!tile.initted()) {
+            //console.log("does not compute");
             return;
         }
         if (!_state.canWrite || (tile.isProtected() && !_state.canAdmin)) {
@@ -1160,7 +1162,7 @@ YourWorld.World = function() {
         
         //// Do it:
         // Ensure visible
-        var e = $(el);
+        /*var e = $(el);
         var rightRoom = _container.offset().left + _container.width() - e.offset().left - e.width();
         if (rightRoom < 0) {
             scrollLeftBy(Math.ceil(-rightRoom/_config.charWidth())*_config.charWidth());
@@ -1168,7 +1170,7 @@ YourWorld.World = function() {
         var btmRoom = _container.offset().top + _container.height() - e.offset().top - e.height();
         if (btmRoom < 0) {
             scrollUpBy(Math.ceil(-btmRoom/_config.charHeight())*_config.charHeight());
-        }
+        }*/
         
         // Hightlight and store
         _state.selected = el; 
@@ -1337,12 +1339,9 @@ YourWorld.World = function() {
         
         // Push and pull data
         setInterval(sendEdits, 1997);
-        // TODO reenable
-        setInterval(fetchUpdates, 2999); // Changed to happen after success/failure
+        //setInterval(fetchUpdates, 2999); // Changed to happen after success/failure
         setInterval(renderMandatoryTiles, 197);
-
-
-        // fetchUpdates();  //this was active, and the above intervalled one was commented out...
+        fetchUpdates();
         
         //// Add menu options
         var s, i;
@@ -1664,6 +1663,7 @@ YourWorld.Tile = function() {
 		// node.style.backgroundColor = '#eee';
 		node.innerHTML = getDefaultHTML(config);
 		_content = config.defaultContent();
+        _initted = true;
 		
         //breaking the rules
         obj.HTMLnode= function()
