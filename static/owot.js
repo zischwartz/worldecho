@@ -129,7 +129,7 @@ YourWorld.Config = function(container) {
     var map_tile_x = 256;
     var map_tile_y = 256;
 
-    var default_char= '_';
+    var default_char= '.';
 
     // Auto-generated settings
     //not working
@@ -366,7 +366,7 @@ var bignum= 1000000000000000;
     {
                 // _state.selected = $(".tilecont").eq(5).find("td").eq(0).get(0);
                 // console.log($(".tilecont"));
-                 setSelected( $(".tilecont").eq(5).find("td").eq(0).get(0));
+                setSelected( $(".tilecont").eq(5).find("td").eq(0).get(0));
                 // console.log('selected el is ', _state.selected);
                 console.log('Setting Selected to a random el');
     }
@@ -433,7 +433,7 @@ var bignum= 1000000000000000;
                 var upperLeft = new google.maps.LatLng(topBound, leftBound);
 
 				var upperLefTile = FromLatLngToTileCoordinates(upperLeft, z);
-				console.log(tile);
+				// console.log(tile);
                 var numDown = Math.ceil(_container.height()/_config.mapTileY());
                 var numAcross= Math.ceil(_container.width()/_config.mapTileX());
                 
@@ -442,7 +442,12 @@ var bignum= 1000000000000000;
 		        var minX = upperLefTile[0] - 1;
 		        var maxY = minY + numDown + 2; // Add two because we might only see 1px of TL
 		        var maxX = minX + numAcross + 2;
-				console.log([minY, minX, maxY, maxX]);
+				// console.log([minY, minX, maxY, maxX]);
+                if (_firstBoundCheck)
+                {
+                    probablyDoneLoading();
+                    _firstBoundCheck=0;
+                }
 		        return [minY, minX, maxY, maxX];
             }
         }

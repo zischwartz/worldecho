@@ -109,7 +109,13 @@ class Whitelist(models.Model):
         unique_together=[['user', 'world']]
     
 
+class UserWorld(models.Model):
+    world = models.ForeignKey(World, null=True, blank=True)
+    user = models.ForeignKey(User, null=True, blank=True)
+
+
 
 from django.contrib import admin
 admin.site.register(World)
 admin.site.register(Tile)
+admin.site.register(UserWorld)
