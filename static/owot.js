@@ -245,7 +245,7 @@ YourWorld.World = function() {
                 map.setCenter(initialUserPos);
 
                 // we could figure out size based on zoom here...
-                map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(_config.mapTileX(), _config.mapTileY())));
+                map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(_config.mapTileY(), _config.mapTileX())));
                 // console.log(map.overlayMapTypes);
                 google.maps.event.addListener(map, 'bounds_changed', function() {
                      bounds = map.getBounds();
@@ -293,8 +293,8 @@ var bignum= 1000000000000000;
         // div.style.height = this.tileSize.height + 'px';
         // div.style.fontSize = '15px';
 
-        // div.innerHTML= topleft;
-        tile = getOrCreateTile(coord.x, coord.y);
+        // this actually doesn't make sense to me, why it's Y before X, but it seems to solve all our problems miraculously...
+        tile = getOrCreateTile(coord.y, coord.x);
         
         // div.innerHTML+=tile.HTMLcontent();
         div = tile.HTMLnode();
