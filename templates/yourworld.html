@@ -9,6 +9,7 @@
 </head>
 <body>
 <div id="topbar" class="ui">
+	<div id="topbarAbout"> <a href="#">what is this?</a></div>
     <div id="topbar_inner">
         <span id="paused" class="ui-vis tab">Paused</span>
         <div id="announce" class="ui-vis"></div>
@@ -29,14 +30,22 @@
 
 <!-- <h1 id="loading">Loading...</h1> -->
 <div id="geoReminder">
-    <h3>Finding your location</h3> 
+    <h3>Finding your location..</h3> 
         <p>If asked, please click <b>Allow</b> above to use your location.</p><p> Otherwise, you can't use the site.</p>
 </div>
 
+<div id="aboutOverlay">
+	<div class="closeme"></div>
+    <h1>about this thing</h1>
+	<p>Well this thing is kinda awesome, right?</p>
+	<p>So go use it? What are you doing here? Nobody reads the about pages!</p>
+
+</div>
+
+
 <div id="loadingIndicator">
-    <h1>Loading...</h1>
+    <h1>localtext</h1>
     {{world.prompt}}
-    <p>Why not take a nice break from looking at your screen for a moment.</p>
 </div>
 
 
@@ -51,6 +60,7 @@
 <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=geometry&sensor=false"></script>
 <script type="text/javascript" src="/static/tileoverlay_uncompressed.js"></script>
 <script type="text/javascript" src="/static/mapstyles.js"></script>
+<script type="text/javascript" src="/static/ui.js"></script>
 <script type="text/javascript" src="/static/owot.js"></script>
 <!-- <script type="text/javascript" src="/static/map.js"></script> -->
 
