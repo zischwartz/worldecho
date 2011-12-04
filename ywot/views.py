@@ -116,28 +116,44 @@ def yourworld(request, namespace):
     return req_render_to_response(request, 'yourworld.html', {
         'settings': settings,
         'state': simplejson.dumps(state),
+        'world': world,
     })
     
 def fetch_updates(request, world):
+    # log.info('fetching updates')
+
     response = {}
-    min_tileY = int(request.GET['min_tileY'])
-    min_tileX = int(request.GET['min_tileX'])
-    max_tileY = int(request.GET['max_tileY'])
-    max_tileX = int(request.GET['max_tileX'])
+    min_tileY = float(request.GET['min_tileY'])
+    min_tileX = float(request.GET['min_tileX'])
+    max_tileY = float(request.GET['max_tileY'])
+    max_tileX = float(request.GET['max_tileX'])
     response = {}
 
-    assert min_tileY < max_tileY
-    assert min_tileX < max_tileX
-    assert ((max_tileY - min_tileY)*(max_tileX - min_tileX)) < 400
+    #max_tileX   
+    # -73.99154663085938
+    # max_tileY   
+    # 40.730608477796636
+    # min_tileX   
+    # -73.99566650390625
+    # min_tileY   
+    # 40.73164913017892
+
+# TODO minY and maxY seem to be reversed, coming form client/martin's js
+
+    # assert min_tileY < max_tileY
+    # assert min_tileX < max_tileX
+    # assert ((max_tileY - min_tileY)*(max_tileX - min_tileX)) < 400
     
     # Set default info to null
-    for tileY in xrange(min_tileY, max_tileY + 1): #+1 b/c of range bounds
-        for tileX in xrange(min_tileX, max_tileX + 1):
-            response["%d,%d" % (tileY, tileX)] = None
+    #not sure what this was trying to do, but it won't work for us with our float values for tiles
+    # for tileY in xrange(min_tileY, max_tileY + 1): #+1 b/c of range bounds
+    #     for tileX in xrange(min_tileX, max_tileX + 1):
+    #         response["%d,%d" % (tileY, tileX)] = None
             
     tiles = Tile.objects.filter(world=world,
                                 tileY__gte=min_tileY, tileY__lte=max_tileY,
                                 tileX__gte=min_tileX, tileX__lte=max_tileX)
+
     for t in tiles:
         tile_key = "%s,%s" % (t.tileY, t.tileX)
         if (int(request.GET.get('v', 0)) == 2):
@@ -155,6 +171,10 @@ def fetch_updates(request, world):
     return HttpResponse(simplejson.dumps(response))
     
 def send_edits(request, world):
+
+    log.info('sending edits, request:')
+    log.info(request)
+    
     assert permissions.can_write(request.user, world) # Checked by router
     response = []
     tiles = {} # a simple cache
