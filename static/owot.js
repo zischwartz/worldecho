@@ -107,13 +107,8 @@ YourWorld.helpers = function() {
 		return true;
 	};
   
-
-
     return obj;
 }();
-
-
-
 
 YourWorld.Config = function(container) {
 // YourWorld.Config = function(container) {
@@ -129,7 +124,7 @@ YourWorld.Config = function(container) {
     var map_tile_x = 256;
     var map_tile_y = 256;
 
-    var default_char= '#';
+    var default_char= '_';
 
     // Auto-generated settings
     //not working
@@ -240,8 +235,8 @@ YourWorld.World = function() {
                 // map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(_config.mapTileX(), _config.mapTileY())));
                 // map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(250, 100, )));
                 // console.log(map.overlayMapTypes);
+
                 google.maps.event.addListener(map, 'bounds_changed', function() { bounds = map.getBounds(); });
-                
             
                 TextLayer = new missouristate.web.TileOverlay(
                     function(x, y, z) { return "http://search.missouristate.edu/map/tilesets/baselayer/" + z + "_" + x + "_" + y + ".png"; },
@@ -354,6 +349,7 @@ YourWorld.World = function() {
         return getTile(tileY, tileX) || createTile(tileY, tileX);
     };
     
+    // Below is Martin's code... giving credit where credit is due :)
     var getMandatoryBounds = function() {
         // Returns [minY, minX, maxY, maxX] of mandatory rendered rectangle
         
@@ -598,13 +594,11 @@ YourWorld.World = function() {
     };
    
     var sendEdits = function() {
+        console.log('sending edits');
         // Send local edits to the server
         if (!_edits.length) {
             return;
         }
-
-        console.log('sending edits f0real');
-
         jQuery.ajax({
             type: 'POST',
             url: window.location.pathname,
@@ -1345,12 +1339,9 @@ YourWorld.World = function() {
         
         // Push and pull data
         setInterval(sendEdits, 1997);
-        // TODO reenable
         //setInterval(fetchUpdates, 2999); // Changed to happen after success/failure
         setInterval(renderMandatoryTiles, 197);
-
-
-        fetchUpdates();  //this was active, and the above intervalled one was commented out...
+        fetchUpdates();
         
         //// Add menu options
         var s, i;
