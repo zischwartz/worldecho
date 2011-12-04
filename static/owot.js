@@ -376,10 +376,46 @@ var bignum= 1000000000000000;
         return getTile(tileY, tileX) || createTile(tileY, tileX);
     };
     
+
+
+	function FromLatLngToTileCoordinates(latLng, zoom) {
+
+		var TILE_SIZE = 256;
+		/** @const */
+		var TILE_INITIAL_RESOLUTION = 2 * Math.PI * 6378137 / TILE_SIZE;
+		/** @const */
+		var TILE_ORIGIN_SHIFT = 2 * Math.PI * 6378137 / 2.0;
+
+	    //LatLng to Meters
+	    var mx = latLng.lng() * TILE_ORIGIN_SHIFT / 180.0;
+	    var my = (Math.log(Math.tan((90 + latLng.lat()) * Math.PI / 360.0))
+	        / (Math.PI / 180.0)) * TILE_ORIGIN_SHIFT / 180.0;
+
+	    //Meters to Pixels
+	    var res = TILE_INITIAL_RESOLUTION / Math.pow(2, zoom);
+	    var px = (mx + TILE_ORIGIN_SHIFT) / res;
+	    var py = (my + TILE_ORIGIN_SHIFT) / res;
+
+	    //Pixels to Tile Coords
+	    var tx = Math.floor(Math.ceil(px / TILE_SIZE) - 1);
+	    var ty = Math.pow(2, zoom) - 1 - Math.floor(Math.ceil(py / TILE_SIZE) - 1);
+
+	    return ([tx, ty]);
+	}
+
+
+
+
     var getMandatoryBounds = function() {
         // Returns [minY, minX, maxY, maxX] of mandatory rendered rectangle
+        // var minVisY = Math.floor((_container.scrollTop() - _state.offsetY) / _config.tileHeight());
+        //         var minVisX = Math.floor((_container.scrollLeft() - _state.offsetX) / _config.tileWidth());
+        //         var numDown = Math.ceil(_container.height()/_config.tileHeight());
+        //         var numAcross = Math.ceil(_container.width()/_config.tileWidth());
+        //         
         
-        if (map)
+
+		if (map)
         {
 
             if (map.getBounds())
@@ -389,81 +425,25 @@ var bignum= 1000000000000000;
                 //console.log(mapBounds);
 				var minVisY, maxVisY;
 				var minVisX, maxVisX;
-                //var topBound = mapBounds.getNorthEast().lat();
-                //var leftBound = mapBounds.getSouthWest().lng();
+                var topBound = mapBounds.getNorthEast().lat();
+                var leftBound = mapBounds.getSouthWest().lng();
                 
                 var z = map.getZoom();
-                var topBound = FromLatLngToTileCoordinates(mapBounds.getNorthEast(), z).y;
-                var leftBound = FromLatLngToTileCoordinates(mapBounds.getNorthEast(), z).x;
                 
+                var upperLeft = new google.maps.LatLng(topBound, leftBound);
+
+				var upperLefTile = FromLatLngToTileCoordinates(upperLeft, z);
+				console.log(tile);
                 var numDown = Math.ceil(_container.height()/_config.mapTileY());
                 var numAcross= Math.ceil(_container.width()/_config.mapTileX());
                 
-//this function should probably go somewhere else
-				Array.prototype.unique =
-				  function() {
-				    var a = [];
-				    var l = this.length;
-				    for(var i=0; i<l; i++) {
-				      for(var j=i+1; j<l; j++) {
-				        // If this[i] is found later in the array
-				        if (this[i] === this[j])
-				          j = ++i;
-				      }
-				      a.push(this[i]);
-				    }
-				    return a;
-				  };
-/////////////////////////////////////////
 
-				function sortNumberDes(a,b){ return b - a; }
-				function sortNumber(a,b){ return a - b; }
-				
-				var tilesY = Object.keys(_tileByCoord).sort(sortNumberDes);
-				var tilesX = [];
-				var dif = 100;
-				for (var i = 0; i < tilesY.length; i++) {
-					
-					tilesX = tilesX.concat( Object.keys(_tileByCoord[tilesY[i]]));
-					
-					var t = parseFloat(tilesY[i]);
-					var d = Math.abs(topBound-t); 
-					if (d < dif) { 
-						dif = d;
-						minVisY = t; 
-						maxVisY = parseFloat(tilesY[i+numDown]);						
-						}
-				}
-					
-				if (isNaN(maxVisY)) {maxVisY = parseFloat(tilesY[tilesY.length-1]);}
-				
-				tilesX = tilesX.unique().sort(sortNumber);
-				dif = 100;
-				for (var i = 0; i < tilesX.length; i++) {
-					var t = parseFloat(tilesX[i]);
-					var d = Math.abs(leftBound-t); 
-					if (d < dif) { 
-						dif = d;
-						minVisX = t; 
-						maxVisX = parseFloat(tilesX[i+numAcross]);
-						}
-				}
-				if (isNaN(maxVisX)) {maxVisX = parseFloat(tilesX[tilesX.length-1]);}
-				
-				if (_firstBoundCheck)
-                {
-                    probablyDoneLoading();
-                    _firstBoundCheck=0;
-                }
-
-
-    			var minY = minVisY;// + deltaY; // one tile of padding around what's visible
-                var minX = minVisX;// - deltaX;
-                var maxY = maxVisY;// - (deltaY*(numDown+2.0)); // Add two because we might only see 1px of TL
-                var maxX = maxVisX;// + (deltaX*(numAcross+2.0));
-               // console.log([minY, minX, maxY, maxX]);
-                return [minY, minX, maxY, maxX];
-
+				var minY = upperLefTile[1] - 1; // one tile of padding around what's visible
+		        var minX = upperLefTile[0] - 1;
+		        var maxY = minY + numDown + 2; // Add two because we might only see 1px of TL
+		        var maxX = minX + numAcross + 2;
+				console.log([minY, minX, maxY, maxX]);
+		        return [minY, minX, maxY, maxX];
             }
         }
 
