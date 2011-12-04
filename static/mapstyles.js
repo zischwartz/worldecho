@@ -46,7 +46,7 @@ darkMapStyle = [
   },{
     featureType: "poi",
     stylers: [
-      { visibility: "simplified" }
+      { visibility: "off" }
     ]
   },{
     featureType: "poi.park",
@@ -63,7 +63,7 @@ darkMapStyle = [
     stylers: [
       { lightness: -16 },
       { gamma: 1.4 },
-      { visibility: "simplified" }
+      { visibility: "off" }
     ]
   },{
     featureType: "transit",
@@ -130,7 +130,9 @@ darkMapStyle_old=[
     featureType: "poi",
     elementType: "labels",
     stylers: [
+      { visibility: "off" },
       { lightness: -10 }
+
     ]
   },{
     featureType: "transit",

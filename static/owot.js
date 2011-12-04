@@ -129,7 +129,7 @@ YourWorld.Config = function(container) {
     var map_tile_x = 256;
     var map_tile_y = 256;
 
-    var default_char= '#';
+    var default_char= '.';
 
     // Auto-generated settings
     //not working
@@ -231,9 +231,37 @@ YourWorld.World = function() {
         if(navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 $("#geoReminder").fadeOut();
+				setTimeout(function(){ $("#loadingIndicator").fadeOut(200) }, 2000);
 
                 initialUserPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-                var marker = new google.maps.Marker({ map: map, position: initialUserPos, });
+				
+				var image = new google.maps.MarkerImage(
+				    'static/dot.png',
+				    new google.maps.Size(50,50),
+				    new google.maps.Point(0,0),
+				    new google.maps.Point(25,25)
+				  );
+				var shadow = new google.maps.MarkerImage(
+				    'static/here.png',
+				    new google.maps.Size(116,57),
+				    new google.maps.Point(0,0),
+				    new google.maps.Point(-20,50)
+				  );
+				
+				var shape = {
+				    coord: [21,2,23,3,24,4,25,5,26,6,27,7,28,8,28,9,29,10,29,11,29,12,29,13,29,14,29,15,29,16,29,17,29,18,29,19,29,20,29,21,28,22,28,23,27,24,26,25,25,26,24,27,23,28,21,29,10,29,8,28,7,27,6,26,5,25,4,24,3,23,3,22,2,21,2,20,2,19,2,18,2,17,2,16,2,15,2,14,2,13,2,12,2,11,2,10,3,9,3,8,4,7,5,6,6,5,7,4,8,3,10,2,21,2],
+				    type: 'poly'
+				  };
+				
+				var marker = new google.maps.Marker({
+				    icon: image,
+					shadow: shadow,
+				    shape: shape,
+				    map: map,
+				    position: initialUserPos
+				  });
+				
+				
                 map.setCenter(initialUserPos);
 
                 // we could figure out size based on zoom here...
@@ -1680,3 +1708,19 @@ YourWorld.Tile = function() {
 	}; // end of Tile.create
 	return obj;
 }(); // end of Tile
+
+
+$(document).ready(function() {
+
+	$("#topbarAbout > a").click(function(){
+		$("#aboutOverlay").fadeIn(300);	
+	});
+	$(".closeme").click(function(){
+		$("#aboutOverlay").fadeOut()
+	});
+	
+});
+
+
+
+

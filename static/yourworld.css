@@ -3,12 +3,11 @@
     padding: 0;
 }
 body {
-    /*background: red;*/
     overflow: hidden;
-    /*color: red;*/
-    /*color: white;*/
-    /*font-weight: 800;*/
+	font-family: Helvetica, Arial, Sans-Serif;
     font-size: 16px;
+	line-height:1.3;
+
 }
 
 
@@ -20,6 +19,7 @@ body {
     position: fixed !important;
     color: white;
     font-family: monospace;
+	background:none!important;
 }
 
 #mapcanvas b
@@ -62,11 +62,15 @@ img
 
 #geoReminder
 {
-    background-color: #fff0c6;
-    text-align: center;
+    background-color: #ff4d4d;
+   text-align: center;
+
     padding: 20px;
 
 }
+	#geoReminder h3 {
+		color:#fff;
+	}
 
 /*
 td {
@@ -75,23 +79,27 @@ td {
 */
 
 
-#loadingIndicator
+#loadingIndicator, #aboutOverlay
 {
     text-align: center;
     position: absolute;
+	background:#fff;
+	z-index:1;
     width: 45%;
-    margin: 20% 25%;
+    margin: 10% 25%;
     padding: 2.5%;
 
 -moz-box-shadow: 0 0px 5px #888;
 -webkit-box-shadow: 0px 0px 5px #888;
 box-shadow: 0px 0px 5px #888;
 
-display: none;
+-moz-border-radius: 5px;
+-webkit-border-radius: 5px;
+border-radius: 5px;
 
     /*border: 1px solid blue;*/
 }
-
+#aboutOverlay {display:none;}
 
 /* below is just for tabs etc. */
 
@@ -109,11 +117,32 @@ a, a:link, a:hover, a:active, a:visited {
 #topbar_inner {
     width:100%;
     position:absolute;
+	display:none;
 }
+#topbarAbout {
+	position:absolute;
+	top:0;
+	right:0px;
+	background:#fff;
+	padding:1px 5px;
+	font-size: 12px;
+	color:#ff0000;
+	}
+	.closeme {
+		position:absolute;
+		top:-12px;
+		right:-12px;
+		background:url("closeme.png")right top no-repeat;
+		width:24px;
+		height:24px;
+	}
+	.closeme:hover {
+		background:url("closeme_h.png")right top no-repeat;
+		cursor:pointer;
+	}
 
 .ui {
     color: #888;
-    font-family: Verdana;
     font-size: 12px;
     z-index: 1;
 }
@@ -147,7 +176,6 @@ a, a:link, a:hover, a:active, a:visited {
 }
 
 #loading {
-    font-family: Verdana;
 }
 
 #coords {
