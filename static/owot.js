@@ -130,7 +130,7 @@ YourWorld.Config = function(container) {
     var map_tile_y = 256;
 
 
-    var default_char= '.';
+    var default_char= ' ';
 
     // Auto-generated settings
     //not working
@@ -435,14 +435,7 @@ var bignum= 1000000000000000;
 
 
 
-    var getMandatoryBounds = function() {
-        // Returns [minY, minX, maxY, maxX] of mandatory rendered rectangle
-        // var minVisY = Math.floor((_container.scrollTop() - _state.offsetY) / _config.tileHeight());
-        //         var minVisX = Math.floor((_container.scrollLeft() - _state.offsetX) / _config.tileWidth());
-        //         var numDown = Math.ceil(_container.height()/_config.tileHeight());
-        //         var numAcross = Math.ceil(_container.width()/_config.tileWidth());
-        //         
-        
+    var getMandatoryBounds = function() {    
 
 		if (map)
         {
@@ -481,15 +474,6 @@ var bignum= 1000000000000000;
             }
         }
 
-        // var minVisY = Math.floor((_container.scrollTop() - _state.offsetY) / _config.tileHeight());
-        // var minVisX = Math.floor((_container.scrollLeft() - _state.offsetX) / _config.tileWidth());
-        // var numDown = Math.ceil(_container.height()/_config.tileHeight());
-        // var numAcross = Math.ceil(_container.width()/_config.tileWidth());
-        // var minY = minVisY - 1; // one tile of padding around what's visible
-        // var minX = minVisX - 1;
-        // var maxY = minVisY + numDown + 2; // Add two because we might only see 1px of TL
-        // var maxX = minVisX + numAcross + 2;
-        // return [minY, minX, maxY, maxX];
     };
     
     var setCoords = function() {
@@ -610,11 +594,18 @@ var bignum= 1000000000000000;
     var makeBottomRoom = makeRightRoom;
     
     var updateData = function(data) {
+        console.log('updateData --------------');
+        // console.log(data);
         // Callback for fetchEdits -- gets new tile data from server and renders
-        setTimeout(fetchUpdates, 997);
+        
+        // TODO reenable
+        // setTimeout(fetchUpdates, 997);
+        
         $.each(data, function(YX, properties) {
             var coords = YX.split(',');
+            console.log('coords', coords);
             var tile = getTile(coords[0], coords[1]);
+            console.log('tile: ', tile);
             // We may have cleaned up tiles while the request was made:
             if (tile) {
                 tile.setProperties(properties);
@@ -658,23 +649,34 @@ var bignum= 1000000000000000;
         _edits = [];
     };
     
+
+    var t;
     var fetchUpdates = function() {
-        //console.log('fetching updates...');
+        console.log('fetching updates...');
 
         // Get updates for rendered tiles
         // Skip if user is inactive for over a minute:
         if ((new Date().getTime() - _state.lastEvent) > 30000) {
+            console.log('paused');
             _ui.paused.show();
             setTimeout(fetchUpdates, 331); // yarg this is getting hacky
             return;
         }
+
         _ui.paused.hide();
         var bounds = getMandatoryBounds();
         //  maybe we can mess with this
 
-        if (bounds)
+        if (_firstBoundCheck)
         {
-            //console.log('has bounds, fetching Updates');
+            t =setTimeout(fetchUpdates, 2000);
+            return;
+        }
+
+        if (!_firstBoundCheck)
+        {
+            clearTimeout(t);
+            console.log('has bounds, fetching Updates');
 
             jQuery.ajax({
                 type: 'GET',
@@ -1389,11 +1391,11 @@ var bignum= 1000000000000000;
         // Push and pull data
         setInterval(sendEdits, 1997);
         // TODO reenable
-        setInterval(fetchUpdates, 2999); // Changed to happen after success/failure
+        // setInterval(fetchUpdates, 2999); // Changed to happen after success/failure
         setInterval(renderMandatoryTiles, 197);
 
 
-        // fetchUpdates();  //this was active, and the above intervalled one was commented out...
+        fetchUpdates();  //this was active, and the above intervalled one was commented out...
         
         //// Add menu options
         var s, i;
@@ -1564,7 +1566,7 @@ YourWorld.Tile = function() {
 						if (highlight && !cell.style.backgroundColor) {
 							// Don't highlight selected or it'll stay yellow
 							if (_inkLimiter[1] < 10) {
-								$(cell).effect('highlight', {}, 500);
+								// $(cell).effect('highlight', {}, 500);
 								_inkLimiter[1]++;
 							}
 						}
