@@ -1765,13 +1765,15 @@ YourWorld.Tile = function() {
 							}
 
 						} 
-                        else if (propName == 'sessionid')
+                        else if (propName == 'cn')
                         {
                             s = document.createElement('span');
                             s.className= "colory";
+                            s.className= "t"+ val.toString()
                             // $.data(s, 'sid', val);
                             $(cell).wrapInner($(s));
                             s = cell.childNodes[0];
+
 
                             console.log('that cell has a sessionid property!', val, s);
                         }
