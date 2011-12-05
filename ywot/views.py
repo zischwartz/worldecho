@@ -5,13 +5,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.utils import simplejson
 
 from helpers import req_render_to_response
 from lib import log
 from ywot.models import Tile, World, Edit, Whitelist
 from ywot import permissions
+
 
 #
 # Helpers
@@ -29,11 +30,12 @@ def claim(user, worldname):
     # TODO: write tests for this
     if not re.match('\w+$', worldname):
         raise ClaimException, "Invalid world name."
-    world, new = World.get_or_create(worldname)
-    if new:
-        return do_claim(user, world)
-    if world.owner:
-        raise ClaimException, "That world already has an owner."
+    # world, new = World.get_or_create(worldname)
+    get_object_or_404(World, name=worldname)
+    # if new:
+        # return do_claim(user, world)
+    # if world.owner:
+        # raise ClaimException, "That world already has an owner."
     editors = set(world.edit_set.all().values_list('user', flat=True))
     if not editors:
         return do_claim(user, world)
@@ -95,7 +97,9 @@ def response_403():
 
 def yourworld(request, namespace):
     """Check permissions and route request."""
-    world, _ = World.get_or_create(namespace)
+    # world, _ = World.get_or_create(namespace)
+    world = get_object_or_404(World, name=namespace)
+
     if not permissions.can_read(request.user, world):
         return HttpResponseRedirect('/accounts/private/')
     if 'fetch' in request.GET:
@@ -165,8 +169,6 @@ def send_edits(request, world):
 
     sessionid= ''
     if request.session:
-        # log.info('sending edits, request:')
-        # log.info(request.session.session_key)
         sessionid = request.session.session_key
     
     assert permissions.can_write(request.user, world) # Checked by router

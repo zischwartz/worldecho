@@ -245,9 +245,9 @@ YourWorld.World = function() {
             disableDoubleClickZoom : _config.disableDoubleClickZoom(),
             scrollwheel: false,
             // draggable: false,
-            // disableDefaultUI: true,
+            disableDefaultUI: true,
             panControl: false, 
-            // zoomControl: false,
+            zoomControl: false,
             streetViewControl: false,
             mapTypeControl:false,
 
@@ -1769,14 +1769,12 @@ YourWorld.Tile = function() {
                         else if (propName == 'cn')
                         {
                             s = document.createElement('span');
-                            s.className= "colory";
-                            s.className= "t"+ val.toString()
+                            // s.className= "colory";
+                            // s.className= "t"+ val.toString()
                             // $.data(s, 'sid', val);
-                            $(cell).wrapInner($(s));
-                            s = cell.childNodes[0];
-
-
-                            console.log('that cell has a sessionid property!', val, s);
+                            // $(cell).wrapInner($(s));
+                            // s = cell.childNodes[0];
+                            // console.log('that cell has a sessionid property!', val, s);
                         }
                         else {
 							throw new Error('Unknown cell property');
