@@ -395,9 +395,18 @@ var bignum= 1000000000000000;
     {
                 // _state.selected = $(".tilecont").eq(5).find("td").eq(0).get(0);
                 // console.log($(".tilecont"));
-                setSelected( $(".tilecont").eq(5).find("td").eq(0).get(0));
+                //setSelected( $(".tilecont").eq(5).find("td").eq(0).get(0));
                 // console.log('selected el is ', _state.selected);
-                console.log('Setting Selected to a random el');
+                //console.log('Setting Selected to a random el');
+                
+                // We can actually grab the center cell, yay!
+                var centerCell = FromLatLngToTileWithCells(map.getCenter(), map.getZoom());
+                //console.log(centerCell);
+                //console.log(getTile(centerCell[1] - 1, centerCell[0]));
+                //console.log(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
+                setSelected(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
+                moveCursor('down', null);
+                moveCursor('down', null);
     }
 
     var getOrCreateTile = function(tileY, tileX) {
@@ -1313,7 +1322,7 @@ var bignum= 1000000000000000;
     var typeChar = function(s) {
         // Updates the tile text. 
         // Param `s` is a character that was typed
-        console.log('typeChar---', s);
+        //console.log('typeChar---', s);
 
         // Validate and parse
         if (!_state.canWrite) {
@@ -1431,9 +1440,10 @@ var bignum= 1000000000000000;
                 typeChar(' ');
             // Enter
             } else if (e.keyCode == $.ui.keyCode.ENTER) {
-                if (_state.lastClick && _state.lastClick.nodeName == 'TD') {
+                /*if (_state.lastClick && _state.lastClick.nodeName == 'TD') {
                     _state.lastClick = moveCursor('down', _state.lastClick);
-                }
+                }*/
+                moveCursor('down');
             } else if (e.keyCode == $.ui.keyCode.LEFT) {
                 moveCursor('left');
             } else if (e.keyCode == $.ui.keyCode.RIGHT) {
@@ -1750,7 +1760,7 @@ YourWorld.Tile = function() {
                             $(cell).wrapInner($(s));
                             s = cell.childNodes[0];
 
-                            console.log('that cell has a sessionid property!', val, s);
+                            //console.log('that cell has a sessionid property!', val, s);
                         }
                         else {
 							throw new Error('Unknown cell property');
