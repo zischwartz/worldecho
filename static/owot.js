@@ -141,7 +141,7 @@ YourWorld.Config = function(container) {
 
 
     var restrictToLatLng = new google.maps.LatLng(40.73061489199429, -73.9934785);
-    var restrictDistance= 15000; //in m
+    var restrictDistance= 20000; //in meters
     var restrictLocationString= "New York City";
 
     //google.maps.MapTypeId.ROADMAP;
@@ -252,8 +252,8 @@ YourWorld.World = function() {
             disableDoubleClickZoom : _config.disableDoubleClickZoom(),
             scrollwheel: false,
             // draggable: false,
-            disableDefaultUI: true,
-            panControl: false, 
+            // disableDefaultUI: true,
+            panControl: true, 
             zoomControl: false,
             streetViewControl: false,
             mapTypeControl:false,
@@ -314,13 +314,14 @@ YourWorld.World = function() {
                         console.log('can?',_state.canWrite);
                         _state.canWrite=false;
                         console.log('can?',_state.canWrite);
-                        obj.message = "Sorry, you can't write on the map because you're not close enough to " + _config.restrictLocationString() + ". You can look around though. We'll open this up to everyone soon.";
-                        alert(obj.message);
+
+                        obj.message = "<b>Sorry, you can't write on the map because you're not close enough to " + _config.restrictLocationString() + ". You can look around though. We'll open this up to everyone soon.</b>";
+                        // alert(obj.message);
                         initialUserPos = _config.restrictLatLng();
+                        var infowindow = new google.maps.InfoWindow({map:map, position:_config.restrictLatLng(), content: obj.message});
+
                     }
                 }
-
-
 
 
                 map.setCenter(initialUserPos);
@@ -345,7 +346,26 @@ YourWorld.World = function() {
     handleNoGeolocation(false);
   } 
 };//end mapInitialize
-    
+
+
+function handleNoGeolocation(errorFlag) {
+  if (errorFlag) {
+    var content = "<b>Error: The Geolocation service failed. You can't write, sorry.</b>";
+  } else {
+    var content = '<b>Error: Your browser doesn\'t support geolocation.</b>';
+  }
+ 
+  var options = {
+    map: map,
+    position: _config.restrictLatLng(), 
+    // position: new google.maps.LatLng(-69.821392, -75.329819), //antartica, teeeheeee
+    content: content
+  };
+
+  var infowindow = new google.maps.InfoWindow(options);
+
+  map.setCenter(options.position);
+}
 
 
     CoordMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
@@ -437,6 +457,7 @@ YourWorld.World = function() {
     var probablyDoneLoading = function()
     {
                 // _state.selected = $(".tilecont").eq(5).find("td").eq(0).get(0);
+
                 // console.log($(".tilecont"));
                 //setSelected( $(".tilecont").eq(5).find("td").eq(0).get(0));
                 // console.log('selected el is ', _state.selected);
@@ -551,8 +572,13 @@ YourWorld.World = function() {
 				// console.log([minY, minX, maxY, maxX]);
                 if (_firstBoundCheck)
                 {
-                    probablyDoneLoading();
-                    _firstBoundCheck=0;
+                    if ($(".tilecont").length)
+                        {
+                            probablyDoneLoading();
+                            _firstBoundCheck=0;
+                        }
+
+                    
                 }
 		        return [minY, minX, maxY, maxX];
             }
@@ -1326,6 +1352,7 @@ YourWorld.World = function() {
         // Unset current
         if (_state.selected) {
             _state.selected.style.backgroundColor = '';
+            $(_state.selected).removeClass("selected");
         }
         _state.selected = null;
         // Check DOM
@@ -1359,7 +1386,8 @@ YourWorld.World = function() {
         
         // Hightlight and store
         _state.selected = el; 
-        _state.selected.style.backgroundColor = 'yellow';
+        $(_state.selected).addClass("selected")
+        // _state.selected.style.backgroundColor = 'yellow';
     };
 
     var typeChar = function(s) {
@@ -1798,9 +1826,6 @@ YourWorld.Tile = function() {
                         else if (propName == 'sid')
                         {
                             cell.className= "t"+ val.toString();
-
-                            // console.log('that cell has a sessionid property!', val, s);
-
                         }
 
                         else {
@@ -1885,7 +1910,7 @@ YourWorld.Tile = function() {
 $(document).ready(function() {
 
 	$("#topbarAbout > a").click(function(){
-		$("#aboutOverlay").append().fadeIn(300);	
+		$("#aboutOverlay").fadeIn(300);	
 	});
 
 
