@@ -329,7 +329,7 @@ var bignum= 1000000000000000;
         div = tile.HTMLnode();
 
         //for debug
-        $(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
+        //$(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
 
         // div.innerHTML= topleft.lat()*bignum + ' x'+topleft.lng()*bignum ;
         // div.innerHTML= coord;
@@ -395,9 +395,18 @@ var bignum= 1000000000000000;
     {
                 // _state.selected = $(".tilecont").eq(5).find("td").eq(0).get(0);
                 // console.log($(".tilecont"));
-                setSelected( $(".tilecont").eq(5).find("td").eq(0).get(0));
+                //setSelected( $(".tilecont").eq(5).find("td").eq(0).get(0));
                 // console.log('selected el is ', _state.selected);
-                console.log('Setting Selected to a random el');
+                //console.log('Setting Selected to a random el');
+                
+                // We can actually grab the center cell, yay!
+                var centerCell = FromLatLngToTileWithCells(map.getCenter(), map.getZoom());
+                //console.log(centerCell);
+                //console.log(getTile(centerCell[1] - 1, centerCell[0]));
+                //console.log(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
+                setSelected(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
+                moveCursor('down', null);
+                moveCursor('down', null);
     }
 
     var getOrCreateTile = function(tileY, tileX) {
@@ -626,7 +635,7 @@ var bignum= 1000000000000000;
     var makeBottomRoom = makeRightRoom;
     
     var updateData = function(data) {
-        console.log('updateData --------------');
+        //console.log('updateData --------------');
         // console.log(data);
         // Callback for fetchEdits -- gets new tile data from server and renders
         
@@ -635,9 +644,9 @@ var bignum= 1000000000000000;
         
         $.each(data, function(YX, properties) {
             var coords = YX.split(',');
-            console.log('coords', coords);
+            //console.log('coords', coords);
             var tile = getTile(coords[0], coords[1]);
-            console.log('tile: ', tile);
+            //console.log('tile: ', tile);
             // We may have cleaned up tiles while the request was made:
             if (tile) {
                 tile.setProperties(properties);
