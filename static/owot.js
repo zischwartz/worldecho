@@ -1800,17 +1800,14 @@ YourWorld.Tile = function() {
 							}
 
 						} 
-                        else if (propName == 'cn')
+                        else if (propName == 'sid')
                         {
                             cell.className= "t"+ val.toString();
 
                             // console.log('that cell has a sessionid property!', val, s);
 
                         }
-                        else if (propName == 'sid')
-                        {
-                               
-                        }
+
                         else {
 							throw new Error('Unknown cell property');
 						}
