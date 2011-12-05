@@ -324,8 +324,6 @@ YourWorld.World = function() {
                 }
 
 
-
-
                 map.setCenter(initialUserPos);
 
                 // we could figure out size based on zoom here...
@@ -464,10 +462,10 @@ function handleNoGeolocation(errorFlag) {
     var probablyDoneLoading = function()
     {
                 // _state.selected = $(".tilecont").eq(5).find("td").eq(0).get(0);
-                // console.log($(".tilecont"));
-                setSelected( $(".tilecont").eq(5).find("td").eq(0).get(0));
+                console.log($(".tilecont").length); //this is the problem, make sure these exist
+                setSelected( $(".tilecont").eq(0).find("td").eq(150).get(0));
                 // console.log('selected el is ', _state.selected);
-                console.log('Setting Selected to a random el');
+                // console.log('Setting Selected to a random el');
     }
 
     var getOrCreateTile = function(tileY, tileX) {
@@ -569,8 +567,13 @@ function handleNoGeolocation(errorFlag) {
 				// console.log([minY, minX, maxY, maxX]);
                 if (_firstBoundCheck)
                 {
-                    probablyDoneLoading();
-                    _firstBoundCheck=0;
+                    if ($(".tilecont").length)
+                        {
+                            probablyDoneLoading();
+                            _firstBoundCheck=0;
+                        }
+
+                    
                 }
 		        return [minY, minX, maxY, maxX];
             }
@@ -1344,6 +1347,7 @@ function handleNoGeolocation(errorFlag) {
         // Unset current
         if (_state.selected) {
             _state.selected.style.backgroundColor = '';
+            $(_state.selected).removeClass("selected");
         }
         _state.selected = null;
         // Check DOM
@@ -1377,7 +1381,8 @@ function handleNoGeolocation(errorFlag) {
         
         // Hightlight and store
         _state.selected = el; 
-        _state.selected.style.backgroundColor = 'yellow';
+        $(_state.selected).addClass("selected")
+        // _state.selected.style.backgroundColor = 'yellow';
     };
 
     var typeChar = function(s) {

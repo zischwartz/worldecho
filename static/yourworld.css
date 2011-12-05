@@ -14,7 +14,10 @@ body {
     color: green !important;
 }
 
-
+td.selected
+{
+    background-color: yellow;
+}
 
 #mapcanvas
 {
@@ -309,3 +312,28 @@ a.urlLink {
     .t11 span{background:#037700;}
 .t0 {color:#bd57b3;}
     .t0 span{background:#9e008c;}
+
+
+
+@-webkit-keyframes pulser {
+        0%   { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
+}
+@-moz-keyframes pulser {
+        0%   { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
+}
+@-ms-keyframes pulser {
+        0%   { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
+}
+
+.selected {
+    background-color: yellow;
+     -webkit-animation: pulser 1s infinite;
+     -moz-animation:    pulser 1s infinite;
+     -ms-animation:     pulser 1s infinite;
+}
