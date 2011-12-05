@@ -1802,15 +1802,14 @@ YourWorld.Tile = function() {
 						} 
                         else if (propName == 'cn')
                         {
-                            s = document.createElement('span');
-                            // s.className= "colory";
-                            // s.className= "t"+ val.toString()
-                            // $.data(s, 'sid', val);
+                            cell.className= "t"+ val.toString();
 
-                            // $(cell).wrapInner($(s));
-                            // s = cell.childNodes[0];
                             // console.log('that cell has a sessionid property!', val, s);
 
+                        }
+                        else if (propName == 'sid')
+                        {
+                               
                         }
                         else {
 							throw new Error('Unknown cell property');

@@ -88,20 +88,21 @@ class Tile(models.Model):
         charY, charX = int(charY), int(charX)
         index = charY*self.COLS+charX
         self.content = self.content[:index] + char + self.content[index+1:]
-        # if sessionid:
+        if sessionid:
 
-        #     # get a number from 0 to 11 (ok 10) for the classname
-        #     for a in sessionid:
-        #         if a.isdigit():
-        #             val=a
+            # get a number from 0 to 11 (ok 10) for the classname
+            for a in sessionid:
+                if a.isdigit():
+                    val=a
 
-        #     if 'cell_props' not in self.properties:
-        #         self.properties['cell_props'] = {}
-        #     if charY not in self.properties['cell_props']:
-        #         self.properties['cell_props'][charY] = {}
-        #     if charX not in self.properties['cell_props'][charY]:
-        #         self.properties['cell_props'][charY][charX] = {}
-        #     self.properties['cell_props'][charY][charX]['cn'] = val
+            if 'cell_props' not in self.properties:
+                self.properties['cell_props'] = {}
+            if charY not in self.properties['cell_props']:
+                self.properties['cell_props'][charY] = {}
+            if charX not in self.properties['cell_props'][charY]:
+                self.properties['cell_props'][charY][charX] = {}
+            self.properties['cell_props'][charY][charX]['cn'] = val
+            self.properties['cell_props'][charY][charX]['sid'] = sessionid
             # self.save()
 
         assert len(self.content) == self.ROWS*self.COLS
