@@ -334,11 +334,6 @@ YourWorld.World = function() {
 
                  });
                 
-                // No one understands why this doesnt' work.
-                // console.log('tiles by coord in init',_tileByCoord);
-                // console.log(_tileByCoord);
-                // var yt = Object.keys(_tileByCoord);
-                // console.log('the ys:', yt);
             
         }, function() {
       handleNoGeolocation(true);

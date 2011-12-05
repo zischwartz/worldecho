@@ -118,6 +118,13 @@ a, a:link, a:hover, a:active, a:visited {
     width: 100%;
 }
 
+#bottombar {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    text-align:right;
+}
+
 #topbar_inner {
     width:100%;
     position:absolute;
