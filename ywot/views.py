@@ -5,13 +5,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.utils import simplejson
 
 from helpers import req_render_to_response
 from lib import log
 from ywot.models import Tile, World, Edit, Whitelist
 from ywot import permissions
+
 
 #
 # Helpers
@@ -29,11 +30,12 @@ def claim(user, worldname):
     # TODO: write tests for this
     if not re.match('\w+$', worldname):
         raise ClaimException, "Invalid world name."
-    world, new = World.get_or_create(worldname)
-    if new:
-        return do_claim(user, world)
-    if world.owner:
-        raise ClaimException, "That world already has an owner."
+    # world, new = World.get_or_create(worldname)
+    get_object_or_404(World, name=worldname)
+    # if new:
+        # return do_claim(user, world)
+    # if world.owner:
+        # raise ClaimException, "That world already has an owner."
     editors = set(world.edit_set.all().values_list('user', flat=True))
     if not editors:
         return do_claim(user, world)
@@ -95,7 +97,9 @@ def response_403():
 
 def yourworld(request, namespace):
     """Check permissions and route request."""
-    world, _ = World.get_or_create(namespace)
+    # world, _ = World.get_or_create(namespace)
+    world = get_object_or_404(World, name=namespace)
+
     if not permissions.can_read(request.user, world):
         return HttpResponseRedirect('/accounts/private/')
     if 'fetch' in request.GET:
@@ -111,12 +115,13 @@ def yourworld(request, namespace):
         'worldName': world.name,
         'features': permissions.get_available_features(request.user, world),
     }
+
     if 'MSIE' in request.META.get('HTTP_USER_AGENT', ''):
         state['announce'] = "Sorry, your World of Text doesn't work well with Internet Explorer."
     return req_render_to_response(request, 'yourworld.html', {
         'settings': settings,
         'state': simplejson.dumps(state),
-        'world': world,
+        'properties': simplejson.dumps(world.properties),
     })
     
 def fetch_updates(request, world):
@@ -160,14 +165,20 @@ def fetch_updates(request, world):
             raise ValueError, 'Unknown JS version'
     return HttpResponse(simplejson.dumps(response))
     
-def send_edits(request, world):
+def get_color(request):
+    log.info("getting random!")
+    import random
+    request.session['sid']= random.randint(1,12)
+    ref=request.META['HTTP_REFERER']
+    return HttpResponseRedirect(ref)
 
-    sessionid= ''
-    if request.session:
-        # log.info('sending edits, request:')
-        # log.info(request.session.session_key)
-        sessionid = request.session.session_key
-    
+def send_edits(request, world):
+    log.info("sending edits")
+    sid= 0
+
+    if 'sid' in request.session:
+        sid = request.session['sid']
+
     assert permissions.can_write(request.user, world) # Checked by router
     response = []
     tiles = {} # a simple cache
@@ -186,16 +197,8 @@ def send_edits(request, world):
         if tile.properties.get('protected'):
             if not permissions.can_admin(request.user, world):
                 continue    
-        tile.set_char(charY, charX, char, sessionid)
+        tile.set_char(charY, charX, char, sid)
         # TODO: anything, please.
-        if tile.properties:
-            if 'cell_props' in tile.properties:
-                if str(charY) in tile.properties['cell_props']: #must be str because that's how JSON interprets int keys
-                    if str(charX) in tile.properties['cell_props'][str(charY)]:
-                        log.info('oooo')
-
-        response.append([tileY, tileX, charY, charX, timestamp, char, sessionid])
-
 
         # if tile.properties:
         #     if 'cell_props' in tile.properties:
@@ -207,6 +210,10 @@ def send_edits(request, world):
         #                     if not tile.properties['cell_props']:
         #                         del tile.properties['cell_props']
         # response.append([tileY, tileX, charY, charX, timestamp, char, sessionid])
+
+        response.append([tileY, tileX, charY, charX, timestamp, char, sid])
+
+
                 
     if len(edits) < 200:
         for tile in tiles.values():

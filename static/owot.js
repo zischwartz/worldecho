@@ -130,7 +130,23 @@ YourWorld.Config = function(container) {
     var map_tile_y = 256;
 
 
-    var default_char= ' ';
+    console.log('we think the default char is:', properties.default_char);
+    var default_char= properties.default_char || ' ';
+    var mapTypeId = google.maps.MapTypeId.ROADMAP;
+    // console.log(properties);
+
+    var mapTypeCustom = new google.maps.StyledMapType(darkMapStyle, {name: "Dark Maps"});
+    var mapTypeAsString = 'dark_map'; //only relevant if custom
+    var disableDoubleClickZoom = true;
+
+
+    var restrictToLatLng = new google.maps.LatLng(40.73061489199429, -73.9934785);
+    var restrictDistance= 15000; //in m
+    var restrictLocationString= "New York City";
+
+    //google.maps.MapTypeId.ROADMAP;
+
+    var zoom=18;
 
     // Auto-generated settings
     //not working
@@ -163,6 +179,17 @@ YourWorld.Config = function(container) {
     obj.defaultContent = function() { return default_content;};
     obj.mapTileX = function() {return map_tile_x;};
     obj.mapTileY = function() {return map_tile_y;};
+
+    obj.mapTypeId = function() {return mapTypeId;};
+    obj.zoom = function() {return zoom;};
+    obj.mapTypeCustom = function() {return mapTypeCustom;};
+    obj.mapTypeAsString = function() {return mapTypeAsString;};
+    obj.disableDoubleClickZoom = function() {return disableDoubleClickZoom;};
+
+    obj.restrictDistance = function() {return restrictDistance;};
+    obj.restrictLatLng = function() {return restrictToLatLng}
+    obj.restrictLocationString = function() {return restrictLocationString}
+
 
     return obj;
 };
@@ -208,7 +235,7 @@ YourWorld.World = function() {
 
     // var map;
     var initialUserPos, pixelWorldCenter, pixelUser;
-    var darkMapType = new google.maps.StyledMapType(darkMapStyle, {name: "Dark Maps"});
+
 
     function CoordMapType(tileSize) { 
         this.tileSize = tileSize; 
@@ -216,26 +243,30 @@ YourWorld.World = function() {
          // console.log(this);
     }
 
+
+
     var mapInitialize= function() {
         var myOptions = {
-            zoom: 18,
+            zoom:  _config.zoom(),
             // zoom: 16,
-            disableDoubleClickZoom : true,
+            disableDoubleClickZoom : _config.disableDoubleClickZoom(),
             scrollwheel: false,
             // draggable: false,
-            // disableDefaultUI: true,
+            disableDefaultUI: true,
             panControl: false, 
-            // zoomControl: false,
+            zoomControl: false,
             streetViewControl: false,
             mapTypeControl:false,
-            mapTypeId: google.maps.MapTypeId.ROADMAP,
 
-            mapTypeControlOptions: { mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'dark_map'] }
+            mapTypeId: _config.mapTypeId(), 
+
+            // mapTypeControlOptions: { mapTypeIds: [worldOption.bgTiletype, 'dark_map'] }
         }; //end options
       
         map = new google.maps.Map(document.getElementById('mapcanvas'), myOptions);
-        map.mapTypes.set('dark_map', darkMapType);
-        map.setMapTypeId('dark_map');
+        
+        map.mapTypes.set(_config.mapTypeAsString(), _config.mapTypeCustom());
+        map.setMapTypeId(_config.mapTypeAsString());
 
         if(navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
@@ -270,7 +301,28 @@ YourWorld.World = function() {
 				    position: initialUserPos
 				  });
 				
-				
+
+                if (_config.restrictDistance())
+                {
+                    // var myhouse = new google.maps.LatLng(40.6795338, -73.98078750000002); //initialUserPos
+                    var distance= google.maps.geometry.spherical.computeDistanceBetween(initialUserPos, _config.restrictLatLng());
+                    // console.log('distance away', distance);
+
+                    if (distance >_config.restrictDistance())
+                    // if (distance >2) //for testing
+                    {
+                        console.log('can?',_state.canWrite);
+                        _state.canWrite=false;
+                        console.log('can?',_state.canWrite);
+                        obj.message = "Sorry, you can't write on the map because you're not close enough to " + _config.restrictLocationString() + ". You can look around though. We'll open this up to everyone soon.";
+                        alert(obj.message);
+                        initialUserPos = _config.restrictLatLng();
+                    }
+                }
+
+
+
+
                 map.setCenter(initialUserPos);
 
                 // we could figure out size based on zoom here...
@@ -299,7 +351,6 @@ YourWorld.World = function() {
   } 
 };//end mapInitialize
     
-var bignum= 1000000000000000;
 
 
     CoordMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
@@ -330,9 +381,6 @@ var bignum= 1000000000000000;
 
         //for debug
         // $(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
-
-        // div.innerHTML= topleft.lat()*bignum + ' x'+topleft.lng()*bignum ;
-        // div.innerHTML= coord;
         // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = 'red';
         return div;
 
@@ -395,9 +443,18 @@ var bignum= 1000000000000000;
     {
                 // _state.selected = $(".tilecont").eq(5).find("td").eq(0).get(0);
                 // console.log($(".tilecont"));
-                setSelected( $(".tilecont").eq(5).find("td").eq(0).get(0));
+                //setSelected( $(".tilecont").eq(5).find("td").eq(0).get(0));
                 // console.log('selected el is ', _state.selected);
-                console.log('Setting Selected to a random el');
+                //console.log('Setting Selected to a random el');
+                
+                // We can actually grab the center cell, yay!
+                var centerCell = FromLatLngToTileWithCells(map.getCenter(), map.getZoom());
+                //console.log(centerCell);
+                //console.log(getTile(centerCell[1] - 1, centerCell[0]));
+                //console.log(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
+                setSelected(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
+                moveCursor('down', null);
+                moveCursor('down', null);
     }
 
     var getOrCreateTile = function(tileY, tileX) {
@@ -1313,7 +1370,7 @@ var bignum= 1000000000000000;
     var typeChar = function(s) {
         // Updates the tile text. 
         // Param `s` is a character that was typed
-        console.log('typeChar---', s);
+        //console.log('typeChar---', s);
 
         // Validate and parse
         if (!_state.canWrite) {
@@ -1431,9 +1488,10 @@ var bignum= 1000000000000000;
                 typeChar(' ');
             // Enter
             } else if (e.keyCode == $.ui.keyCode.ENTER) {
-                if (_state.lastClick && _state.lastClick.nodeName == 'TD') {
+                /*if (_state.lastClick && _state.lastClick.nodeName == 'TD') {
                     _state.lastClick = moveCursor('down', _state.lastClick);
-                }
+                }*/
+                moveCursor('down');
             } else if (e.keyCode == $.ui.keyCode.LEFT) {
                 moveCursor('left');
             } else if (e.keyCode == $.ui.keyCode.RIGHT) {
@@ -1742,16 +1800,14 @@ YourWorld.Tile = function() {
 							}
 
 						} 
-                        else if (propName == 'sessionid')
+                        else if (propName == 'sid')
                         {
-                            s = document.createElement('span');
-                            s.className= "colory";
-                            // $.data(s, 'sid', val);
-                            $(cell).wrapInner($(s));
-                            s = cell.childNodes[0];
+                            cell.className= "t"+ val.toString();
 
-                            console.log('that cell has a sessionid property!', val, s);
+                            // console.log('that cell has a sessionid property!', val, s);
+
                         }
+
                         else {
 							throw new Error('Unknown cell property');
 						}
@@ -1834,8 +1890,10 @@ YourWorld.Tile = function() {
 $(document).ready(function() {
 
 	$("#topbarAbout > a").click(function(){
-		$("#aboutOverlay").fadeIn(300);	
+		$("#aboutOverlay").append().fadeIn(300);	
 	});
+
+
 	$(".closeme").click(function(){
 		$("#aboutOverlay").fadeOut()
 	});

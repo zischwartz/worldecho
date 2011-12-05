@@ -20,9 +20,7 @@ class World(models.Model):
 
     prompt = models.TextField(blank=True)
 
-    # properties:
-    #  - features: {} 
-    #      - 'go_to_coord' true/false
+    properties = DictField(default={})
     
     @staticmethod
     def get_or_create(name):
@@ -66,14 +64,22 @@ class Tile(models.Model):
     tileX = models.IntegerField()
     properties = DictField(default={})
 
-    
+    new = models.IntegerField(default=1)
+
     # properties:
     # - protected (bool)
     # - cell_props[charY][charX] = {}
     
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if self.new:
+            self.content=self.world.default_char * self.LEN
+            self.new=0;
+        super(Tile, self).save(*args, **kwargs) # Call the "real" save() method.
+        # do_something_else()
     
-    def set_char(self, charY, charX, char, sessionid):
+    def set_char(self, charY, charX, char, sid):
         from helpers import control_chars_set
         if char in control_chars_set:
             # TODO: log these guys again at some point
@@ -82,14 +88,15 @@ class Tile(models.Model):
         charY, charX = int(charY), int(charX)
         index = charY*self.COLS+charX
         self.content = self.content[:index] + char + self.content[index+1:]
-        if sessionid:
-            if 'cell_props' not in self.properties:
-                self.properties['cell_props'] = {}
-            if charY not in self.properties['cell_props']:
-                self.properties['cell_props'][charY] = {}
-            if charX not in self.properties['cell_props'][charY]:
-                self.properties['cell_props'][charY][charX] = {}
-            self.properties['cell_props'][charY][charX]['sessionid'] = sessionid
+
+        # add sid identifier 
+        if 'cell_props' not in self.properties:
+            self.properties['cell_props'] = {}
+        if charY not in self.properties['cell_props']:
+            self.properties['cell_props'][charY] = {}
+        if charX not in self.properties['cell_props'][charY]:
+            self.properties['cell_props'][charY][charX] = {}
+        self.properties['cell_props'][charY][charX]['sid'] = sid
             # self.save()
 
         assert len(self.content) == self.ROWS*self.COLS
