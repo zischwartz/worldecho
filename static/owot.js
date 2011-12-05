@@ -130,7 +130,7 @@ YourWorld.Config = function(container) {
     var map_tile_y = 256;
 
 
-    var default_char= '.';
+    var default_char= ' ';
 
     // Auto-generated settings
     //not working
@@ -156,8 +156,8 @@ YourWorld.Config = function(container) {
     //// Public
     obj.numRows = function() { return num_rows;};
     obj.numCols = function() { return num_cols;};
-    obj.charHeight = function() { return char_height;};
-    obj.charWidth = function() { return char_width;};
+    obj.charHeight = function() { return tile_height / num_rows;};
+    obj.charWidth = function() { return tile_width / num_cols;};
     obj.tileHeight = function() { return tile_height;};
     obj.tileWidth = function() { return tile_width;};
     obj.defaultContent = function() { return default_content;};
@@ -432,6 +432,38 @@ var bignum= 1000000000000000;
 	    return ([tx, ty]);
 	}
 
+	function FromLatLngToTileWithCells(latLng, zoom) {
+
+		var TILE_SIZE = 256;
+		/** @const */
+		var TILE_INITIAL_RESOLUTION = 2 * Math.PI * 6378137 / TILE_SIZE;
+		/** @const */
+		var TILE_ORIGIN_SHIFT = 2 * Math.PI * 6378137 / 2.0;
+
+	    //LatLng to Meters
+	    var mx = latLng.lng() * TILE_ORIGIN_SHIFT / 180.0;
+	    var my = (Math.log(Math.tan((90 + latLng.lat()) * Math.PI / 360.0))
+	        / (Math.PI / 180.0)) * TILE_ORIGIN_SHIFT / 180.0;
+
+	    //Meters to Pixels
+	    var res = TILE_INITIAL_RESOLUTION / Math.pow(2, zoom);
+	    var px = (mx + TILE_ORIGIN_SHIFT) / res;
+	    var py = (my + TILE_ORIGIN_SHIFT) / res;
+
+	    //Pixels to Tile Coords
+	    var tx = Math.floor(Math.ceil(px / TILE_SIZE) - 1);
+	    var ty = Math.pow(2, zoom) - 1 - Math.floor(Math.ceil(py / TILE_SIZE) - 1);
+
+        //Characters
+        var ux = px / TILE_SIZE;
+        var remx = ux - Math.floor(ux);
+        var cx = Math.floor(remx * _config.numCols());
+        var uy = py / TILE_SIZE;
+        var remy = uy - Math.floor(uy);
+        var cy = Math.floor((1 - remy) * _config.numRows());
+
+	    return ([tx, ty, cx, cy]);
+	}
 
 
 
@@ -765,6 +797,56 @@ var bignum= 1000000000000000;
         }
         var target = getCell(tileY, tileX, charY, charX);
         setSelected(target);
+        
+        if (dir == 'left') 
+        {
+            var bottomLeft = FromLatLngToTileWithCells(map.getBounds().getSouthWest(), map.getZoom());
+            var maxLeftTile = bottomLeft[0];
+            var maxLeftChar = bottomLeft[2];
+            if (tileX <= maxLeftTile && charX <= maxLeftChar) 
+            {
+                //console.log([tileX, maxLeftTile, charX, maxLeftChar]);
+                //console.log("panning left by ", _config.charWidth() * -1);
+                map.panBy(_config.charWidth() * -1, 0);
+            }
+        }
+        else if (dir == 'right') 
+        {
+            var topRight = FromLatLngToTileWithCells(map.getBounds().getNorthEast(), map.getZoom());
+            var maxRightTile = topRight[0];
+            var maxRightChar = topRight[2];
+            if (tileX >= maxRightTile && charX >= maxRightChar) 
+            {
+                //console.log([tileX, maxRightTile, charX, maxRightChar]);
+                //console.log("panning right by ", _config.charWidth());
+                map.panBy(_config.charWidth(), 0);
+            }
+        }
+        else if (dir == 'up') 
+        {
+            var topRight = FromLatLngToTileWithCells(map.getBounds().getNorthEast(), map.getZoom());
+            var maxTopTile = topRight[1];
+            var maxTopChar = topRight[3];
+            if (tileY <= maxTopTile && charY <= maxTopChar) 
+            {
+                //console.log([tileY, charY, " vs ", maxTopTile, maxTopChar]);
+                //console.log("panning up by ", _config.charHeight() * -1);
+                map.panBy(0, _config.charHeight() * -1);
+            }
+        }
+        else if (dir == 'down') 
+        {
+            var bottomLeft = FromLatLngToTileWithCells(map.getBounds().getSouthWest(), map.getZoom());
+            var maxBottomTile = bottomLeft[1];
+            var maxBottomChar = bottomLeft[3];
+            if (tileY >= maxBottomTile && charY >= maxBottomChar) 
+            {
+                //console.log([tileY, charY, " vs ", maxBottomTile, maxBottomChar]);
+                //console.log("panning down by ", _config.charHeight());
+                map.panBy(0, _config.charHeight());
+            }
+        }
+        
         return target;
     };
     
@@ -1184,7 +1266,7 @@ var bignum= 1000000000000000;
 
     var setSelected = function(el) {
         // Sets the character TD element that is the active cursor position, or null
-        console.log('selected', el);
+        //console.log('selected', el);
 
         //// Setup
         // Unset current
