@@ -1322,7 +1322,7 @@ var bignum= 1000000000000000;
     var typeChar = function(s) {
         // Updates the tile text. 
         // Param `s` is a character that was typed
-        console.log('typeChar---', s);
+        //console.log('typeChar---', s);
 
         // Validate and parse
         if (!_state.canWrite) {
@@ -1440,9 +1440,10 @@ var bignum= 1000000000000000;
                 typeChar(' ');
             // Enter
             } else if (e.keyCode == $.ui.keyCode.ENTER) {
-                if (_state.lastClick && _state.lastClick.nodeName == 'TD') {
+                /*if (_state.lastClick && _state.lastClick.nodeName == 'TD') {
                     _state.lastClick = moveCursor('down', _state.lastClick);
-                }
+                }*/
+                moveCursor('down');
             } else if (e.keyCode == $.ui.keyCode.LEFT) {
                 moveCursor('left');
             } else if (e.keyCode == $.ui.keyCode.RIGHT) {
@@ -1759,7 +1760,7 @@ YourWorld.Tile = function() {
                             $(cell).wrapInner($(s));
                             s = cell.childNodes[0];
 
-                            console.log('that cell has a sessionid property!', val, s);
+                            //console.log('that cell has a sessionid property!', val, s);
                         }
                         else {
 							throw new Error('Unknown cell property');
