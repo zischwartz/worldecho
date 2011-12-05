@@ -281,12 +281,7 @@ YourWorld.World = function() {
 				    new google.maps.Point(0,0),
 				    new google.maps.Point(25,25)
 				  );
-				var shadow = new google.maps.MarkerImage(
-				    'static/here.png',
-				    new google.maps.Size(116,57),
-				    new google.maps.Point(0,0),
-				    new google.maps.Point(-20,50)
-				  );
+				
 				
 				var shape = {
 				    coord: [21,2,23,3,24,4,25,5,26,6,27,7,28,8,28,9,29,10,29,11,29,12,29,13,29,14,29,15,29,16,29,17,29,18,29,19,29,20,29,21,28,22,28,23,27,24,26,25,25,26,24,27,23,28,21,29,10,29,8,28,7,27,6,26,5,25,4,24,3,23,3,22,2,21,2,20,2,19,2,18,2,17,2,16,2,15,2,14,2,13,2,12,2,11,2,10,3,9,3,8,4,7,5,6,6,5,7,4,8,3,10,2,21,2],
@@ -295,7 +290,6 @@ YourWorld.World = function() {
 				
 				var marker = new google.maps.Marker({
 				    icon: image,
-					shadow: shadow,
 				    shape: shape,
 				    map: map,
 				    position: initialUserPos
@@ -455,6 +449,7 @@ YourWorld.World = function() {
                 setSelected(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
                 moveCursor('down', null);
                 moveCursor('down', null);
+				_state.lastClick = _state.selected;
     }
 
     var getOrCreateTile = function(tileY, tileX) {
@@ -1046,62 +1041,6 @@ YourWorld.World = function() {
         scrollUpBy(yMove);
     };
 
-    //same as doGoToCoord, but for pixels....
-    var doGoToPix = function(x, y) {
-
-        if (!_state.goToCoord.initted) {
-            _state.goToCoord.cancel = function() {
-                clearInterval(_state.goToCoord.interval);
-                _state.lastEvent = new Date().getTime(); // unpause if paused
-                $(document).trigger('YWOT_GoToCoord_stop');
-            };
-
-            $(document).bind('YWOT_GoToCoord_start', function() {
-                    // console.log('gotopix start');
-
-                    // $(document).bind('mousedown', _state.goToCoord.cancel); // 'click' event flaky while scrolling
-                    });
-            $(document).bind('YWOT_GoToCoord_stop', function() {
-                    // console.log('gotopix end!!!!1111');
-                    $("#yourworld").addClass('haveOffset');
-                    $("#loadingIndicator").fadeOut();
-                    // $(document).unbind('mousedown', _state.goToCoord.cancel);
-                    });
-            _state.goToCoord.initted = true;
-        } 
-
-
-        console.log('centerCOOrds',getCenterCoords());
-
-        var scroller = function() {
-            // We have to recalculate the move every time, or else imprecision will take
-            // us off-target over long distances
-
-            var coords = getCenterYX();
-            var centerY = coords[0],
-                centerX = coords[1];
-
-            var yDiff = y - centerY;
-            var xDiff = x - centerX;
-
-            var distance = YourWorld.helpers.vectorLen(yDiff, xDiff);
-            var yMove = Math.round(yDiff*200/distance); // normalize, then scale to 10px
-            var xMove = Math.round(xDiff*200/distance); //both were 20
-            if (YourWorld.helpers.vectorLen(yDiff, xDiff) < 250) { // 40 pixels w/in target (arbitrary)
-                scrollUpBy(yDiff);
-                scrollLeftBy(xDiff);
-
-                _state.goToCoord.cancel();
-                return;
-            }
-            yDiff = yDiff - yMove;
-            scrollUpBy(yMove);
-            xDiff = xDiff - xMove;
-            scrollLeftBy(xMove);
-        };
-        _state.goToCoord.interval = setInterval(scroller, 25); // 1000/25=40 per second * 20px = 800px/s speed
-        $(document).trigger('YWOT_GoToCoord_start');
-    };
 
 
 
@@ -1488,18 +1427,23 @@ YourWorld.World = function() {
                 typeChar(' ');
             // Enter
             } else if (e.keyCode == $.ui.keyCode.ENTER) {
-                /*if (_state.lastClick && _state.lastClick.nodeName == 'TD') {
+                if (_state.lastClick && _state.lastClick.nodeName == 'TD') {
+                	moveCursor('down', _state.lastClick);
                     _state.lastClick = moveCursor('down', _state.lastClick);
-                }*/
-                moveCursor('down');
+                }
+
             } else if (e.keyCode == $.ui.keyCode.LEFT) {
                 moveCursor('left');
+				_state.lastClick = _state.selected;
             } else if (e.keyCode == $.ui.keyCode.RIGHT) {
                 moveCursor('right');
+				_state.lastClick = _state.selected;
             } else if (e.keyCode == $.ui.keyCode.DOWN) {
                 moveCursor('down');
+				_state.lastClick = _state.selected;
             } else if (e.keyCode == $.ui.keyCode.UP) {
                 moveCursor('up');
+				_state.lastClick = _state.selected;
             }
             _state.lastEvent = new Date().getTime();
         });
