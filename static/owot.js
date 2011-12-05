@@ -462,12 +462,7 @@ function handleNoGeolocation(errorFlag) {
     var probablyDoneLoading = function()
     {
                 // _state.selected = $(".tilecont").eq(5).find("td").eq(0).get(0);
-<<<<<<< HEAD
-                console.log($(".tilecont").length); //this is the problem, make sure these exist
-                setSelected( $(".tilecont").eq(0).find("td").eq(150).get(0));
-                // console.log('selected el is ', _state.selected);
-                // console.log('Setting Selected to a random el');
-=======
+
                 // console.log($(".tilecont"));
                 //setSelected( $(".tilecont").eq(5).find("td").eq(0).get(0));
                 // console.log('selected el is ', _state.selected);
@@ -481,7 +476,6 @@ function handleNoGeolocation(errorFlag) {
                 setSelected(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
                 moveCursor('down', null);
                 moveCursor('down', null);
->>>>>>> e344f97790abbc6f84f138b5fa14f3ede116c9d1
     }
 
     var getOrCreateTile = function(tileY, tileX) {
@@ -1840,7 +1834,7 @@ YourWorld.Tile = function() {
                             // s.className= "colory";
                             // s.className= "t"+ val.toString()
                             // $.data(s, 'sid', val);
-                            
+
                             // $(cell).wrapInner($(s));
                             // s = cell.childNodes[0];
                             // console.log('that cell has a sessionid property!', val, s);
