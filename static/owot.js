@@ -130,7 +130,8 @@ YourWorld.Config = function(container) {
     var map_tile_y = 256;
 
 
-    var default_char= properties.default_char;
+    console.log('we think the default char is:', properties.default_char);
+    var default_char= properties.default_char || ' ';
     var mapTypeId = google.maps.MapTypeId.ROADMAP;
     // console.log(properties);
 
