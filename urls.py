@@ -48,7 +48,6 @@ urlpatterns += patterns('ywot.views',
     url(r'^ajax/coordlink/$', 'coordlink', name='coordlink'),
     url(r'^ajax/urllink/$', 'urllink', name='urllink'),
     
-    url(r'^get_color/$', 'get_color', name ='get_color'),
 
     # Worldviews
     ('^(\w*)$', 'yourworld'),
