@@ -138,9 +138,11 @@ YourWorld.Config = function(container) {
     var mapTypeCustom = new google.maps.StyledMapType(darkMapStyle, {name: "Dark Maps"});
     var mapTypeAsString = 'dark_map'; //only relevant if custom
     var disableDoubleClickZoom = true;
-        // _config.mapTypeAsString= 'dark_map';
 
 
+    var restrictToLatLng = new google.maps.LatLng(40.73061489199429, -73.9934785);
+    var restrictDistance= 15000; //in m
+    var restrictLocationString= "New York City";
 
     //google.maps.MapTypeId.ROADMAP;
 
@@ -183,6 +185,11 @@ YourWorld.Config = function(container) {
     obj.mapTypeCustom = function() {return mapTypeCustom;};
     obj.mapTypeAsString = function() {return mapTypeAsString;};
     obj.disableDoubleClickZoom = function() {return disableDoubleClickZoom;};
+
+    obj.restrictDistance = function() {return restrictDistance;};
+    obj.restrictLatLng = function() {return restrictToLatLng}
+    obj.restrictLocationString = function() {return restrictLocationString}
+
 
     return obj;
 };
@@ -294,7 +301,28 @@ YourWorld.World = function() {
 				    position: initialUserPos
 				  });
 				
-				
+
+                if (_config.restrictDistance())
+                {
+                    // var myhouse = new google.maps.LatLng(40.6795338, -73.98078750000002); //initialUserPos
+                    var distance= google.maps.geometry.spherical.computeDistanceBetween(initialUserPos, _config.restrictLatLng());
+                    // console.log('distance away', distance);
+
+                    if (distance >_config.restrictDistance())
+                    // if (distance >2) //for testing
+                    {
+                        console.log('can?',_state.canWrite);
+                        _state.canWrite=false;
+                        console.log('can?',_state.canWrite);
+                        obj.message = "Sorry, you can't write on the map because you're not close enough to " + _config.restrictLocationString() + ". You can look around though. We'll open this up to everyone soon.";
+                        alert(obj.message);
+                        initialUserPos = _config.restrictLatLng();
+                    }
+                }
+
+
+
+
                 map.setCenter(initialUserPos);
 
                 // we could figure out size based on zoom here...
@@ -323,7 +351,6 @@ YourWorld.World = function() {
   } 
 };//end mapInitialize
     
-var bignum= 1000000000000000;
 
 
     CoordMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
@@ -354,9 +381,6 @@ var bignum= 1000000000000000;
 
         //for debug
         // $(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
-
-        // div.innerHTML= topleft.lat()*bignum + ' x'+topleft.lng()*bignum ;
-        // div.innerHTML= coord;
         // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = 'red';
         return div;
 
@@ -1858,8 +1882,10 @@ YourWorld.Tile = function() {
 $(document).ready(function() {
 
 	$("#topbarAbout > a").click(function(){
-		$("#aboutOverlay").fadeIn(300);	
+		$("#aboutOverlay").append().fadeIn(300);	
 	});
+
+
 	$(".closeme").click(function(){
 		$("#aboutOverlay").fadeOut()
 	});

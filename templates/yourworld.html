@@ -82,7 +82,7 @@
 <script type="text/javascript">
   $(function() {
     var menu = $.Menu($('#menu'), $('#nav'));
-    var state = {{ state|safe }};
+    var  state = {{ state|safe }};
     InitWorld(document.getElementById('yourworld'), menu, state);
 
   });
