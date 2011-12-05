@@ -123,26 +123,16 @@ def fetch_updates(request, world):
     # log.info('fetching updates')
 
     response = {}
-    min_tileY = float(request.GET['min_tileY'])
-    min_tileX = float(request.GET['min_tileX'])
-    max_tileY = float(request.GET['max_tileY'])
-    max_tileX = float(request.GET['max_tileX'])
+    min_tileY = int(request.GET['min_tileY'])
+    min_tileX = int(request.GET['min_tileX'])
+    max_tileY = int(request.GET['max_tileY'])
+    max_tileX = int(request.GET['max_tileX'])
     response = {}
 
-    #max_tileX   
-    # -73.99154663085938
-    # max_tileY   
-    # 40.730608477796636
-    # min_tileX   
-    # -73.99566650390625
-    # min_tileY   
-    # 40.73164913017892
 
-# TODO minY and maxY seem to be reversed, coming form client/martin's js
-
-    # assert min_tileY < max_tileY
-    # assert min_tileX < max_tileX
-    # assert ((max_tileY - min_tileY)*(max_tileX - min_tileX)) < 400
+    assert min_tileY < max_tileY
+    assert min_tileX < max_tileX
+    assert ((max_tileY - min_tileY)*(max_tileX - min_tileX)) < 400
     
     # Set default info to null
     #not sure what this was trying to do, but it won't work for us with our float values for tiles
@@ -172,8 +162,11 @@ def fetch_updates(request, world):
     
 def send_edits(request, world):
 
-    log.info('sending edits, request:')
-    log.info(request)
+    sessionid= ''
+    if request.session:
+        # log.info('sending edits, request:')
+        # log.info(request.session.session_key)
+        sessionid = request.session.session_key
     
     assert permissions.can_write(request.user, world) # Checked by router
     response = []
@@ -193,18 +186,28 @@ def send_edits(request, world):
         if tile.properties.get('protected'):
             if not permissions.can_admin(request.user, world):
                 continue    
-        tile.set_char(charY, charX, char)
+        tile.set_char(charY, charX, char, sessionid)
         # TODO: anything, please.
         if tile.properties:
             if 'cell_props' in tile.properties:
                 if str(charY) in tile.properties['cell_props']: #must be str because that's how JSON interprets int keys
                     if str(charX) in tile.properties['cell_props'][str(charY)]:
-                        del tile.properties['cell_props'][str(charY)][str(charX)]
-                        if not tile.properties['cell_props'][str(charY)]:
-                            del tile.properties['cell_props'][str(charY)]
-                            if not tile.properties['cell_props']:
-                                del tile.properties['cell_props']
-        response.append([tileY, tileX, charY, charX, timestamp, char])
+                        log.info('oooo')
+
+        response.append([tileY, tileX, charY, charX, timestamp, char, sessionid])
+
+
+        # if tile.properties:
+        #     if 'cell_props' in tile.properties:
+        #         if str(charY) in tile.properties['cell_props']: #must be str because that's how JSON interprets int keys
+        #             if str(charX) in tile.properties['cell_props'][str(charY)]:
+        #                 del tile.properties['cell_props'][str(charY)][str(charX)]
+        #                 if not tile.properties['cell_props'][str(charY)]:
+        #                     del tile.properties['cell_props'][str(charY)]
+        #                     if not tile.properties['cell_props']:
+        #                         del tile.properties['cell_props']
+        # response.append([tileY, tileX, charY, charX, timestamp, char, sessionid])
+                
     if len(edits) < 200:
         for tile in tiles.values():
             tile.save()
