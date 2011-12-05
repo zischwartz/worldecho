@@ -462,10 +462,26 @@ function handleNoGeolocation(errorFlag) {
     var probablyDoneLoading = function()
     {
                 // _state.selected = $(".tilecont").eq(5).find("td").eq(0).get(0);
+<<<<<<< HEAD
                 console.log($(".tilecont").length); //this is the problem, make sure these exist
                 setSelected( $(".tilecont").eq(0).find("td").eq(150).get(0));
                 // console.log('selected el is ', _state.selected);
                 // console.log('Setting Selected to a random el');
+=======
+                // console.log($(".tilecont"));
+                //setSelected( $(".tilecont").eq(5).find("td").eq(0).get(0));
+                // console.log('selected el is ', _state.selected);
+                //console.log('Setting Selected to a random el');
+                
+                // We can actually grab the center cell, yay!
+                var centerCell = FromLatLngToTileWithCells(map.getCenter(), map.getZoom());
+                //console.log(centerCell);
+                //console.log(getTile(centerCell[1] - 1, centerCell[0]));
+                //console.log(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
+                setSelected(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
+                moveCursor('down', null);
+                moveCursor('down', null);
+>>>>>>> e344f97790abbc6f84f138b5fa14f3ede116c9d1
     }
 
     var getOrCreateTile = function(tileY, tileX) {
@@ -1388,7 +1404,7 @@ function handleNoGeolocation(errorFlag) {
     var typeChar = function(s) {
         // Updates the tile text. 
         // Param `s` is a character that was typed
-        console.log('typeChar---', s);
+        //console.log('typeChar---', s);
 
         // Validate and parse
         if (!_state.canWrite) {
@@ -1506,9 +1522,10 @@ function handleNoGeolocation(errorFlag) {
                 typeChar(' ');
             // Enter
             } else if (e.keyCode == $.ui.keyCode.ENTER) {
-                if (_state.lastClick && _state.lastClick.nodeName == 'TD') {
+                /*if (_state.lastClick && _state.lastClick.nodeName == 'TD') {
                     _state.lastClick = moveCursor('down', _state.lastClick);
-                }
+                }*/
+                moveCursor('down');
             } else if (e.keyCode == $.ui.keyCode.LEFT) {
                 moveCursor('left');
             } else if (e.keyCode == $.ui.keyCode.RIGHT) {
@@ -1823,9 +1840,11 @@ YourWorld.Tile = function() {
                             // s.className= "colory";
                             // s.className= "t"+ val.toString()
                             // $.data(s, 'sid', val);
+                            
                             // $(cell).wrapInner($(s));
                             // s = cell.childNodes[0];
                             // console.log('that cell has a sessionid property!', val, s);
+
                         }
                         else {
 							throw new Error('Unknown cell property');
