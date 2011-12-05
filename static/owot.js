@@ -329,7 +329,7 @@ var bignum= 1000000000000000;
         div = tile.HTMLnode();
 
         //for debug
-        //$(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
+        // $(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
 
         // div.innerHTML= topleft.lat()*bignum + ' x'+topleft.lng()*bignum ;
         // div.innerHTML= coord;
@@ -550,7 +550,7 @@ var bignum= 1000000000000000;
         var numAcross = _container.width()/_config.tileWidth();
         var centerY = minVisY + numDown/2;
         var centerX = minVisX + numAcross/2;
-        console.log('centercoords', centerY, centerX);
+        // console.log('centercoords', centerY, centerX);
 		return [centerY, centerX];
 	};
 
@@ -635,18 +635,18 @@ var bignum= 1000000000000000;
     var makeBottomRoom = makeRightRoom;
     
     var updateData = function(data) {
-        //console.log('updateData --------------');
+        // console.log('updateData --------------');
         // console.log(data);
         // Callback for fetchEdits -- gets new tile data from server and renders
         
         // TODO reenable
-        // setTimeout(fetchUpdates, 997);
+        setTimeout(fetchUpdates, 997);
         
         $.each(data, function(YX, properties) {
             var coords = YX.split(',');
-            //console.log('coords', coords);
+            // console.log('coords', coords);
             var tile = getTile(coords[0], coords[1]);
-            //console.log('tile: ', tile);
+            // console.log('tile: ', tile);
             // We may have cleaned up tiles while the request was made:
             if (tile) {
                 tile.setProperties(properties);
@@ -677,7 +677,7 @@ var bignum= 1000000000000000;
             return;
         }
 
-        console.log('sending edits f0real');
+        // console.log('sending edits f0real');
 
         jQuery.ajax({
             type: 'POST',
@@ -693,7 +693,7 @@ var bignum= 1000000000000000;
 
     var t;
     var fetchUpdates = function() {
-        console.log('fetching updates...');
+        // console.log('fetching updates...');
 
         // Get updates for rendered tiles
         // Skip if user is inactive for over a minute:
@@ -717,7 +717,7 @@ var bignum= 1000000000000000;
         if (!_firstBoundCheck)
         {
             clearTimeout(t);
-            console.log('has bounds, fetching Updates');
+            // console.log('has bounds, fetching Updates');
 
             jQuery.ajax({
                 type: 'GET',
@@ -1657,7 +1657,7 @@ YourWorld.Tile = function() {
 						if (highlight && !cell.style.backgroundColor) {
 							// Don't highlight selected or it'll stay yellow
 							if (_inkLimiter[1] < 10) {
-								// $(cell).effect('highlight', {}, 500);
+								// $(cell).effect('highlight', {}, 500);  //removed because people didn't like it
 								_inkLimiter[1]++;
 							}
 						}
@@ -1749,7 +1749,19 @@ YourWorld.Tile = function() {
 							} else {
 								//throw new Error('Unknown link type');
 							}
-						} else {
+
+						} 
+                        else if (propName == 'sessionid')
+                        {
+                            s = document.createElement('span');
+                            s.className= "colory";
+                            // $.data(s, 'sid', val);
+                            $(cell).wrapInner($(s));
+                            s = cell.childNodes[0];
+
+                            console.log('that cell has a sessionid property!', val, s);
+                        }
+                        else {
 							throw new Error('Unknown cell property');
 						}
 					});
