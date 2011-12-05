@@ -111,12 +111,13 @@ def yourworld(request, namespace):
         'worldName': world.name,
         'features': permissions.get_available_features(request.user, world),
     }
+
     if 'MSIE' in request.META.get('HTTP_USER_AGENT', ''):
         state['announce'] = "Sorry, your World of Text doesn't work well with Internet Explorer."
     return req_render_to_response(request, 'yourworld.html', {
         'settings': settings,
         'state': simplejson.dumps(state),
-        'world': world,
+        'properties': simplejson.dumps(world.properties),
     })
     
 def fetch_updates(request, world):

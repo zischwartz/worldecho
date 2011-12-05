@@ -130,7 +130,20 @@ YourWorld.Config = function(container) {
     var map_tile_y = 256;
 
 
-    var default_char= ' ';
+    var default_char= properties.default_char;
+    var mapTypeId = google.maps.MapTypeId.ROADMAP;
+    // console.log(properties);
+
+    var mapTypeCustom = new google.maps.StyledMapType(darkMapStyle, {name: "Dark Maps"});
+    var mapTypeAsString = 'dark_map'; //only relevant if custom
+    var disableDoubleClickZoom = true;
+        // _config.mapTypeAsString= 'dark_map';
+
+
+
+    //google.maps.MapTypeId.ROADMAP;
+
+    var zoom=18;
 
     // Auto-generated settings
     //not working
@@ -163,6 +176,12 @@ YourWorld.Config = function(container) {
     obj.defaultContent = function() { return default_content;};
     obj.mapTileX = function() {return map_tile_x;};
     obj.mapTileY = function() {return map_tile_y;};
+
+    obj.mapTypeId = function() {return mapTypeId;};
+    obj.zoom = function() {return zoom;};
+    obj.mapTypeCustom = function() {return mapTypeCustom;};
+    obj.mapTypeAsString = function() {return mapTypeAsString;};
+    obj.disableDoubleClickZoom = function() {return disableDoubleClickZoom;};
 
     return obj;
 };
@@ -208,7 +227,7 @@ YourWorld.World = function() {
 
     // var map;
     var initialUserPos, pixelWorldCenter, pixelUser;
-    var darkMapType = new google.maps.StyledMapType(darkMapStyle, {name: "Dark Maps"});
+
 
     function CoordMapType(tileSize) { 
         this.tileSize = tileSize; 
@@ -216,11 +235,13 @@ YourWorld.World = function() {
          // console.log(this);
     }
 
+
+
     var mapInitialize= function() {
         var myOptions = {
-            zoom: 18,
+            zoom:  _config.zoom(),
             // zoom: 16,
-            disableDoubleClickZoom : true,
+            disableDoubleClickZoom : _config.disableDoubleClickZoom(),
             scrollwheel: false,
             // draggable: false,
             // disableDefaultUI: true,
@@ -228,14 +249,16 @@ YourWorld.World = function() {
             // zoomControl: false,
             streetViewControl: false,
             mapTypeControl:false,
-            mapTypeId: google.maps.MapTypeId.ROADMAP,
 
-            mapTypeControlOptions: { mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'dark_map'] }
+            mapTypeId: _config.mapTypeId(), 
+
+            // mapTypeControlOptions: { mapTypeIds: [worldOption.bgTiletype, 'dark_map'] }
         }; //end options
       
         map = new google.maps.Map(document.getElementById('mapcanvas'), myOptions);
-        map.mapTypes.set('dark_map', darkMapType);
-        map.setMapTypeId('dark_map');
+        
+        map.mapTypes.set(_config.mapTypeAsString(), _config.mapTypeCustom());
+        map.setMapTypeId(_config.mapTypeAsString());
 
         if(navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {

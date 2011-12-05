@@ -20,9 +20,7 @@ class World(models.Model):
 
     prompt = models.TextField(blank=True)
 
-    # properties:
-    #  - features: {} 
-    #      - 'go_to_coord' true/false
+    properties = DictField(default={})
     
     @staticmethod
     def get_or_create(name):
@@ -66,12 +64,20 @@ class Tile(models.Model):
     tileX = models.IntegerField()
     properties = DictField(default={})
 
-    
+    new = models.IntegerField(default=1)
+
     # properties:
     # - protected (bool)
     # - cell_props[charY][charX] = {}
     
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if self.new:
+            self.content=self.world.default_char * self.LEN
+            self.new=0;
+        super(Tile, self).save(*args, **kwargs) # Call the "real" save() method.
+        # do_something_else()
     
     def set_char(self, charY, charX, char, sessionid):
         from helpers import control_chars_set
