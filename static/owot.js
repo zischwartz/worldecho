@@ -540,34 +540,35 @@ function handleNoGeolocation(errorFlag) {
 		
 		
 	var FromPixelsToTileWithCells = function(e){
+
 	//get latlongs of the map
 	var bounds = map.getBounds();
 	var mDeltaX = bounds.getNorthEast().lng() - bounds.getSouthWest().lng();
 	var mDeltaY = bounds.getNorthEast().lat() - bounds.getSouthWest().lat();
-	var northWest = new google.maps.LatLng( bounds.getSouthWest().lat(), bounds.getNorthEast().lng()); 
 
 	//get pixels of the window
 	var wDeltaX = $(window).width();
 	var wDeltaY = $(window).height();
-
-
+	
 	//get ratio pixels to latlng
 	var ratioX = wDeltaX / mDeltaX;
 	var ratioY = wDeltaY / mDeltaY;
 
-	// point is at upper left latln plus cursor
+
+	// mouse position to latlong
 	var mouseLng = bounds.getSouthWest().lng() + ( e.pageX / ratioX );
 	var mouseLat = bounds.getNorthEast().lat() - ( e.pageY / ratioY );
 	var mousePos = new google.maps.LatLng(mouseLat, mouseLng);
 
-
-
 //	alert(mousePos.lng() +', '+ mousePos.lat() +', '+ northWest.lng()+', '+ northWest.lat() );
-  	  
+  	 
+ 	
    	XY_xy =  FromLatLngToTileWithCells(mousePos, map.getZoom());
-   //	alert(XY_xy);
+
+	//finding the actual element and selecting it
    	var target = getCell(XY_xy[1], XY_xy[0], XY_xy[3], XY_xy[2]);
     setSelected(target);
+	//storing last click (that also works as last selected with arrows)
 	_state.lastClick = _state.selected;
 
 	}
