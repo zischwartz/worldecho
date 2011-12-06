@@ -130,7 +130,7 @@ YourWorld.Config = function(container) {
     var map_tile_y = 256;
 
 
-    console.log('we think the default char is:', properties.default_char);
+    // console.log('we think the default char is:', properties.default_char);
     var default_char= properties.default_char || ' ';
     var mapTypeId = google.maps.MapTypeId.ROADMAP;
     // console.log(properties);
@@ -305,9 +305,9 @@ YourWorld.World = function() {
                     if (distance >_config.restrictDistance())
                     // if (distance >2) //for testing
                     {
-                        console.log('can?',_state.canWrite);
+                        // console.log('can?',_state.canWrite);
                         _state.canWrite=false;
-                        console.log('can?',_state.canWrite);
+                        // console.log('can?',_state.canWrite);
 
                         obj.message = "<b>Sorry, you can't write on the map because you're not close enough to " + _config.restrictLocationString() + ". You can look around though. We'll open this up to everyone soon.</b>";
                         // alert(obj.message);
@@ -419,7 +419,7 @@ function handleNoGeolocation(errorFlag) {
 
     var createTile = function(tileY, tileX) {
         // The World wraps each Tile object in a custom container div.
-        console.log('creating tile');
+        // console.log('creating tile');
         //these attributes aren't making it into the dom
         var tile, tileContainer;
         tileContainer = document.createElement('div');
@@ -594,7 +594,7 @@ function handleNoGeolocation(errorFlag) {
 			var me_Y = my_YX_yx[0]*_config.tileHeight() + _config.charHeight()*my_YX_yx[2];
 			var center_Y = center_XY_xy[1]*_config.tileHeight() + center_XY_xy[3]*_config.charHeight();
 			var dif_Y = me_Y - center_Y;
-			console.log("out of Y by: ", dif_Y );
+			// console.log("out of Y by: ", dif_Y );
 			map.panBy(0, dif_Y);
 		};
 		//on X
@@ -602,7 +602,7 @@ function handleNoGeolocation(errorFlag) {
 			var me_X = my_YX_yx[1]*_config.tileWidth() + _config.charWidth()*my_YX_yx[3];
 			var center_X = center_XY_xy[0]*_config.tileWidth() + center_XY_xy[2]*_config.charWidth();
 			var dif_X = me_X - center_X;
-			console.log("out of X by: ", dif_X );
+			// console.log("out of X by: ", dif_X );
 			map.panBy(dif_X, 0);
 			
 		};
@@ -781,7 +781,7 @@ function handleNoGeolocation(errorFlag) {
         
         $.each(data, function(YX, properties) {
             
-            console.log('properties',properties);
+
 
             var coords = YX.split(',');
             // console.log('coords', coords);
@@ -1675,7 +1675,7 @@ function handleNoGeolocation(errorFlag) {
         
         
         $('#loading').hide();
-        console.log('initd');
+        // console.log('initd');
 
 
     };
@@ -1766,7 +1766,7 @@ YourWorld.Tile = function() {
                         $(cell).removeClass();
                         $(cell).addClass("t"+colorid);
                         
-                        console.log('colorrrid', colorid);
+                        // console.log('colorrrid', colorid);
 						
 						if (highlight && !cell.style.backgroundColor) {
 							// Don't highlight selected or it'll stay yellow
@@ -1830,7 +1830,7 @@ YourWorld.Tile = function() {
 				// TODO: does this leak memory from the live event?
 				this.parentNode.innerHTML = this.innerHTML;
 			});
-          console.log('setting cell props');
+          // console.log('setting cell props');
 
 			// Set new cellProps:
 			$.each(cellProps, function(charY, rowProps) {
