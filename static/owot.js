@@ -534,6 +534,7 @@ function handleNoGeolocation(errorFlag) {
 	    return ([tx, ty, cx, cy]);
 	}
 
+    // $(window).dblclick(function(e){
 	$(window).dblclick(function(e){
 		moveCursorToClickPosition(e);
 		});
