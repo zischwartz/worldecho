@@ -302,8 +302,8 @@ YourWorld.World = function() {
                     var distance= google.maps.geometry.spherical.computeDistanceBetween(initialUserPos, _config.restrictLatLng());
                     // console.log('distance away', distance);
 
-                    // if (distance >_config.restrictDistance())
-                    if (distance > 2 ) //for testing
+                    if (distance >_config.restrictDistance())
+                    // if (distance > 2 ) //for testing
                     {
                         // console.log('can?',_state.canWrite);
                         _state.canWrite=false;
