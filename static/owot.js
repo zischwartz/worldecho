@@ -141,7 +141,7 @@ YourWorld.Config = function(container) {
 
 
     var restrictToLatLng = new google.maps.LatLng(40.73061489199429, -73.9934785);
-    var restrictDistance= 20000; //in meters
+    var restrictDistance= 30000; //in meters
     var restrictLocationString= "New York City";
 
     //google.maps.MapTypeId.ROADMAP;
