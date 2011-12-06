@@ -535,7 +535,7 @@ function handleNoGeolocation(errorFlag) {
 	}
 
 	$(window).dblclick(function(e){
-		FromPixelsToTileWithCells(e);
+		moveCursorToClickPosition(e);
 		});
 		
 		
@@ -566,14 +566,18 @@ function handleNoGeolocation(errorFlag) {
    	XY_xy =  FromLatLngToTileWithCells(mousePos, map.getZoom());
 
 	//finding the actual element and selecting it
-   	var target = getCell(XY_xy[1], XY_xy[0], XY_xy[3], XY_xy[2]);
-    setSelected(target);
-	//storing last click (that also works as last selected with arrows)
-	_state.lastClick = _state.selected;
-
+	return XY_xy
 	}
 
+	var moveCursorToClickPosition = function(e){
+		
+		XY_xy = FromPixelsToTileWithCells(e);
+		var target = getCell(XY_xy[1], XY_xy[0], XY_xy[3], XY_xy[2]);
+	    setSelected(target);
+		//storing last click (that also works as last selected with arrows)
+		_state.lastClick = _state.selected;
 
+	}
 
 
 	var goBackToCursor = function() {
