@@ -59,6 +59,7 @@ class Tile(models.Model):
     world = models.ForeignKey(World)
 
     content = models.CharField(default=' '*LEN,  max_length=LEN)
+    color = models.CharField(default='0'*LEN,  max_length=LEN)
     echos = models.CharField(default='0'*LEN,  max_length=LEN)
     tileY = models.IntegerField()
     tileX = models.IntegerField()
@@ -79,7 +80,7 @@ class Tile(models.Model):
         super(Tile, self).save(*args, **kwargs) # Call the "real" save() method.
         # do_something_else()
     
-    def set_char(self, charY, charX, char, sid):
+    def set_char(self, charY, charX, char, cid):
         from helpers import control_chars_set
         if char in control_chars_set:
             # TODO: log these guys again at some point
@@ -88,15 +89,17 @@ class Tile(models.Model):
         charY, charX = int(charY), int(charX)
         index = charY*self.COLS+charX
         self.content = self.content[:index] + char + self.content[index+1:]
+        self.color = self.color[:index] + cid + self.color[index+1:]
+
 
         # add sid identifier 
-        if 'cell_props' not in self.properties:
-            self.properties['cell_props'] = {}
-        if charY not in self.properties['cell_props']:
-            self.properties['cell_props'][charY] = {}
-        if charX not in self.properties['cell_props'][charY]:
-            self.properties['cell_props'][charY][charX] = {}
-        self.properties['cell_props'][charY][charX]['sid'] = sid
+        # if 'cell_props' not in self.properties:
+        #     self.properties['cell_props'] = {}
+        # if charY not in self.properties['cell_props']:
+        #     self.properties['cell_props'][charY] = {}
+        # if charX not in self.properties['cell_props'][charY]:
+        #     self.properties['cell_props'][charY][charX] = {}
+        # self.properties['cell_props'][charY][charX]['sid'] = sid
             # self.save()
 
         assert len(self.content) == self.ROWS*self.COLS
