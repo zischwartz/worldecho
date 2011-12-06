@@ -1767,7 +1767,7 @@ YourWorld.Tile = function() {
 							}
 
 						} 
-                        else if (propName == 'sid')
+                        else if (propName == 'color')
                         {
                             cell.className= "t"+ val.toString();
                         }

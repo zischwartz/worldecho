@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <title>World Text!</title>
-	<link rel="shortcut icon" href="/static/favicon.ico" />
+	<link rel="shortcut icon" href="static/favicon.ico" />
 
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8"> 
     <link type="text/css" rel="stylesheet" href="/static/yourworld.css?v=1">
@@ -64,7 +64,8 @@
   $(function() {
     //implicit global is so silly
      properties = {{ properties|safe }};
-
+	 color = {{ color }};
+	 alert(color);
   });
 </script>
 
