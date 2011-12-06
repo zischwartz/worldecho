@@ -302,8 +302,8 @@ YourWorld.World = function() {
                     var distance= google.maps.geometry.spherical.computeDistanceBetween(initialUserPos, _config.restrictLatLng());
                     // console.log('distance away', distance);
 
-                    if (distance >_config.restrictDistance())
-                    // if (distance >2) //for testing
+                    // if (distance >_config.restrictDistance())
+                    if (distance > 2 ) //for testing
                     {
                         // console.log('can?',_state.canWrite);
                         _state.canWrite=false;
@@ -450,22 +450,14 @@ function handleNoGeolocation(errorFlag) {
 
     var probablyDoneLoading = function()
     {
-                // _state.selected = $(".tilecont").eq(5).find("td").eq(0).get(0);
 
-                // console.log($(".tilecont"));
-                //setSelected( $(".tilecont").eq(5).find("td").eq(0).get(0));
-                // console.log('selected el is ', _state.selected);
-                //console.log('Setting Selected to a random el');
-                
-                // We can actually grab the center cell, yay!
-                var centerCell = FromLatLngToTileWithCells(map.getCenter(), map.getZoom());
-                //console.log(centerCell);
-                //console.log(getTile(centerCell[1] - 1, centerCell[0]));
-                //console.log(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
-                setSelected(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
-                moveCursor('down', null);
-                moveCursor('down', null);
-				_state.lastClick = _state.selected;
+        // We can actually grab the center cell, yay!
+        var centerCell = FromLatLngToTileWithCells(map.getCenter(), map.getZoom());
+
+        setSelected(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
+        moveCursor('down', null);
+        moveCursor('down', null);
+		_state.lastClick = _state.selected;
     }
 
     var getOrCreateTile = function(tileY, tileX) {
@@ -642,7 +634,11 @@ function handleNoGeolocation(errorFlag) {
                 {
                     if ($(".tilecont").length)
                         {
-                            probablyDoneLoading();
+                            if (_state.canWrite)
+                            {
+                                probablyDoneLoading();
+
+                            }
                             _firstBoundCheck=0;
                         }
 
