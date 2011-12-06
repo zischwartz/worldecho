@@ -146,7 +146,7 @@ YourWorld.Config = function(container) {
 
     //google.maps.MapTypeId.ROADMAP;
 
-    var zoom=18;
+    var zoom=16;
 
     // Auto-generated settings
     //not working
@@ -271,7 +271,7 @@ YourWorld.World = function() {
         if(navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 $("#geoReminder").fadeOut();
-				setTimeout(function(){ $("#loadingIndicator").fadeOut(200) }, 2000);
+				setTimeout(function(){ $("#loadingIndicator").fadeOut(200) }, 5000);
 
                 initialUserPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
 				
@@ -333,7 +333,7 @@ YourWorld.World = function() {
         }, function() {
       handleNoGeolocation(true);
     }, 
-  { enableHighAccuracy: true,} //timeout: 6000, maximumAge: 10000 }  //optons for getCurrentPosition
+  { enableHighAccuracy: true} //, maximumAge: 10000} //timeout: 6000, maximumAge: 10000 }  //optons for getCurrentPosition
   );
   } else {
     // Browser doesn't support Geolocation
@@ -344,7 +344,7 @@ YourWorld.World = function() {
 
 function handleNoGeolocation(errorFlag) {
   if (errorFlag) {
-    var content = "<b>Error: The Geolocation service failed. You can't write, sorry.</b>";
+    var content = "<b>Error: The Geolocation service failed. You can't write on the map for now, sorry. Maybe try a different browser or location.</b>";
   } else {
     var content = '<b>Error: Your browser doesn\'t support geolocation.</b>';
   }
@@ -475,6 +475,7 @@ function handleNoGeolocation(errorFlag) {
     
 
 
+
 	function FromLatLngToTileCoordinates(latLng, zoom) {
 
 		var TILE_SIZE = 256;
@@ -533,7 +534,79 @@ function handleNoGeolocation(errorFlag) {
 	    return ([tx, ty, cx, cy]);
 	}
 
+    // $(window).dblclick(function(e){
+	$(window).dblclick(function(e){
+		moveCursorToClickPosition(e);
+		});
+		
+		
+	var FromPixelsToTileWithCells = function(e){
 
+	//get latlongs of the map
+	var bounds = map.getBounds();
+	var mDeltaX = bounds.getNorthEast().lng() - bounds.getSouthWest().lng();
+	var mDeltaY = bounds.getNorthEast().lat() - bounds.getSouthWest().lat();
+
+	//get pixels of the window
+	var wDeltaX = $(window).width();
+	var wDeltaY = $(window).height();
+	
+	//get ratio pixels to latlng
+	var ratioX = wDeltaX / mDeltaX;
+	var ratioY = wDeltaY / mDeltaY;
+
+
+	// mouse position to latlong
+	var mouseLng = bounds.getSouthWest().lng() + ( e.pageX / ratioX );
+	var mouseLat = bounds.getNorthEast().lat() - ( e.pageY / ratioY );
+	var mousePos = new google.maps.LatLng(mouseLat, mouseLng);
+
+//	alert(mousePos.lng() +', '+ mousePos.lat() +', '+ northWest.lng()+', '+ northWest.lat() );
+  	 
+ 	
+   	XY_xy =  FromLatLngToTileWithCells(mousePos, map.getZoom());
+
+	//finding the actual element and selecting it
+	return XY_xy
+	}
+
+	var moveCursorToClickPosition = function(e){
+		
+		XY_xy = FromPixelsToTileWithCells(e);
+		var target = getCell(XY_xy[1], XY_xy[0], XY_xy[3], XY_xy[2]);
+	    setSelected(target);
+		//storing last click (that also works as last selected with arrows)
+		_state.lastClick = _state.selected;
+
+	}
+
+
+	var goBackToCursor = function() {
+		mapBounds= map.getBounds();
+        var z = map.getZoom();
+
+		var my_YX_yx = YourWorld.helpers.getCellCoords(_state.selected);//(XY_xy)
+		var ne_XY_xy = FromLatLngToTileWithCells(mapBounds.getNorthEast(), z); //(XY_xy)*********careful...flipped!
+		var sw_XY_xy = FromLatLngToTileWithCells(mapBounds.getSouthWest(), z);//(XY_xy)**********careful...flipped!
+		var center_XY_xy = FromLatLngToTileWithCells(map.getCenter(), z);
+        //on Y
+		if (ne_XY_xy[1] > my_YX_yx[0] || my_YX_yx[0] > sw_XY_xy[1] ){
+			var me_Y = my_YX_yx[0]*_config.tileHeight() + _config.charHeight()*my_YX_yx[2];
+			var center_Y = center_XY_xy[1]*_config.tileHeight() + center_XY_xy[3]*_config.charHeight();
+			var dif_Y = me_Y - center_Y;
+			console.log("out of Y by: ", dif_Y );
+			map.panBy(0, dif_Y);
+		};
+		//on X
+		if (ne_XY_xy[0] < my_YX_yx[1] || my_YX_yx[1] < sw_XY_xy[0] ){
+			var me_X = my_YX_yx[1]*_config.tileWidth() + _config.charWidth()*my_YX_yx[3];
+			var center_X = center_XY_xy[0]*_config.tileWidth() + center_XY_xy[2]*_config.charWidth();
+			var dif_X = me_X - center_X;
+			console.log("out of X by: ", dif_X );
+			map.panBy(dif_X, 0);
+			
+		};
+	}
 
     var getMandatoryBounds = function() {    
 
@@ -807,6 +880,7 @@ function handleNoGeolocation(errorFlag) {
         // opt_from means move it relative to cell other than the default highlighted cell
         // (used for newline)
         // returns the new cursor location
+    	goBackToCursor();
 
         var from = opt_from || _state.selected;
         if (!from) {
@@ -819,6 +893,7 @@ function handleNoGeolocation(errorFlag) {
         var charY = YX_yx[2];
         var charX = YX_yx[3];
  
+
         if (dir == 'right') {
             // Go forwards. Typing and arrow.
             if (charX == _config.numCols() - 1) {
@@ -920,7 +995,7 @@ function handleNoGeolocation(errorFlag) {
                 //console.log("panning down by ", _config.charHeight());
                 map.panBy(0, _config.charHeight());
             }
-        }
+		}
         
         return target;
     };
@@ -1333,6 +1408,7 @@ function handleNoGeolocation(errorFlag) {
         // Updates the tile text. 
         // Param `s` is a character that was typed
         //console.log('typeChar---', s);
+		
 
         // Validate and parse
         if (!_state.canWrite) {
@@ -1354,7 +1430,11 @@ function handleNoGeolocation(errorFlag) {
         if (!tile) {
             throw new Error('tile to update not found');
         }
-    
+	
+		//check if cursor is outside bounds and pan back to it.
+    	goBackToCursor();
+	
+	
         // Update character in UI and record pending edit
         _state.selected.innerHTML = YourWorld.helpers.escapeChar(s);
         var timestamp = new Date().getTime();
@@ -1767,10 +1847,6 @@ YourWorld.Tile = function() {
 							}
 
 						} 
-                        else if (propName == 'color')
-                        {
-                            cell.className= "t"+ val.toString();
-                        }
 
                         else {
 							throw new Error('Unknown cell property');
@@ -1859,9 +1935,13 @@ $(document).ready(function() {
 
 
 	$(".closeme").click(function(){
-		$("#aboutOverlay").fadeOut()
+		$(this).parent().fadeOut()
 	});
 	
+
+			
+			
+
 });
 
 

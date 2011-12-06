@@ -130,7 +130,10 @@ def yourworld(request, namespace):
         'settings': settings,
         'state': simplejson.dumps(state),
         'properties': simplejson.dumps(world.properties),
-		'color': color
+		'color': color,
+        'world': world,
+
+
     })
     
 def fetch_updates(request, world):

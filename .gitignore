@@ -1,4 +1,7 @@
 *.pyc
 .DS_Store
+.pyc
+*.sqlite
 *.pyc
 *.ai
+
