@@ -121,6 +121,13 @@ a, a:link, a:hover, a:active, a:visited {
     width: 100%;
 }
 
+#bottombar {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    text-align:right;
+}
+
 #topbar_inner {
     width:100%;
     position:absolute;
@@ -286,7 +293,7 @@ a.urlLink {
 
 /*** END SIMPLEMODAL ***/
 
-
+.hidden {display:none;}
 
 .t1 {color:#ffffff;}
     .t1 span{background:#ffffff;}
@@ -310,8 +317,10 @@ a.urlLink {
     .t10 span{background:#00ff81;}
 .t11 {color:#6bbd68;}
     .t11 span{background:#037700;}
-.t0 {color:#bd57b3;}
-    .t0 span{background:#9e008c;}
+.t12 {color:#bd57b3;}
+    .t12 span{background:#9e008c;}
+.t0 {color:white;}
+    .t0 span{background:white;}
 
 
 
@@ -337,3 +346,4 @@ a.urlLink {
      -moz-animation:    pulser 1s infinite;
      -ms-animation:     pulser 1s infinite;
 }
+

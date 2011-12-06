@@ -165,12 +165,20 @@ def fetch_updates(request, world):
             raise ValueError, 'Unknown JS version'
     return HttpResponse(simplejson.dumps(response))
     
-def send_edits(request, world):
+def get_color(request):
+    log.info("getting random!")
+    import random
+    request.session['sid']= random.randint(1,12)
+    ref=request.META['HTTP_REFERER']
+    return HttpResponseRedirect(ref)
 
-    sessionid= ''
-    if request.session:
-        sessionid = request.session.session_key
-    
+def send_edits(request, world):
+    log.info("sending edits")
+    sid= 0
+
+    if 'sid' in request.session:
+        sid = request.session['sid']
+
     assert permissions.can_write(request.user, world) # Checked by router
     response = []
     tiles = {} # a simple cache
@@ -189,16 +197,8 @@ def send_edits(request, world):
         if tile.properties.get('protected'):
             if not permissions.can_admin(request.user, world):
                 continue    
-        tile.set_char(charY, charX, char, sessionid)
+        tile.set_char(charY, charX, char, sid)
         # TODO: anything, please.
-        if tile.properties:
-            if 'cell_props' in tile.properties:
-                if str(charY) in tile.properties['cell_props']: #must be str because that's how JSON interprets int keys
-                    if str(charX) in tile.properties['cell_props'][str(charY)]:
-                        log.info('oooo')
-
-        response.append([tileY, tileX, charY, charX, timestamp, char, sessionid])
-
 
         # if tile.properties:
         #     if 'cell_props' in tile.properties:
@@ -210,6 +210,10 @@ def send_edits(request, world):
         #                     if not tile.properties['cell_props']:
         #                         del tile.properties['cell_props']
         # response.append([tileY, tileX, charY, charX, timestamp, char, sessionid])
+
+        response.append([tileY, tileX, charY, charX, timestamp, char, sid])
+
+
                 
     if len(edits) < 200:
         for tile in tiles.values():
