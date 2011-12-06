@@ -271,7 +271,7 @@ YourWorld.World = function() {
         if(navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 $("#geoReminder").fadeOut();
-				setTimeout(function(){ $("#loadingIndicator").fadeOut(200) }, 2000);
+				setTimeout(function(){ $("#loadingIndicator").fadeOut(200) }, 5000);
 
                 initialUserPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
 				
@@ -475,6 +475,7 @@ function handleNoGeolocation(errorFlag) {
     
 
 
+
 	function FromLatLngToTileCoordinates(latLng, zoom) {
 
 		var TILE_SIZE = 256;
@@ -533,7 +534,32 @@ function handleNoGeolocation(errorFlag) {
 	    return ([tx, ty, cx, cy]);
 	}
 
+	var goBackToCursor = function() {
+		mapBounds= map.getBounds();
+        var z = map.getZoom();
 
+		var my_YX_yx = YourWorld.helpers.getCellCoords(_state.selected);//(XY_xy)
+		var ne_XY_xy = FromLatLngToTileWithCells(mapBounds.getNorthEast(), z); //(XY_xy)*********careful...flipped!
+		var sw_XY_xy = FromLatLngToTileWithCells(mapBounds.getSouthWest(), z);//(XY_xy)**********careful...flipped!
+		var center_XY_xy = FromLatLngToTileWithCells(map.getCenter(), z);
+        //on Y
+		if (ne_XY_xy[1] > my_YX_yx[0] || my_YX_yx[0] > sw_XY_xy[1] ){
+			var me_Y = my_YX_yx[0]*_config.tileHeight() + _config.charHeight()*my_YX_yx[2];
+			var center_Y = center_XY_xy[1]*_config.tileHeight() + center_XY_xy[3]*_config.charHeight();
+			var dif_Y = me_Y - center_Y;
+			console.log("out of Y by: ", dif_Y );
+			map.panBy(0, dif_Y);
+		};
+		//on X
+		if (ne_XY_xy[0] < my_YX_yx[1] || my_YX_yx[1] < sw_XY_xy[0] ){
+			var me_X = my_YX_yx[1]*_config.tileWidth() + _config.charWidth()*my_YX_yx[3];
+			var center_X = center_XY_xy[0]*_config.tileWidth() + center_XY_xy[2]*_config.charWidth();
+			var dif_X = me_X - center_X;
+			console.log("out of X by: ", dif_X );
+			map.panBy(dif_X, 0);
+			
+		};
+	}
 
     var getMandatoryBounds = function() {    
 
@@ -807,6 +833,7 @@ function handleNoGeolocation(errorFlag) {
         // opt_from means move it relative to cell other than the default highlighted cell
         // (used for newline)
         // returns the new cursor location
+    	goBackToCursor();
 
         var from = opt_from || _state.selected;
         if (!from) {
@@ -819,6 +846,7 @@ function handleNoGeolocation(errorFlag) {
         var charY = YX_yx[2];
         var charX = YX_yx[3];
  
+
         if (dir == 'right') {
             // Go forwards. Typing and arrow.
             if (charX == _config.numCols() - 1) {
@@ -1333,6 +1361,7 @@ function handleNoGeolocation(errorFlag) {
         // Updates the tile text. 
         // Param `s` is a character that was typed
         //console.log('typeChar---', s);
+		
 
         // Validate and parse
         if (!_state.canWrite) {
@@ -1354,7 +1383,11 @@ function handleNoGeolocation(errorFlag) {
         if (!tile) {
             throw new Error('tile to update not found');
         }
-    
+	
+		//check if cursor is outside bounds and pan back to it.
+    	goBackToCursor();
+	
+	
         // Update character in UI and record pending edit
         _state.selected.innerHTML = YourWorld.helpers.escapeChar(s);
         var timestamp = new Date().getTime();
@@ -1859,9 +1892,42 @@ $(document).ready(function() {
 
 
 	$(".closeme").click(function(){
-		$("#aboutOverlay").fadeOut()
+		$(this).parent().fadeOut()
 	});
 	
+	// $(window).dblclick(function(e){
+	// 		
+	// 		var TILE_SIZE = 256;
+	// 		/** @const */
+	// 		var TILE_INITIAL_RESOLUTION = 2 * Math.PI * 6378137 / TILE_SIZE;
+	// 		/** @const */
+	// 		var TILE_ORIGIN_SHIFT = 2 * Math.PI * 6378137 / 2.0;
+	// 
+	// 		//Pixels to Meters
+	// 	    var res = TILE_INITIAL_RESOLUTION / Math.pow(2, zoom);
+	// 	    var mx = (px*res) - TILE_ORIGIN_SHIFT;
+	// 	    var my = (py*res) - TILE_ORIGIN_SHIFT;
+	// 
+	// 	    //Meters to LatLng
+	// 	    var lng = mx*180.0 / TILE_ORIGIN_SHIFT;
+	// 		//this one needs to be reverted and i have no idea how
+	// 	    var my = (Math.log(Math.tan((90 + latLng.lat()) * Math.PI / 360.0)) / (Math.PI / 180.0)) * (TILE_ORIGIN_SHIFT / 180.0);
+	// 
+	// 	    //LatLng to Meters
+	// 	    var mx = latLng.lng() * TILE_ORIGIN_SHIFT / 180.0;
+	// 	    var my = (Math.log(Math.tan((90 + latLng.lat()) * Math.PI / 360.0))
+	// 	        / (Math.PI / 180.0)) * TILE_ORIGIN_SHIFT / 180.0;
+	// 
+	// 
+	// 		
+	// 		
+	// 		var center = map.getCenter();
+	// 		var bounds = 
+	// 		var width = $(window).width();
+	// 		var w_height = $(window).height(); 
+	// 		alert(width);
+	// 		alert(e.pageX +', '+ e.pageY +', '+ center.lat() +', '+ center.lng() )
+	// 	});
 });
 
 
