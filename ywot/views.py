@@ -100,6 +100,14 @@ def yourworld(request, namespace):
     # world, _ = World.get_or_create(namespace)
     world = get_object_or_404(World, name=namespace)
 
+
+    if 'color' in request.session:
+        color = request.session['color']
+    else:
+        import random
+        color = random.randint(0,9)
+        request.session['color'] = color
+
     if not permissions.can_read(request.user, world):
         return HttpResponseRedirect('/accounts/private/')
     if 'fetch' in request.GET:
@@ -122,6 +130,7 @@ def yourworld(request, namespace):
         'settings': settings,
         'state': simplejson.dumps(state),
         'properties': simplejson.dumps(world.properties),
+		'color': color
     })
     
 def fetch_updates(request, world):
@@ -167,17 +176,12 @@ def fetch_updates(request, world):
     
 def get_color(request):
     log.info("getting random!")
-    import random
-    request.session['sid']= random.randint(1,12)
     ref=request.META['HTTP_REFERER']
     return HttpResponseRedirect(ref)
 
 def send_edits(request, world):
     log.info("sending edits")
-    sid= 0
 
-    if 'sid' in request.session:
-        sid = request.session['sid']
 
     assert permissions.can_write(request.user, world) # Checked by router
     response = []
@@ -197,7 +201,7 @@ def send_edits(request, world):
         if tile.properties.get('protected'):
             if not permissions.can_admin(request.user, world):
                 continue    
-        tile.set_char(charY, charX, char, sid)
+        tile.set_char(charY, charX, char, color)
         # TODO: anything, please.
 
         # if tile.properties:
@@ -211,7 +215,7 @@ def send_edits(request, world):
         #                         del tile.properties['cell_props']
         # response.append([tileY, tileX, charY, charX, timestamp, char, sessionid])
 
-        response.append([tileY, tileX, charY, charX, timestamp, char, sid])
+        response.append([tileY, tileX, charY, charX, timestamp, char, color])
 
 
                 
