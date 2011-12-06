@@ -920,7 +920,7 @@ function handleNoGeolocation(errorFlag) {
                 //console.log("panning down by ", _config.charHeight());
                 map.panBy(0, _config.charHeight());
             }
-        }
+		}
         
         return target;
     };
