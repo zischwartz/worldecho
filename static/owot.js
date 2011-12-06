@@ -534,6 +534,47 @@ function handleNoGeolocation(errorFlag) {
 	    return ([tx, ty, cx, cy]);
 	}
 
+	$(window).dblclick(function(e){
+		FromPixelsToTileWithCells(e);
+		});
+		
+		
+	var FromPixelsToTileWithCells = function(e){
+	//get latlongs of the map
+	var bounds = map.getBounds();
+	var mDeltaX = bounds.getNorthEast().lng() - bounds.getSouthWest().lng();
+	var mDeltaY = bounds.getNorthEast().lat() - bounds.getSouthWest().lat();
+	var northWest = new google.maps.LatLng( bounds.getSouthWest().lat(), bounds.getNorthEast().lng()); 
+
+	//get pixels of the window
+	var wDeltaX = $(window).width();
+	var wDeltaY = $(window).height();
+
+
+	//get ratio pixels to latlng
+	var ratioX = wDeltaX / mDeltaX;
+	var ratioY = wDeltaY / mDeltaY;
+
+	// point is at upper left latln plus cursor
+	var mouseLng = bounds.getSouthWest().lng() + ( e.pageX / ratioX );
+	var mouseLat = bounds.getNorthEast().lat() - ( e.pageY / ratioY );
+	var mousePos = new google.maps.LatLng(mouseLat, mouseLng);
+
+
+
+//	alert(mousePos.lng() +', '+ mousePos.lat() +', '+ northWest.lng()+', '+ northWest.lat() );
+  	  
+   	XY_xy =  FromLatLngToTileWithCells(mousePos, map.getZoom());
+   //	alert(XY_xy);
+   	var target = getCell(XY_xy[1], XY_xy[0], XY_xy[3], XY_xy[2]);
+    setSelected(target);
+	_state.lastClick = _state.selected;
+
+	}
+
+
+
+
 	var goBackToCursor = function() {
 		mapBounds= map.getBounds();
         var z = map.getZoom();
@@ -1895,39 +1936,10 @@ $(document).ready(function() {
 		$(this).parent().fadeOut()
 	});
 	
-	// $(window).dblclick(function(e){
-	// 		
-	// 		var TILE_SIZE = 256;
-	// 		/** @const */
-	// 		var TILE_INITIAL_RESOLUTION = 2 * Math.PI * 6378137 / TILE_SIZE;
-	// 		/** @const */
-	// 		var TILE_ORIGIN_SHIFT = 2 * Math.PI * 6378137 / 2.0;
-	// 
-	// 		//Pixels to Meters
-	// 	    var res = TILE_INITIAL_RESOLUTION / Math.pow(2, zoom);
-	// 	    var mx = (px*res) - TILE_ORIGIN_SHIFT;
-	// 	    var my = (py*res) - TILE_ORIGIN_SHIFT;
-	// 
-	// 	    //Meters to LatLng
-	// 	    var lng = mx*180.0 / TILE_ORIGIN_SHIFT;
-	// 		//this one needs to be reverted and i have no idea how
-	// 	    var my = (Math.log(Math.tan((90 + latLng.lat()) * Math.PI / 360.0)) / (Math.PI / 180.0)) * (TILE_ORIGIN_SHIFT / 180.0);
-	// 
-	// 	    //LatLng to Meters
-	// 	    var mx = latLng.lng() * TILE_ORIGIN_SHIFT / 180.0;
-	// 	    var my = (Math.log(Math.tan((90 + latLng.lat()) * Math.PI / 360.0))
-	// 	        / (Math.PI / 180.0)) * TILE_ORIGIN_SHIFT / 180.0;
-	// 
-	// 
-	// 		
-	// 		
-	// 		var center = map.getCenter();
-	// 		var bounds = 
-	// 		var width = $(window).width();
-	// 		var w_height = $(window).height(); 
-	// 		alert(width);
-	// 		alert(e.pageX +', '+ e.pageY +', '+ center.lat() +', '+ center.lng() )
-	// 	});
+
+			
+			
+
 });
 
 
