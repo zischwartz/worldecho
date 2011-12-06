@@ -172,12 +172,11 @@ def fetch_updates(request, world):
             response[tile_key] = d
         else:
             raise ValueError, 'Unknown JS version'
+    
+    log.info(response)
     return HttpResponse(simplejson.dumps(response))
     
-def get_color(request):
-    log.info("getting random!")
-    ref=request.META['HTTP_REFERER']
-    return HttpResponseRedirect(ref)
+
 
 def send_edits(request, world):
     log.info("sending edits")
@@ -186,9 +185,10 @@ def send_edits(request, world):
     assert permissions.can_write(request.user, world) # Checked by router
     response = []
     tiles = {} # a simple cache
-    edits = [e.split(',', 5) for e in request.POST.getlist('edits')]
+    edits = [e.split(',', 6) for e in request.POST.getlist('edits')]
     for edit in edits:
         char = edit[5]
+        color= edit[6]
         tileY, tileX, charY, charX, timestamp = map(int, edit[:5])
         assert len(char) == 1 # TODO: investigate these tracebacks
         keyname = "%d,%d" % (tileY, tileX)
