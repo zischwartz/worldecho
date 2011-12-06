@@ -146,7 +146,7 @@ YourWorld.Config = function(container) {
 
     //google.maps.MapTypeId.ROADMAP;
 
-    var zoom=18;
+    var zoom=16;
 
     // Auto-generated settings
     //not working
@@ -333,7 +333,7 @@ YourWorld.World = function() {
         }, function() {
       handleNoGeolocation(true);
     }, 
-  { enableHighAccuracy: true,} //timeout: 6000, maximumAge: 10000 }  //optons for getCurrentPosition
+  { enableHighAccuracy: true, maximumAge: 10000} //timeout: 6000, maximumAge: 10000 }  //optons for getCurrentPosition
   );
   } else {
     // Browser doesn't support Geolocation

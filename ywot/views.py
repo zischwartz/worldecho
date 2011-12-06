@@ -122,6 +122,8 @@ def yourworld(request, namespace):
         'settings': settings,
         'state': simplejson.dumps(state),
         'properties': simplejson.dumps(world.properties),
+        'world': world,
+
     })
     
 def fetch_updates(request, world):
