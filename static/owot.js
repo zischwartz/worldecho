@@ -344,7 +344,7 @@ YourWorld.World = function() {
 
 function handleNoGeolocation(errorFlag) {
   if (errorFlag) {
-    var content = "<b>Error: The Geolocation service failed. You can't write, sorry.</b>";
+    var content = "<b>Error: The Geolocation service failed. You can't write on the map for now, sorry. Maybe try a different browser or location.</b>";
   } else {
     var content = '<b>Error: Your browser doesn\'t support geolocation.</b>';
   }
