@@ -333,7 +333,7 @@ YourWorld.World = function() {
         }, function() {
       handleNoGeolocation(true);
     }, 
-  { enableHighAccuracy: true, maximumAge: 10000} //timeout: 6000, maximumAge: 10000 }  //optons for getCurrentPosition
+  { enableHighAccuracy: true} //, maximumAge: 10000} //timeout: 6000, maximumAge: 10000 }  //optons for getCurrentPosition
   );
   } else {
     // Browser doesn't support Geolocation
