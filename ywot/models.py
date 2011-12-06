@@ -90,13 +90,13 @@ class Tile(models.Model):
         self.content = self.content[:index] + char + self.content[index+1:]
 
         # add sid identifier 
-        if 'cell_props' not in self.properties:
-            self.properties['cell_props'] = {}
-        if charY not in self.properties['cell_props']:
-            self.properties['cell_props'][charY] = {}
-        if charX not in self.properties['cell_props'][charY]:
-            self.properties['cell_props'][charY][charX] = {}
-        self.properties['cell_props'][charY][charX]['sid'] = sid
+        # if 'cell_props' not in self.properties:
+        #     self.properties['cell_props'] = {}
+        # if charY not in self.properties['cell_props']:
+        #     self.properties['cell_props'][charY] = {}
+        # if charX not in self.properties['cell_props'][charY]:
+        #     self.properties['cell_props'][charY][charX] = {}
+        # self.properties['cell_props'][charY][charX]['sid'] = sid
             # self.save()
 
         assert len(self.content) == self.ROWS*self.COLS

@@ -1767,10 +1767,10 @@ YourWorld.Tile = function() {
 							}
 
 						} 
-                        else if (propName == 'sid')
-                        {
-                            cell.className= "t"+ val.toString();
-                        }
+                        // else if (propName == 'sid')
+                        // {
+                        //     cell.className= "t"+ val.toString();
+                        // }
 
                         else {
 							throw new Error('Unknown cell property');
