@@ -36,18 +36,22 @@
 
 <div id="aboutOverlay">
 	<div class="closeme"></div>
-	<img src="/static/writtenworld.png">
-    
-    <h1>about this thing</h1>
-	
-	<p>This is a world to write on. Why don't you go type instead of be reading this?</br>
-		We, we know it's is kinda awesome.</p>
-	<p>
-	The yellow cursor is waiting for your keystrokes. It will only respond to your keyboard.</br>
-	You may go wonder with your mouse but it will get you back to your cursor as soon as you start typing.
-	</p>
-	<p>So go use it! What are you doing here? Nobody reads the about pages!</p>
-
+	<center><img src="/static/writtenworld.png"></center>
+<p>    
+Hi There, 
+</p><p>
+We’re Zach Schwartz, Martín Bravo, Nara Kasbergen, Rachel Slaff, and Ruth Spencer, students in <a href="http://shirky.com/">Clay Shirky’s</a> Designing Conversational Spaces course at NYU’s <a href="http://itp.nyu.edu/itp/">ITP</a>. </p>
+<p>
+The Written World is an experiment, based on <a href="http://www.yourworldoftext.com/">yourworldoftext</a>. We’ve placed a free-form text canvas on top of Google maps and added geolocation* functionality to see what happens when we combine online chat with the pre-existing relationships that are inherent to pysical location and real-world places. For now, we’ve limited WW to New York users, but will open it up to everyone soon.
+</p>
+<p>
+You’ll automatically be positioned at your current location*. Want to travel? Type your way over to different areas or click and drag to scroll. To move the cursor, use the arrow keys, or double click.
+</p><p>
+That’s it. The rules of the site are for you to create (or ignore). So what are you waiting for? Go explore! 
+</p><p>
+<small>
+*Geolocation is an experimental feature in html5 and may not work in all browsers, locations, operating systems, and weather systems. Sorry.</small>
+</p>
 </div>
 
 
@@ -56,13 +60,7 @@
 	
     <img src="/static/writtenworld.png">
     <h1>{{ world.name|default:"Written World" }}</h1>
-	<p>
-		You're about to enter a world to write on. </br>
-		The yellow cursor is waiting for your keystrokes.
-	</p>
-	<p>	But be warned it will only respond to your keyboard. </br>
-		You may go wonder with your mouse but it will get you back to your cursor as soon as you start typing.
-	</p>
+
     {{world.prompt|safe}}
 
 </div>

@@ -381,3 +381,11 @@ a.urlLink {
      -moz-animation:    fi 2s ;
      -ms-animation:     fi 2s ;
 }
+
+
+#aboutOverlay a
+{
+    color: blue !important;
+    text-decoration: underline;
+
+}
