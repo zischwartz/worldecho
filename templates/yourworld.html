@@ -1,8 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
 <head>
-    <title>Written World</title>
 
+    <title>Written World</title>
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8"> 
     <link type="text/css" rel="stylesheet" href="/static/yourworld.css?v=1">
 	<link rel="shortcut icon" href="/static/ww.png" />
@@ -37,16 +37,33 @@
 
 <div id="aboutOverlay">
 	<div class="closeme"></div>
+	<img src="/static/writtenworld.png">
+    
     <h1>about this thing</h1>
-	<p>Well this thing is kinda awesome, right?</p>
-	<p>So go use it? What are you doing here? Nobody reads the about pages!</p>
+	
+	<p>This is a world to write on. Why don't you go type instead of be reading this?</br>
+		We, we know it's is kinda awesome.</p>
+	<p>
+	The yellow cursor is waiting for your keystrokes. It will only respond to your keyboard.</br>
+	You may go wonder with your mouse but it will get you back to your cursor as soon as you start typing.
+	</p>
+	<p>So go use it! What are you doing here? Nobody reads the about pages!</p>
 
 </div>
 
 
 <div id="loadingIndicator">
-    <img src="./static/writtenworld.png">
+	<div class="closeme"></div>
+	
+    <img src="/static/writtenworld.png">
     <h1>{{ world.name|default:"Written World" }}</h1>
+	<p>
+		You're about to enter a world to write on. </br>
+		The yellow cursor is waiting for your keystrokes.
+	</p>
+	<p>	But be warned it will only respond to your keyboard. </br>
+		You may go wonder with your mouse but it will get you back to your cursor as soon as you start typing.
+	</p>
     {{world.prompt|safe}}
 
 </div>
