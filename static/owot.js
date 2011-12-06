@@ -780,6 +780,9 @@ function handleNoGeolocation(errorFlag) {
         setTimeout(fetchUpdates, 997);
         
         $.each(data, function(YX, properties) {
+            
+            console.log('properties',properties);
+
             var coords = YX.split(',');
             // console.log('coords', coords);
             var tile = getTile(coords[0], coords[1]);
@@ -1407,8 +1410,8 @@ function handleNoGeolocation(errorFlag) {
     var typeChar = function(s) {
         // Updates the tile text. 
         // Param `s` is a character that was typed
-        //console.log('typeChar---', s);
-		
+        // console.log('typeChar-', s , '-');
+
 
         // Validate and parse
         if (!_state.canWrite) {
@@ -1434,18 +1437,26 @@ function handleNoGeolocation(errorFlag) {
 		//check if cursor is outside bounds and pan back to it.
     	goBackToCursor();
 	
-	
+
         // Update character in UI and record pending edit
         _state.selected.innerHTML = YourWorld.helpers.escapeChar(s);
+        
+        if (s != ' ')
+        {
+            $(_state.selected).removeClass();
+            $(_state.selected).addClass("t"+ usercolor);
+        }
+
+        
         var timestamp = new Date().getTime();
-        tile.tellEdit(charY, charX, s, timestamp);
-        queueEdit([tileY, tileX, charY, charX, timestamp, s]);
+        tile.tellEdit(charY, charX, s, timestamp, usercolor);
+        queueEdit([tileY, tileX, charY, charX, timestamp, s, usercolor]);
     };
     
     var queueEdit = function (arr) {
         // Record a local edit to be transmitted to server
-        // arr is [tileY, tileX, charY, charX, timestamp, char]
-        if (arr.length != 6) {
+        // arr is [tileY, tileX, charY, charX, timestamp, char] AND COLOR so 7
+        if (arr.length != 7) {  
             throw new Error('Invalid edit');
         }
         _edits.push(arr);
@@ -1722,13 +1733,14 @@ YourWorld.Tile = function() {
 
 		// Private
 		var $node = $(node);
-		var _content; // string representing tile's last-known state on server (i.e., no local edits)
+        var _content; // string representing tile's last-known state on server (i.e., no local edits)
+		var _colors; // string representing tile's last-known color state on server (i.e., no local edits)
 		var _initted = false; // whether tile has received initial content data
 		var _pendingEdits = {}; // maps (flattened content index) -> (char, timestamp)
 		var _protected = false;
 		var _cellProps = null;
 		
-		var updateHTML = function(newContent, highlight) {
+		var updateHTML = function(newContent, highlight, colors) {
 			var c, charY, charX, cell;
 			var contentPos = 0;
 			var sec = parseInt(new Date().getTime()/1000, 10);
@@ -1742,13 +1754,19 @@ YourWorld.Tile = function() {
 						// Most recent pending edit:
 						c = _pendingEdits[contentPos][_pendingEdits[contentPos].length - 1][0];
 					} else {
-						c = newContent[contentPos];
+                        c = newContent[contentPos];
+						colorid = colors[contentPos];
 					}
 					if (c != _content[contentPos]) {
 						// Update the cell
 						c = YourWorld.helpers.escapeChar(c);
 						cell = obj.getCell(charY, charX);
 						cell.innerHTML = c;
+
+                        $(cell).removeClass();
+                        $(cell).addClass("t"+colorid);
+                        
+                        console.log('colorrrid', colorid);
 						
 						if (highlight && !cell.style.backgroundColor) {
 							// Don't highlight selected or it'll stay yellow
@@ -1763,7 +1781,7 @@ YourWorld.Tile = function() {
 			}
 		};
 		
-		var setContent = function(newContent) {
+		var setContent = function(newContent, colors) {
 			// newContent is either a string, with a char for each cell, or `null` to mean blank
 
 			// First convert content to a string:
@@ -1782,7 +1800,7 @@ YourWorld.Tile = function() {
 
 			// Update the content
 			if (newContent != _content) {
-				updateHTML(newContent, highlight);
+				updateHTML(newContent, highlight, colors);
 				_content = newContent; // this must come after updateHTML
 			}
 		};
@@ -1801,6 +1819,7 @@ YourWorld.Tile = function() {
 		};
 
 		var setCellProps = function(cellProps) {
+
 			if (YourWorld.helpers.deepEquals(cellProps, _cellProps)) {
 				return;
 			}
@@ -1811,6 +1830,7 @@ YourWorld.Tile = function() {
 				// TODO: does this leak memory from the live event?
 				this.parentNode.innerHTML = this.innerHTML;
 			});
+          console.log('setting cell props');
 
 			// Set new cellProps:
 			$.each(cellProps, function(charY, rowProps) {
@@ -1823,6 +1843,10 @@ YourWorld.Tile = function() {
 					chr = YourWorld.helpers.escapeChar(chr);
 					cell = obj.getCell(charY, charX);
 					cell.innerHTML = chr;
+
+                    // $(cell).addClass("t5");
+                    // console.log($(cell).hasClass("t5"));
+
 					$.each(cellProps, function(propName, val) {
 						var s;
 						if (propName == 'link') {
@@ -1843,7 +1867,7 @@ YourWorld.Tile = function() {
 								$(cell).wrapInner($(s));
 								s = cell.childNodes[0];
 							} else {
-								//throw new Error('Unknown link type');
+								throw new Error('Unknown link type');
 							}
 
 						} 
@@ -1860,7 +1884,7 @@ YourWorld.Tile = function() {
 		obj.initted = function() { return _initted; };
 		obj.isProtected = function() { return _protected; };
 		
-		obj.tellEdit = function(charY, charX, s, timestamp) {
+		obj.tellEdit = function(charY, charX, s, timestamp, color) {
 			// Right now the rendering is handled outside of this class because it's easier,
 			// but we still need to know about the update so that the server's version of 
 			// the tile doesn't overwrite our unsent local changes.
@@ -1871,12 +1895,16 @@ YourWorld.Tile = function() {
 			if (_pendingEdits[index] === undefined) {
 				_pendingEdits[index] = [];
 			}
-			_pendingEdits[index].push([s, timestamp]);
+			_pendingEdits[index].push([s, timestamp, color]);
 		};
 		
 		obj.setProperties = function(p) {
 			// p is either an object or null to mean no data
-			setContent((p && p.content) ? p.content : null);
+			// setContent((p && p.content) ? p.content : null);
+
+            setContent(p && p.content, p.color);
+   
+
 			setProtected(p && p.properties && p.properties['protected'] || false);
 			setCellProps(p && p.properties && p.properties.cell_props || null);
 		};

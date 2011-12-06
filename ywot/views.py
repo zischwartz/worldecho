@@ -164,19 +164,21 @@ def fetch_updates(request, world):
     for t in tiles:
         tile_key = "%s,%s" % (t.tileY, t.tileX)
         if (int(request.GET.get('v', 0)) == 2):
-            d = {'content': t.content.replace('\n', ' ')}
-            if 'protected' in t.properties: # We want to send *any* set value (case: reset to false)
-                d['protected'] = t.properties['protected']
+            d = {'content': t.content, 'color' : t.color}
+            # d = {'content': t.content.replace('\n', ' '), 'color' : t.color}
+            # if 'protected' in t.properties: # We want to send *any* set value (case: reset to false)
+                # d['protected'] = t.properties['protected']
             response[tile_key] = d
         elif (int(request.GET.get('v', 0)) == 3):
-            d = {'content': t.content.replace('\n', ' ')}
-            if t.properties:
-                d['properties'] = t.properties
+            d = {'content': t.content, 'color' : t.color}
+            # d = {'content': t.content.replace('\n', ' '), 'color' : t.color}
+            # if t.properties:
+                # d['properties'] = t.properties
             response[tile_key] = d
         else:
             raise ValueError, 'Unknown JS version'
     
-    log.info(response)
+    # log.info(response)
     return HttpResponse(simplejson.dumps(response))
     
 

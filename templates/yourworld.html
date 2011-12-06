@@ -75,11 +75,13 @@
 <script type="text/javascript" src="/static/jquery-1.3.2.min.js"></script>
 
 <script type="text/javascript">
+var usercolor;
   $(function() {
     //implicit global is so silly
      properties = {{ properties|safe }};
-	 color = {{ color }};
-	 alert(color);
+   color = {{ color }};
+	 usercolor = {{ color }};
+   console.log("color:", color);
   });
 </script>
 

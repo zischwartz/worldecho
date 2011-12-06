@@ -87,6 +87,7 @@ class Tile(models.Model):
             # TODO: log these guys again at some point
             char = ' '
         assert len(self.content) == self.ROWS*self.COLS
+        assert len(self.color) == self.ROWS*self.COLS
         charY, charX = int(charY), int(charX)
         index = charY*self.COLS+charX
         self.content = self.content[:index] + char + self.content[index+1:]
@@ -104,6 +105,7 @@ class Tile(models.Model):
             # self.save()
 
         assert len(self.content) == self.ROWS*self.COLS
+        assert len(self.color) == self.ROWS*self.COLS
 
     class Meta:
         unique_together=[['world', 'tileY', 'tileX']]
