@@ -56,7 +56,7 @@ urlpatterns += patterns('ywot.views',
 )
 
 urlpatterns += patterns('',
-    (r'^favicon\.ico$', redirect_to, {'url': '/static/favicon.png'}),
+    (r'^favicon\.ico$', redirect_to, {'url': '/static/ww.png'}),
 )
 
 if settings.DEBUG:
