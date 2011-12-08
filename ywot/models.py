@@ -176,6 +176,8 @@ models.signals.post_save.connect(user_post_save, sender=User)
 # models.signals.post_save.connect(edit_post_save, sender=Edit)
 
 
+
+
 from django.contrib import admin
 admin.site.register(World)
 admin.site.register(Tile)

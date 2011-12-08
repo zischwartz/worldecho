@@ -103,11 +103,7 @@ INSTALLED_APPS = (
 DEFAULT_FROM_EMAIL = SERVER_EMAIL = '"Written World" <no-reply@writtenworld.org>'
 ACCOUNT_ACTIVATION_DAYS = 3
 
-EMAIL_HOST = 'smtp.gmail.com'     
-EMAIL_HOST_USER = 'writtenworldmail@gmail.com'
-EMAIL_HOST_PASSWORD = 'clayshirky'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+from email_details import *
 
 # You should change this
 LOG_DIRECTORY = './log/' 

@@ -95,6 +95,7 @@ def response_403():
 # World Views
 #
 
+
 def yourworld(request, namespace):
     """Check permissions and route request."""
     # world, _ = World.get_or_create(namespace)
