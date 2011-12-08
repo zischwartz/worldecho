@@ -44,10 +44,15 @@ class World(models.Model):
         ordering = ['name']
         
     def __unicode__(self):
-        return self.name
+        try:
+            if self.name[0]=='u' and self.name[1]=='_':
+                return self.name[2:] + "'s Personal World"
+            return self.name
+        except:
+            return self.name
     
     def get_absolute_url(self):
-        # MEDIA_ROOT
+        # MEDIA_ROOT # ?????????
         return '/' + self.name
 
 class Tile(models.Model):
