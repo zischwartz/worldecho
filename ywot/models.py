@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.http import Http404
+from lib import log
 
 from lib.jsonfield import DictField
 
@@ -129,11 +130,25 @@ class Whitelist(models.Model):
     class Meta:
         unique_together=[['user', 'world']]
     
-
+# Turns out we don't really need this
 class UserWorld(models.Model):
     world = models.ForeignKey(World, null=True, blank=True)
     user = models.ForeignKey(User, null=True, blank=True)
 
+
+
+def user_post_save(sender, instance, created, **kwargs):
+    if created:
+        world = World.objects.create(name='user_'+instance.username, public_readable=False, public_writable=False, owner=instance)
+        uworld = UserWorld.objects.create(world=world, user=instance)
+
+        # log.info('user about to be created')
+        # invitation_user = InvitationUser()
+        # invitation_user.inviter = instance
+        # invitation_user.invitations_remaining = settings.INVITATIONS_PER_USER
+        # invitation_user.save()
+
+models.signals.post_save.connect(user_post_save, sender=User)
 
 
 from django.contrib import admin

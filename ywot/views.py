@@ -100,6 +100,9 @@ def yourworld(request, namespace):
     # world, _ = World.get_or_create(namespace)
     world = get_object_or_404(World, name=namespace)
 
+    # if user is exists and is authenticated
+    # send edits should also send it to their world
+    # create a world when they create an account
 
     if 'color' in request.session:
         color = request.session['color']
@@ -133,8 +136,6 @@ def yourworld(request, namespace):
         'properties': simplejson.dumps(world.properties),
 		'color': color,
         'world': world,
-
-
     })
     
 def fetch_updates(request, world):
@@ -185,7 +186,7 @@ def fetch_updates(request, world):
 
 
 def send_edits(request, world):
-    log.info("sending edits")
+    # log.info("sending edits")
 
 
     assert permissions.can_write(request.user, world) # Checked by router

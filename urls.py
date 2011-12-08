@@ -51,6 +51,7 @@ urlpatterns += patterns('ywot.views',
 
     # Worldviews
     ('^(\w*)$', 'yourworld'),
+    ('^u/(\w*)$', 'yourworld'),
     ('^(beta/\w*)$', 'yourworld'),
     ('^(frontpage/\w*)$', 'yourworld'),
 )
