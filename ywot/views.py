@@ -192,7 +192,10 @@ def send_edits(request, world):
     assert permissions.can_write(request.user, world) # Checked by router
     response = []
     tiles = {} # a simple cache
+    tilesU = {} # a simple cache
     edits = [e.split(',', 6) for e in request.POST.getlist('edits')]
+
+
     for edit in edits:
         char = edit[5]
         color= edit[6]
@@ -201,14 +204,30 @@ def send_edits(request, world):
         keyname = "%d,%d" % (tileY, tileX)
         if keyname in tiles:
             tile = tiles[keyname]
+# REWRITE THIS, 
+        if request.user.is_authenticated():
+            if keyname in tilesU:
+                tileU = tilesU[keyname]
+    # Because that else is intended for the other if
+
         else:
             # TODO: select for update
             tile, _ = Tile.objects.get_or_create(world=world, tileY=tileY, tileX=tileX)
             tiles[keyname] = tile
+            # do same thing for personal world
+            if request.user.is_authenticated():
+                worldU= World.objects.get(name="u_"+request.user.username)
+                tileU, _U = Tile.objects.get_or_create(world=worldU, tileY=tileY, tileX=tileX)
+                tilesU[keyname] = tileU
+
         if tile.properties.get('protected'):
             if not permissions.can_admin(request.user, world):
                 continue    
         tile.set_char(charY, charX, char, color)
+        if request.user.is_authenticated():
+            tileU.set_char(charY, charX, char, color)
+
+
         # TODO: anything, please.
 
         # if tile.properties:
@@ -224,11 +243,15 @@ def send_edits(request, world):
 
         response.append([tileY, tileX, charY, charX, timestamp, char, color])
 
+    # for personal world
+    # if request.user.is_authenticated():
 
-                
+
     if len(edits) < 200:
         for tile in tiles.values():
             tile.save()
+            if request.user.is_authenticated():
+                tileU.save() #well given this, the postsave code for personal worlds makes less sense
         Edit.objects.create(world=world, 
                             user=request.user if request.user.is_authenticated() else None,
                             content=repr(edits),

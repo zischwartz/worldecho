@@ -47,7 +47,7 @@ class World(models.Model):
         return self.name
     
     def get_absolute_url(self):
-        MEDIA_ROOT
+        # MEDIA_ROOT
         return '/' + self.name
 
 class Tile(models.Model):
@@ -74,6 +74,9 @@ class Tile(models.Model):
     # - cell_props[charY][charX] = {}
     
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return "Tile in " +self.world.name 
 
     def save(self, *args, **kwargs):
         if self.new:
@@ -121,7 +124,12 @@ class Edit(models.Model):
     
     class Meta:
         ordering = ['time']
-    
+
+    def __unicode__(self):
+        if self.user:
+            return self.user.username + " on " + self.world.name 
+        else:
+            return "somebody on " + self.world.name 
 class Whitelist(models.Model):
     user = models.ForeignKey(User)
     world = models.ForeignKey(World)
@@ -139,16 +147,28 @@ class UserWorld(models.Model):
 
 def user_post_save(sender, instance, created, **kwargs):
     if created:
-        world = World.objects.create(name='user_'+instance.username, public_readable=False, public_writable=False, owner=instance)
+        world = World.objects.create(name='u_'+instance.username, public_readable=False, public_writable=False, owner=instance)
         uworld = UserWorld.objects.create(world=world, user=instance)
 
-        # log.info('user about to be created')
-        # invitation_user = InvitationUser()
-        # invitation_user.inviter = instance
-        # invitation_user.invitations_remaining = settings.INVITATIONS_PER_USER
-        # invitation_user.save()
+
+
+def edit_post_save(sender, instance, created, **kwargs):
+    if instance.user:
+        personal_world_name ="u_"+instance.user.username
+        if (instance.world.name != personal_world_name):
+            personal_world= World.objects.get(name=personal_world_name)
+            personal_edit = instance
+            personal_edit.world = personal_world
+            personal_edit.save()
+            # log.info('created a new personal world edit:')
+            # log.info(personal_edit)
+
+        # world = World.objects.create(name='user_'+instance.username, public_readable=False, public_writable=False, owner=instance)
+        # uworld = UserWorld.objects.create(world=world, user=instance)
 
 models.signals.post_save.connect(user_post_save, sender=User)
+
+models.signals.post_save.connect(edit_post_save, sender=Edit)
 
 
 from django.contrib import admin
