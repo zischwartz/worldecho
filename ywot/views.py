@@ -13,7 +13,7 @@ from lib import log
 from ywot.models import Tile, World, Edit, Whitelist
 from ywot import permissions
 
-
+ 
 #
 # Helpers
 #
@@ -116,7 +116,8 @@ def yourworld(request, namespace):
     if request.method == 'POST':
         if not can_write:
             return response_403()
-        return send_edits(request, world)
+        return send_edits(request, world) #well that's important and conversly put
+
     state = {
         'canWrite': can_write,
         'canAdmin': permissions.can_admin(request.user, world),
