@@ -100,12 +100,12 @@ INSTALLED_APPS = (
     'ywot'
 )
 
-DEFAULT_FROM_EMAIL = SERVER_EMAIL = '"Your World of Text" <no-reply@writtenworld.org>'
+DEFAULT_FROM_EMAIL = SERVER_EMAIL = '"Written World" <no-reply@writtenworld.org>'
 ACCOUNT_ACTIVATION_DAYS = 3
 
 EMAIL_HOST = 'smtp.gmail.com'     
-EMAIL_HOST_USER = 'invite@guidesly.com'
-EMAIL_HOST_PASSWORD = 'dogsarecoolyo'
+EMAIL_HOST_USER = 'writtenworldmail@gmail.com'
+EMAIL_HOST_PASSWORD = 'clayshirky'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 

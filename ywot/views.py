@@ -187,7 +187,12 @@ def fetch_updates(request, world):
 
 def send_edits(request, world):
     # log.info("sending edits")
-
+    if request.user.is_authenticated():
+        authd= True
+        worldU= World.objects.get(name="u_"+request.user.username)
+        assert permissions.can_write(request.user, worldU) # Checked by router
+    else:
+        authd= False
 
     assert permissions.can_write(request.user, world) # Checked by router
     response = []
@@ -195,38 +200,36 @@ def send_edits(request, world):
     tilesU = {} # a simple cache
     edits = [e.split(',', 6) for e in request.POST.getlist('edits')]
 
-
     for edit in edits:
         char = edit[5]
         color= edit[6]
         tileY, tileX, charY, charX, timestamp = map(int, edit[:5])
         assert len(char) == 1 # TODO: investigate these tracebacks
         keyname = "%d,%d" % (tileY, tileX)
-        if keyname in tiles:
-            tile = tiles[keyname]
-# REWRITE THIS, 
-        if request.user.is_authenticated():
-            if keyname in tilesU:
-                tileU = tilesU[keyname]
-    # Because that else is intended for the other if
 
+        if (keyname in tiles) or (keyname in tilesU):
+            tile = tiles[keyname]
+            if authd:
+                tileU = tilesU[keyname]
         else:
             # TODO: select for update
             tile, _ = Tile.objects.get_or_create(world=world, tileY=tileY, tileX=tileX)
             tiles[keyname] = tile
             # do same thing for personal world
-            if request.user.is_authenticated():
-                worldU= World.objects.get(name="u_"+request.user.username)
+            if authd:
                 tileU, _U = Tile.objects.get_or_create(world=worldU, tileY=tileY, tileX=tileX)
                 tilesU[keyname] = tileU
 
         if tile.properties.get('protected'):
             if not permissions.can_admin(request.user, world):
                 continue    
+
         tile.set_char(charY, charX, char, color)
-        if request.user.is_authenticated():
+        if authd:
             tileU.set_char(charY, charX, char, color)
 
+
+# The edits are being recorded correctly, this is a tile issue it seems.
 
         # TODO: anything, please.
 
@@ -242,21 +245,28 @@ def send_edits(request, world):
         # response.append([tileY, tileX, charY, charX, timestamp, char, sessionid])
 
         response.append([tileY, tileX, charY, charX, timestamp, char, color])
-
-    # for personal world
-    # if request.user.is_authenticated():
-
+    
+    #end of for loop of edit in edits
 
     if len(edits) < 200:
         for tile in tiles.values():
             tile.save()
-            if request.user.is_authenticated():
-                tileU.save() #well given this, the postsave code for personal worlds makes less sense
         Edit.objects.create(world=world, 
                             user=request.user if request.user.is_authenticated() else None,
                             content=repr(edits),
                             ip=request.META['REMOTE_ADDR'],
                             )
+    # same as above, but for personal world
+    if authd:
+        if len(edits) < 200:
+            for tile in tilesU.values():
+                tile.save()            
+        Edit.objects.create(world=worldU, 
+                    user=request.user,
+                    content=repr(edits),
+                    ip=request.META['REMOTE_ADDR'],
+                    )
+
     return HttpResponse(simplejson.dumps(response))
 
 #

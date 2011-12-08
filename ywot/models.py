@@ -152,14 +152,14 @@ def user_post_save(sender, instance, created, **kwargs):
 
 
 
-def edit_post_save(sender, instance, created, **kwargs):
-    if instance.user:
-        personal_world_name ="u_"+instance.user.username
-        if (instance.world.name != personal_world_name):
-            personal_world= World.objects.get(name=personal_world_name)
-            personal_edit = instance
-            personal_edit.world = personal_world
-            personal_edit.save()
+# def edit_post_save(sender, instance, created, **kwargs):
+#     if instance.user:
+#         personal_world_name ="u_"+instance.user.username
+#         if (instance.world.name != personal_world_name):
+#             personal_world= World.objects.get(name=personal_world_name)
+#             personal_edit = instance
+#             personal_edit.world = personal_world
+#             personal_edit.save()
             # log.info('created a new personal world edit:')
             # log.info(personal_edit)
 
@@ -168,7 +168,7 @@ def edit_post_save(sender, instance, created, **kwargs):
 
 models.signals.post_save.connect(user_post_save, sender=User)
 
-models.signals.post_save.connect(edit_post_save, sender=Edit)
+# models.signals.post_save.connect(edit_post_save, sender=Edit)
 
 
 from django.contrib import admin
