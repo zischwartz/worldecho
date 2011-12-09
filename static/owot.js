@@ -59,7 +59,7 @@ YourWorld.helpers = function() {
         var tileY = $.data(tile, 'tileY');
         var tileX = $.data(tile, 'tileX');
         var YX_yx = [tileY, tileX, charY, charX];
-		//console.log(YX_yx);
+		// console.log(YX_yx);
         return YX_yx;
     };
 
@@ -126,13 +126,13 @@ YourWorld.Config = function(container) {
 
 
 // lets not use these, lets do this in YourWorld.World so we can change them dynamically
-    var map_tile_x = 256;
-    var map_tile_y = 256;
+    // var map_tile_x = 256;
+    // var map_tile_y = 256;
 
 
     // console.log('we think the default char is:', properties.default_char);
-    var default_char= properties.default_char || ' ';
-    // var default_char='#';
+    // var default_char= properties.default_char || ' ';
+    var default_char='#';
     var mapTypeId = google.maps.MapTypeId.ROADMAP;
     // console.log(properties);
 
@@ -160,8 +160,8 @@ YourWorld.Config = function(container) {
     obj.numCols = function() { return num_cols;};
     obj.charHeight = function() { return map_tile_y / num_rows;};
     obj.charWidth = function() { return map_tile_x / num_cols;};
-    obj.tileHeight = function() { return map_tile_y;};
-    obj.tileWidth = function() { return map_tile_x;};
+    // obj.tileHeight = function() { return map_tile_y;};
+    // obj.tileWidth = function() { return map_tile_x;};
     obj.defaultContent = function() { return default_content;};
     obj.mapTileX = function() {return map_tile_x;};
     obj.mapTileY = function() {return map_tile_y;};
@@ -222,6 +222,8 @@ YourWorld.World = function() {
     // var map;
     var initialUserPos, pixelWorldCenter, pixelUser;
 
+
+    // THIS THING --------------------------------------------------------------------------
     var currentDivider=2;
 
     var currentTileWidth= 256/currentDivider;
@@ -392,9 +394,10 @@ function handleNoGeolocation(errorFlag) {
         
         // div.innerHTML+=tile.HTMLcontent();
         div = tile.HTMLnode();
+        div.style.fontSize = '8px';
 
         //for debug
-        $(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
+        // $(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
         // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = 'red';
         return div;
 
@@ -594,16 +597,16 @@ function handleNoGeolocation(errorFlag) {
 		var center_XY_xy = FromLatLngToTileWithCells(map.getCenter(), z);
         //on Y
 		if (ne_XY_xy[1] > my_YX_yx[0] || my_YX_yx[0] > sw_XY_xy[1] ){
-			var me_Y = my_YX_yx[0]*currentTileHeight + _config.charHeight()*my_YX_yx[2];
-			var center_Y = center_XY_xy[1]*currentTileHeight + center_XY_xy[3]*_config.charHeight();
+			var me_Y = my_YX_yx[0]*currentTileHeight + charHeight*my_YX_yx[2];
+			var center_Y = center_XY_xy[1]*currentTileHeight + center_XY_xy[3]*charHeight;
 			var dif_Y = me_Y - center_Y;
 			// console.log("out of Y by: ", dif_Y );
 			map.panBy(0, dif_Y);
 		};
 		//on X
 		if (ne_XY_xy[0] < my_YX_yx[1] || my_YX_yx[1] < sw_XY_xy[0] ){
-			var me_X = my_YX_yx[1]*currentTileWidth + _config.charWidth()*my_YX_yx[3];
-			var center_X = center_XY_xy[0]*currentTileWidth + center_XY_xy[2]*_config.charWidth();
+			var me_X = my_YX_yx[1]*currentTileWidth + charWidth*my_YX_yx[3];
+			var center_X = center_XY_xy[0]*currentTileWidth + center_XY_xy[2]*charWidth;
 			var dif_X = me_X - center_X;
 			// console.log("out of X by: ", dif_X );
 			map.panBy(dif_X, 0);
@@ -632,8 +635,8 @@ function handleNoGeolocation(errorFlag) {
 
 				var upperLefTile = FromLatLngToTileCoordinates(upperLeft, z);
 				// console.log(tile);
-                var numDown = Math.ceil(_container.height()/_config.mapTileY());
-                var numAcross= Math.ceil(_container.width()/_config.mapTileX());
+                var numDown = Math.ceil(_container.height()/currentTileHeight);
+                var numAcross= Math.ceil(_container.width()/currentTileWidth);
                 
 
 				var minY = upperLefTile[1] - 1; // one tile of padding around what's visible
@@ -967,7 +970,7 @@ function handleNoGeolocation(errorFlag) {
             {
                 //console.log([tileX, maxLeftTile, charX, maxLeftChar]);
                 //console.log("panning left by ", _config.charWidth() * -1);
-                map.panBy(_config.charWidth() * -1, 0);
+                map.panBy(charWidth * -1, 0);
             }
         }
         else if (dir == 'right') 
@@ -979,7 +982,7 @@ function handleNoGeolocation(errorFlag) {
             {
                 //console.log([tileX, maxRightTile, charX, maxRightChar]);
                 //console.log("panning right by ", _config.charWidth());
-                map.panBy(_config.charWidth(), 0);
+                map.panBy(charWidth, 0);
             }
         }
         else if (dir == 'up') 
@@ -991,7 +994,7 @@ function handleNoGeolocation(errorFlag) {
             {
                 //console.log([tileY, charY, " vs ", maxTopTile, maxTopChar]);
                 //console.log("panning up by ", _config.charHeight() * -1);
-                map.panBy(0, _config.charHeight() * -1);
+                map.panBy(0, charHeight * -1);
             }
         }
         else if (dir == 'down') 
@@ -1003,7 +1006,7 @@ function handleNoGeolocation(errorFlag) {
             {
                 //console.log([tileY, charY, " vs ", maxBottomTile, maxBottomChar]);
                 //console.log("panning down by ", _config.charHeight());
-                map.panBy(0, _config.charHeight());
+                map.panBy(0, charHeight);
             }
 		}
         
