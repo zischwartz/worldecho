@@ -113,8 +113,6 @@ YourWorld.helpers = function() {
 }();
 
 
-
-
 YourWorld.Config = function(container) {
 // YourWorld.Config = function(container) {
     // Configuration settings. Dynamically generated to suit container style.
