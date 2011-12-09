@@ -56,6 +56,7 @@ YourWorld.helpers = function() {
         var charX = getNodeIndex(td); // TODO: use cellIndex?
         var charY = getNodeIndex(td.parents('tr'));
         var tile = td.parents('.tilecont')[0];
+        //hmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
         var tileY = $.data(tile, 'tileY');
         var tileX = $.data(tile, 'tileX');
         var YX_yx = [tileY, tileX, charY, charX];
@@ -379,32 +380,34 @@ function handleNoGeolocation(errorFlag) {
 
         //from coords, we need to get latlng, and pixel xy
         // var tilepoint = new google.maps.Point(coord.x*256/zfactor,coord.y*256/zfactor);
-        var tilepoint = new google.maps.Point(coord.x*currentTileWidth/zfactor,coord.y*currentTileHeight/zfactor);
+        // var tilepoint = new google.maps.Point(coord.x*currentTileWidth/zfactor, coord.y*currentTileHeight/zfactor);
 
         // var tilepoint = new google.maps.Point(coord.x*256/zfactor,coord.y*256/zfactor);
 
-        var topleft=projection.fromPointToLatLng(tilepoint);
+        // var topleft=projection.fromPointToLatLng(tilepoint);
         
         // div.style.width = this.tileSize.width + 'px';
         // div.style.height = this.tileSize.height + 'px';
 
 
         // this actually doesn't make sense to me, why it's Y before X, but it seems to solve all our problems miraculously...
-        tile = getOrCreateTile(coord.y, coord.x);
+        tile = getOrCreateTile(coord.y/currentDivider, coord.x/currentDivider);
         
         // div.innerHTML+=tile.HTMLcontent();
         div = tile.HTMLnode();
         div.style.fontSize = '8px';
 
+        // console.log($.data(tile.HTMLnode(), 'tileY'));
 
         //for debug
-        // $(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
+        $(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
         // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = 'red';
         return div;
 
     } //end CoordMapType getTile
 
     var rememberTile = function(tileY, tileX, tileObj) {
+
         if (_tileByCoord[tileY] === undefined) {
             _tileByCoord[tileY] = {};
         }
@@ -428,7 +431,6 @@ function handleNoGeolocation(errorFlag) {
 
     var createTile = function(tileY, tileX) {
         // The World wraps each Tile object in a custom container div.
-        console.log('creating tile');
 
         var tile, tileContainer;
         tileContainer = document.createElement('div');
@@ -440,9 +442,10 @@ function handleNoGeolocation(errorFlag) {
         tileContainer.style.width = currentTileWidth + 'px';
         tileContainer.style.height = currentTileHeight + 'px';
         
-        tester = _config;
+        // console.log('creating tile container:', $.data(tileContainer, 'tileY') );
+
         
-        tileContainer.style.color = 'red';
+        // tileContainer.style.color = 'red';
         tile = YourWorld.Tile.create(tileY, tileX, _config, tileContainer);
 
         rememberTile(tileY, tileX, tile);
@@ -451,6 +454,7 @@ function handleNoGeolocation(errorFlag) {
 
         _state.numTiles++;
         if ((_state.numTiles % 1000) === 0) { // lower this?
+            console.log("CLEAN UP!!!!!");
             setTimeout(cleanUpTiles, 0);
         }
 
@@ -463,11 +467,11 @@ function handleNoGeolocation(errorFlag) {
         // We can actually grab the center cell, yay!
         var centerCell = FromLatLngToTileWithCells(map.getCenter(), map.getZoom());
         
-        console.log("gettile centerCell", getTile(centerCell[1], centerCell[0]));
+        // console.log("gettile centerCell", getTile(centerCell[1], centerCell[0]));
         console.log(" centerCell", centerCell);
-        console.log("gettile 19297 24636", getTile(19297, 124636));
+        // console.log("gettile 19297 24636:", getTile(19297, 124636));
 
-
+        console.log("tiles:", $(".tilecont").length);
         // setSelected(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
         setSelected(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
         
