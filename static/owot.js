@@ -124,6 +124,8 @@ YourWorld.Config = function(container) {
     var num_rows = 14;
     var num_cols = 18;
 
+
+// lets not use these, lets do this in YourWorld.World so we can change them dynamically
     var map_tile_x = 256;
     var map_tile_y = 256;
 
@@ -220,8 +222,10 @@ YourWorld.World = function() {
     // var map;
     var initialUserPos, pixelWorldCenter, pixelUser;
 
-    var currentTileWidth= 256;///2;
-    var currentTileHeight= 256;//2;
+    var currentDivider=2;
+
+    var currentTileWidth= 256/currentDivider;
+    var currentTileHeight= 256/currentDivider;
 
     var num_cols= 18;
     var num_rows= 14;
