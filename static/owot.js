@@ -131,8 +131,8 @@ YourWorld.Config = function(container) {
 
 
     // console.log('we think the default char is:', properties.default_char);
-    // var default_char= properties.default_char || ' ';
-    var default_char='#';
+    var default_char= properties.default_char || ' ';
+    // var default_char='#';
     var mapTypeId = google.maps.MapTypeId.ROADMAP;
     // console.log(properties);
 
@@ -158,13 +158,13 @@ YourWorld.Config = function(container) {
     //// Public
     obj.numRows = function() { return num_rows;};
     obj.numCols = function() { return num_cols;};
-    obj.charHeight = function() { return map_tile_y / num_rows;};
-    obj.charWidth = function() { return map_tile_x / num_cols;};
+    // obj.charHeight = function() { return map_tile_y / num_rows;};
+    // obj.charWidth = function() { return map_tile_x / num_cols;};
     // obj.tileHeight = function() { return map_tile_y;};
     // obj.tileWidth = function() { return map_tile_x;};
     obj.defaultContent = function() { return default_content;};
-    obj.mapTileX = function() {return map_tile_x;};
-    obj.mapTileY = function() {return map_tile_y;};
+    // obj.mapTileX = function() {return map_tile_x;};
+    // obj.mapTileY = function() {return map_tile_y;};
 
     obj.mapTypeId = function() {return mapTypeId;};
     obj.zoom = function() {return zoom;};
@@ -387,7 +387,7 @@ function handleNoGeolocation(errorFlag) {
         
         // div.style.width = this.tileSize.width + 'px';
         // div.style.height = this.tileSize.height + 'px';
-        // div.style.fontSize = '15px';
+
 
         // this actually doesn't make sense to me, why it's Y before X, but it seems to solve all our problems miraculously...
         tile = getOrCreateTile(coord.y, coord.x);
@@ -395,6 +395,7 @@ function handleNoGeolocation(errorFlag) {
         // div.innerHTML+=tile.HTMLcontent();
         div = tile.HTMLnode();
         div.style.fontSize = '8px';
+
 
         //for debug
         // $(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
@@ -427,7 +428,7 @@ function handleNoGeolocation(errorFlag) {
 
     var createTile = function(tileY, tileX) {
         // The World wraps each Tile object in a custom container div.
-        // console.log('creating tile');
+        console.log('creating tile');
 
         var tile, tileContainer;
         tileContainer = document.createElement('div');
@@ -441,7 +442,7 @@ function handleNoGeolocation(errorFlag) {
         
         tester = _config;
         
-        // tileContainer.style.color = 'red';
+        tileContainer.style.color = 'red';
         tile = YourWorld.Tile.create(tileY, tileX, _config, tileContainer);
 
         rememberTile(tileY, tileX, tile);
@@ -461,7 +462,10 @@ function handleNoGeolocation(errorFlag) {
 
         // We can actually grab the center cell, yay!
         var centerCell = FromLatLngToTileWithCells(map.getCenter(), map.getZoom());
+        
         console.log("gettile centerCell", getTile(centerCell[1], centerCell[0]));
+        console.log(" centerCell", centerCell);
+        console.log("gettile 19297 24636", getTile(19297, 124636));
 
 
         // setSelected(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
@@ -471,6 +475,10 @@ function handleNoGeolocation(errorFlag) {
 
         moveCursor('down', null);
         moveCursor('down', null);
+        moveCursor('down', null);
+
+        console.log('in probbably done loading-state.selected=', _state.selected);
+
 		_state.lastClick = _state.selected;
     }
 
@@ -644,15 +652,20 @@ function handleNoGeolocation(errorFlag) {
 		        var maxY = minY + numDown + 2; // Add two because we might only see 1px of TL
 		        var maxX = minX + numAcross + 2;
 				// console.log([minY, minX, maxY, maxX]);
+
+                console.log("_firstBoundCheck", _firstBoundCheck);
+
                 if (_firstBoundCheck)
                 {
-                    if ($(".tilecont").length)
+                    if ($(".tilecont").length)  //have the tiles loaded?
                         {
+                            // console.log($(".tilecont"));
                             if (_state.canWrite)
                             {
                                 probablyDoneLoading();
 
                             }
+
                             _firstBoundCheck=0;
                         }
 
