@@ -152,7 +152,7 @@ def fetch_updates(request, world):
 
     assert min_tileY < max_tileY
     assert min_tileX < max_tileX
-    assert ((max_tileY - min_tileY)*(max_tileX - min_tileX)) < 1000 #was 400, this may kill us with zooming
+    # assert ((max_tileY - min_tileY)*(max_tileX - min_tileX)) < 1000 #was 400, this may kill us with zooming
     
     # Set default info to null
     #not sure what this was trying to do, but it won't work for us with our float values for tiles

@@ -336,10 +336,27 @@ YourWorld.World = function() {
                  });
 
                 google.maps.event.addListener(map, 'zoom_changed', function() {
+                    if (map.getZoom()==17)
+                    {
+                        map.setZoom(18);
+                        console.log('returning cause zoom was 17');
+                        return;
+                    }
                     console.log('zooom changed to ', map.getZoom());
-                    
+
                     // This is sloppy, we should be using getters and setters....
-                    currentDivider=(_config.initialZoom()-map.getZoom()) *2;
+
+                    zoomDiff= _config.initialZoom()-map.getZoom();
+                    //rather than figuring out some clever math....
+                    if (zoomDiff==0)
+                        currentDivider=1;
+                    if (zoomDiff>0)
+                        currentDivider=zoomDiff*2;
+                    if (zoomDiff<0)
+                        currentDivider=0.25;
+
+
+                    console.log('now the cd is ', currentDivider);
 
                     currentTileHeight=currentTileHeight/currentDivider;
                     currentTileWidth=currentTileWidth/currentDivider;
@@ -348,6 +365,7 @@ YourWorld.World = function() {
                     charWidth = currentTileWidth/ num_cols;
 
                     map.overlayMapTypes.removeAt(0);
+                    _tileByCoord = {}; //this is dumb, but is easy for now
                     map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(currentTileHeight, currentTileWidth)));
 
                     // console.log('currentDividerzxxz', x);
@@ -418,12 +436,12 @@ function handleNoGeolocation(errorFlag) {
         div = tile.HTMLnode();
         div.style.fontSize = (16/currentDivider) + 'px';
 
-        // console.log($.data(tile.HTMLnode(), 'tileY'));
+        // console.log(16/currentDivider);
 
         //for debug
-        $(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
+        // $(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
         // $(div).append("<div style='position:absolute; color:red'>"+globalCoord+"</div>");
-        // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = 'red';
+        // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = 'white';
         return div;
 
     } //end CoordMapType getTile
@@ -476,7 +494,7 @@ function handleNoGeolocation(errorFlag) {
         //we're handling this in google maps getTile
 
         _state.numTiles++;
-        if ((_state.numTiles % 1000) === 0) { // lower this?
+        if ((_state.numTiles % 2000) === 0) { // lower this? was 1000
             console.log("CLEAN UP!!!!!");
             setTimeout(cleanUpTiles, 0);
         }
@@ -617,6 +635,7 @@ function handleNoGeolocation(errorFlag) {
 	var moveCursorToClickPosition = function(e){
 		
 		XY_xy = FromPixelsToTileWithCells(e);
+        // console.log('XY_xy', XY_xy);
 		var target = getCell(XY_xy[1], XY_xy[0], XY_xy[3], XY_xy[2]);
 	    setSelected(target);
 		//storing last click (that also works as last selected with arrows)
