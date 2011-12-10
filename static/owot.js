@@ -168,6 +168,7 @@ YourWorld.Config = function(container) {
     // obj.mapTileY = function() {return map_tile_y;};
 
     obj.mapTypeId = function() {return mapTypeId;};
+    obj.initialZoom = function() {return zoom;};
     obj.zoom = function(currentDivider) {console.log(Math.log(currentDivider)/Math.log(2)); return zoom-(Math.log(currentDivider)/Math.log(2));};
     obj.mapTypeCustom = function() {return mapTypeCustom;};
     obj.mapTypeAsString = function() {return mapTypeAsString;};
@@ -225,7 +226,7 @@ YourWorld.World = function() {
 
 
     // THIS THING --------------------------------------------------------------------------
-    var currentDivider=4;
+    var currentDivider=1;
 
     var currentTileWidth= 256/currentDivider;
     var currentTileHeight= 256/currentDivider;
@@ -238,11 +239,6 @@ YourWorld.World = function() {
     // var currentTileWidth= 256/2;
     // var currentTileHeight= 256/2;
 
-
-    obj.goSmall = function(){
-        currentTileWidth= currentTileWidth/2;
-        currentTileHeight= currentTileHeight/2;
-    }
 
 
     function CoordMapType(tileSize) { 
@@ -263,6 +259,9 @@ YourWorld.World = function() {
             // disableDefaultUI: true,
             panControl: true, 
             // zoomControl: false,  #redisable
+              zoomControlOptions: {
+                 style: google.maps.ZoomControlStyle.SMALL
+                },
             streetViewControl: false,
             mapTypeControl:false,
 
@@ -271,7 +270,7 @@ YourWorld.World = function() {
         }; //end options
       
         map = new google.maps.Map(document.getElementById('mapcanvas'), myOptions);
-        
+
         map.mapTypes.set(_config.mapTypeAsString(), _config.mapTypeCustom());
         map.setMapTypeId(_config.mapTypeAsString());
 
@@ -331,10 +330,31 @@ YourWorld.World = function() {
                 map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(currentTileHeight, currentTileWidth)));
                 // console.log(map.overlayMapTypes);
                 google.maps.event.addListener(map, 'bounds_changed', function() {
+                    // console.log('bounds changed event');
                      bounds = map.getBounds();
                      // console.log($(".tilecont"));
-
                  });
+
+                google.maps.event.addListener(map, 'zoom_changed', function() {
+                    console.log('zooom changed to ', map.getZoom());
+                    
+                    // This is sloppy, we should be using getters and setters....
+                    currentDivider=(_config.initialZoom()-map.getZoom()) *2;
+
+                    currentTileHeight=currentTileHeight/currentDivider;
+                    currentTileWidth=currentTileWidth/currentDivider;
+
+                    charHeight = currentTileHeight/ num_rows;
+                    charWidth = currentTileWidth/ num_cols;
+
+                    map.overlayMapTypes.removeAt(0);
+                    map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(currentTileHeight, currentTileWidth)));
+
+                    // console.log('currentDividerzxxz', x);
+                    // and now re render the overlay
+
+
+                });   
                 
             
         }, function() {
@@ -402,7 +422,7 @@ function handleNoGeolocation(errorFlag) {
 
         //for debug
         $(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
-        //$(div).append("<div style='position:absolute; color:red'>"+globalCoord+"</div>");
+        // $(div).append("<div style='position:absolute; color:red'>"+globalCoord+"</div>");
         // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = 'red';
         return div;
 
@@ -434,6 +454,7 @@ function handleNoGeolocation(errorFlag) {
     var createTile = function(tileY, tileX) {
         // The World wraps each Tile object in a custom container div.
 
+        // console.log("in creatTile currentTileWidth", currentTileWidth);
         var tile, tileContainer;
         tileContainer = document.createElement('div');
         $.data(tileContainer, 'tileY', tileY);
@@ -469,8 +490,8 @@ function handleNoGeolocation(errorFlag) {
         // We can actually grab the center cell, yay!
         var centerCell = FromLatLngToTileWithCells(map.getCenter(), map.getZoom());
         
-        console.log(" centerCell", centerCell);
-        console.log("gettile centerCell", getTile(centerCell[1], centerCell[0]));
+        // console.log(" centerCell", centerCell);
+        // console.log("gettile centerCell", getTile(centerCell[1], centerCell[0]));
         // console.log("gettile 19297 24636:", getTile(19297, 124636));
 
         //console.log("tiles:", $(".tilecont").length);
@@ -738,6 +759,7 @@ function handleNoGeolocation(errorFlag) {
     };
 
     var renderMandatoryTiles = function() {
+        // Looks like we don't need this
         /*var bounds = getMandatoryBounds();
         if (_state.lastRender && (bounds[0] == _state.lastRender[0]) && 
             (bounds[1] == _state.lastRender[1]) && (bounds[2] == _state.lastRender[2]) && 
