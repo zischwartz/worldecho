@@ -469,21 +469,22 @@ function handleNoGeolocation(errorFlag) {
         // We can actually grab the center cell, yay!
         var centerCell = FromLatLngToTileWithCells(map.getCenter(), map.getZoom());
         
-        // console.log("gettile centerCell", getTile(centerCell[1], centerCell[0]));
         console.log(" centerCell", centerCell);
+        console.log("gettile centerCell", getTile(centerCell[1], centerCell[0]));
         // console.log("gettile 19297 24636:", getTile(19297, 124636));
 
-        console.log("tiles:", $(".tilecont").length);
+        //console.log("tiles:", $(".tilecont").length);
         // setSelected(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
         setSelected(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
         
         //set selected, pass el
 
-        moveCursor('down', null);
-        moveCursor('down', null);
-        moveCursor('down', null);
+	var i = 0;
+	for (i; i < currentDivider + 2; i++) {
+	  moveCursor('down', null);
+	}
 
-        console.log('in probbably done loading-state.selected=', _state.selected);
+        //console.log('in probbably done loading-state.selected=', _state.selected);
 
 		_state.lastClick = _state.selected;
     }
@@ -536,11 +537,11 @@ function handleNoGeolocation(errorFlag) {
 
 	    //Meters to Pixels
 	    var res = TILE_INITIAL_RESOLUTION / Math.pow(2, zoom);
-	    var px = (mx + TILE_ORIGIN_SHIFT) / res;
-	    var py = (my + TILE_ORIGIN_SHIFT) / res;
+	    var px = ((mx + TILE_ORIGIN_SHIFT) / res) * currentDivider;
+	    var py = ((my + TILE_ORIGIN_SHIFT) / res);
 
 	    //Pixels to Tile Coords
-	    var tx = Math.floor(Math.ceil(px / TILE_SIZE) - 1) * currentDivider;
+	    var tx = Math.floor(Math.ceil(px / TILE_SIZE) - 1);
 	    var ty = (Math.pow(2, zoom) - 1 - Math.floor(Math.ceil(py / TILE_SIZE) - 1)) * currentDivider;
 	    //var tx = Math.floor(Math.ceil(px / TILE_SIZE) - 1) * Math.pow(2, currentDivider);
 	    //var ty = (Math.pow(2, zoom) - 1 - Math.floor(Math.ceil(py / TILE_SIZE) - 1)) * Math.pow(2, currentDivider);
@@ -549,7 +550,7 @@ function handleNoGeolocation(errorFlag) {
         var ux = px / TILE_SIZE;
         var remx = ux - Math.floor(ux);
         var cx = Math.floor(remx * _config.numCols());
-        var uy = py / TILE_SIZE;
+        var uy = (py * currentDivider) / TILE_SIZE;
         var remy = uy - Math.floor(uy);
         var cy = Math.floor((1 - remy) * _config.numRows());
 
@@ -731,7 +732,7 @@ function handleNoGeolocation(errorFlag) {
         var numAcross = _container.width();
         var centerY = minVisY + numDown/2;
         var centerX = minVisX + numAcross/2;
-        console.log('centercoords', centerY, centerX);
+        //console.log('centercoords', centerY, centerX);
         return [centerY, centerX];
     };
 
@@ -1394,7 +1395,7 @@ function handleNoGeolocation(errorFlag) {
 
     var setSelected = function(el) {
         // Sets the character TD element that is the active cursor position, or null
-        console.log('selected', el);
+        //console.log('selected', el);
 
         //// Setup
         // Unset current
