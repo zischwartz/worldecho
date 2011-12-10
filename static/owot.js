@@ -225,7 +225,7 @@ YourWorld.World = function() {
 
 
     // THIS THING --------------------------------------------------------------------------
-    var currentDivider=1;
+    var currentDivider=4;
 
     var currentTileWidth= 256/currentDivider;
     var currentTileHeight= 256/currentDivider;
@@ -512,12 +512,12 @@ function handleNoGeolocation(errorFlag) {
 
 	    //Meters to Pixels
 	    var res = TILE_INITIAL_RESOLUTION / Math.pow(2, zoom);
-	    var px = (mx + TILE_ORIGIN_SHIFT) / res;
+	    var px = ((mx + TILE_ORIGIN_SHIFT) / res) * currentDivider;
 	    var py = (my + TILE_ORIGIN_SHIFT) / res;
 
 	    //Pixels to Tile Coords
 	    var tx = Math.floor(Math.ceil(px / TILE_SIZE) - 1);
-	    var ty = Math.pow(2, zoom) - 1 - Math.floor(Math.ceil(py / TILE_SIZE) - 1);
+	    var ty = (Math.pow(2, zoom) - 1 - Math.floor(Math.ceil(py / TILE_SIZE) - 1)) * currentDivider;
 
 	    return ([tx, ty]);
 	}
@@ -633,8 +633,8 @@ function handleNoGeolocation(errorFlag) {
 
     var getMandatoryBounds = function() {    
 
-		if (map)
-        {
+	if (map)
+	{
 
             if (map.getBounds())
             {
@@ -650,17 +650,16 @@ function handleNoGeolocation(errorFlag) {
                 
                 var upperLeft = new google.maps.LatLng(topBound, leftBound);
 
-				var upperLefTile = FromLatLngToTileCoordinates(upperLeft, z);
-				// console.log(tile);
+		var upperLefTile = FromLatLngToTileCoordinates(upperLeft, z);
+		// console.log(tile);
                 var numDown = Math.ceil(_container.height()/currentTileHeight);
                 var numAcross= Math.ceil(_container.width()/currentTileWidth);
                 
-
-				var minY = upperLefTile[1] - 1; // one tile of padding around what's visible
-		        var minX = upperLefTile[0] - 1;
-		        var maxY = minY + numDown + 2; // Add two because we might only see 1px of TL
-		        var maxX = minX + numAcross + 2;
-				// console.log([minY, minX, maxY, maxX]);
+		var minY = upperLefTile[1] - 1; // one tile of padding around what's visible
+		var minX = upperLefTile[0] - 1;
+		var maxY = minY + numDown + 2; // Add two because we might only see 1px of TL
+		var maxX = minX + numAcross + 2;
+		// console.log([minY, minX, maxY, maxX]);
 
                 //console.log("_firstBoundCheck", _firstBoundCheck);
 
@@ -672,18 +671,14 @@ function handleNoGeolocation(errorFlag) {
                             if (_state.canWrite)
                             {
                                 probablyDoneLoading();
-
                             }
-
                             _firstBoundCheck=0;
-                        }
-
-                    
+                        }                    
                 }
-		        return [minY, minX, maxY, maxX];
+		
+		return [minY, minX, maxY, maxX];
             }
         }
-
     };
     
     var setCoords = function() {
