@@ -4,7 +4,9 @@ from helpers import here
 
 # Django settings for project project.
 
-DEBUG = True
+
+DEBUG = True	
+
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -23,6 +25,7 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
+
 
 CACHES = {
     'default': {

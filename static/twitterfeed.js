@@ -4,5 +4,5 @@ getTwitters('updates_container', {
   enableLinks: true, 
   ignoreReplies: true,
   prefix: '',
-  template: '<div>“%text%” <span class="date">%time%</span></div>'
+  template: '<div>“%text%” <br><span class="date">%time% </span></div>'
 });
