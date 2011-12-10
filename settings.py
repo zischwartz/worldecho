@@ -96,9 +96,14 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
+    'registration',
     'ywot'
 )
 
+DEFAULT_FROM_EMAIL = SERVER_EMAIL = '"Written World" <no-reply@writtenworld.org>'
+ACCOUNT_ACTIVATION_DAYS = 3
+
+from email_details import *
 
 # You should change this
 LOG_DIRECTORY = './log/' 

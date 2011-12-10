@@ -56,10 +56,11 @@ YourWorld.helpers = function() {
         var charX = getNodeIndex(td); // TODO: use cellIndex?
         var charY = getNodeIndex(td.parents('tr'));
         var tile = td.parents('.tilecont')[0];
+        //hmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
         var tileY = $.data(tile, 'tileY');
         var tileX = $.data(tile, 'tileX');
         var YX_yx = [tileY, tileX, charY, charX];
-		//console.log(YX_yx);
+		// console.log(YX_yx);
         return YX_yx;
     };
 
@@ -113,8 +114,6 @@ YourWorld.helpers = function() {
 }();
 
 
-
-
 YourWorld.Config = function(container) {
 // YourWorld.Config = function(container) {
     // Configuration settings. Dynamically generated to suit container style.
@@ -126,12 +125,15 @@ YourWorld.Config = function(container) {
     var num_rows = 14;
     var num_cols = 18;
 
-    var map_tile_x = 256;
-    var map_tile_y = 256;
+
+// lets not use these, lets do this in YourWorld.World so we can change them dynamically
+    // var map_tile_x = 256;
+    // var map_tile_y = 256;
 
 
     // console.log('we think the default char is:', properties.default_char);
     var default_char= properties.default_char || ' ';
+    // var default_char='#';
     var mapTypeId = google.maps.MapTypeId.ROADMAP;
     // console.log(properties);
 
@@ -151,37 +153,22 @@ YourWorld.Config = function(container) {
     // Auto-generated settings
     //not working
 
-    // var span = document.createElement('span');
-    // span.style.visibility = 'hidden';
-    // container.append(span);
-    // span.innerHTML = 'X';
-    // var char_height = $(span).height();
-    // var char_width = $(span).width();
-    // var tile_height = char_height*num_rows;
-    // var tile_width = char_width*num_cols;
-    // $(span).remove();
-
-
-    //or we can just set it for now
-    var tile_height = 256;
-    var tile_width = 256;
-
 
     var default_content = Array(num_rows*num_cols+1).join(default_char);
 
     //// Public
     obj.numRows = function() { return num_rows;};
     obj.numCols = function() { return num_cols;};
-    obj.charHeight = function() { return tile_height / num_rows;};
-    obj.charWidth = function() { return tile_width / num_cols;};
-    obj.tileHeight = function() { return tile_height;};
-    obj.tileWidth = function() { return tile_width;};
+    // obj.charHeight = function() { return map_tile_y / num_rows;};
+    // obj.charWidth = function() { return map_tile_x / num_cols;};
+    // obj.tileHeight = function() { return map_tile_y;};
+    // obj.tileWidth = function() { return map_tile_x;};
     obj.defaultContent = function() { return default_content;};
-    obj.mapTileX = function() {return map_tile_x;};
-    obj.mapTileY = function() {return map_tile_y;};
+    // obj.mapTileX = function() {return map_tile_x;};
+    // obj.mapTileY = function() {return map_tile_y;};
 
     obj.mapTypeId = function() {return mapTypeId;};
-    obj.zoom = function() {return zoom;};
+    obj.zoom = function(currentDivider) {console.log(Math.log(currentDivider)/Math.log(2)); return zoom-(Math.log(currentDivider)/Math.log(2));};
     obj.mapTypeCustom = function() {return mapTypeCustom;};
     obj.mapTypeAsString = function() {return mapTypeAsString;};
     obj.disableDoubleClickZoom = function() {return disableDoubleClickZoom;};
@@ -237,6 +224,27 @@ YourWorld.World = function() {
     var initialUserPos, pixelWorldCenter, pixelUser;
 
 
+    // THIS THING --------------------------------------------------------------------------
+    var currentDivider=1;
+
+    var currentTileWidth= 256/currentDivider;
+    var currentTileHeight= 256/currentDivider;
+
+    var num_cols= 18;
+    var num_rows= 14;
+    var charHeight = currentTileHeight/ num_rows;
+    var charWidth = currentTileWidth/ num_cols;
+
+    // var currentTileWidth= 256/2;
+    // var currentTileHeight= 256/2;
+
+
+    obj.goSmall = function(){
+        currentTileWidth= currentTileWidth/2;
+        currentTileHeight= currentTileHeight/2;
+    }
+
+
     function CoordMapType(tileSize) { 
         this.tileSize = tileSize; 
          // var panes = this.getPanes();
@@ -247,19 +255,18 @@ YourWorld.World = function() {
 
     var mapInitialize= function() {
         var myOptions = {
-            zoom:  _config.zoom(),
+            zoom:  _config.zoom(currentDivider),
             // zoom: 16,
             disableDoubleClickZoom : _config.disableDoubleClickZoom(),
             scrollwheel: false,
             // draggable: false,
             // disableDefaultUI: true,
             panControl: true, 
-            zoomControl: false,
+            // zoomControl: false,  #redisable
             streetViewControl: false,
             mapTypeControl:false,
 
             mapTypeId: _config.mapTypeId(), 
-
             // mapTypeControlOptions: { mapTypeIds: [worldOption.bgTiletype, 'dark_map'] }
         }; //end options
       
@@ -321,7 +328,7 @@ YourWorld.World = function() {
                 map.setCenter(initialUserPos);
 
                 // we could figure out size based on zoom here...
-                map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(_config.mapTileY(), _config.mapTileX())));
+                map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(currentTileHeight, currentTileWidth)));
                 // console.log(map.overlayMapTypes);
                 google.maps.event.addListener(map, 'bounds_changed', function() {
                      bounds = map.getBounds();
@@ -372,30 +379,37 @@ function handleNoGeolocation(errorFlag) {
         var zfactor=Math.pow(2,zoom);
 
         //from coords, we need to get latlng, and pixel xy
-        var tilepoint = new google.maps.Point(coord.x*256/zfactor,coord.y*256/zfactor);
+        // var tilepoint = new google.maps.Point(coord.x*256/zfactor,coord.y*256/zfactor);
+        // var tilepoint = new google.maps.Point(coord.x*currentTileWidth/zfactor, coord.y*currentTileHeight/zfactor);
 
         // var tilepoint = new google.maps.Point(coord.x*256/zfactor,coord.y*256/zfactor);
 
-        var topleft=projection.fromPointToLatLng(tilepoint);
+        // var topleft=projection.fromPointToLatLng(tilepoint);
         
         // div.style.width = this.tileSize.width + 'px';
         // div.style.height = this.tileSize.height + 'px';
-        // div.style.fontSize = '15px';
 
+	//globalCoord = new google.maps.Point(coord.x*currentDivider, coord.y*currentDivider);
         // this actually doesn't make sense to me, why it's Y before X, but it seems to solve all our problems miraculously...
         tile = getOrCreateTile(coord.y, coord.x);
+        //tile = getOrCreateTile(globalCoord.y, globalCoord.x);
         
         // div.innerHTML+=tile.HTMLcontent();
         div = tile.HTMLnode();
+        div.style.fontSize = (16/currentDivider) + 'px';
+
+        // console.log($.data(tile.HTMLnode(), 'tileY'));
 
         //for debug
-        // $(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
+        $(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
+        //$(div).append("<div style='position:absolute; color:red'>"+globalCoord+"</div>");
         // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = 'red';
         return div;
 
     } //end CoordMapType getTile
 
     var rememberTile = function(tileY, tileX, tileObj) {
+
         if (_tileByCoord[tileY] === undefined) {
             _tileByCoord[tileY] = {};
         }
@@ -419,8 +433,7 @@ function handleNoGeolocation(errorFlag) {
 
     var createTile = function(tileY, tileX) {
         // The World wraps each Tile object in a custom container div.
-        // console.log('creating tile');
-        //these attributes aren't making it into the dom
+
         var tile, tileContainer;
         tileContainer = document.createElement('div');
         $.data(tileContainer, 'tileY', tileY);
@@ -428,10 +441,11 @@ function handleNoGeolocation(errorFlag) {
         tileContainer.className = 'tilecont';
         // tileContainer.style.top = (_config.tileHeight())*(tileY) + _state.offsetY + 'px';
         // tileContainer.style.left = (_config.tileWidth())*(tileX) + _state.offsetX + 'px';
-        tileContainer.style.width = _config.tileWidth() + 'px';
-        tileContainer.style.height = _config.tileHeight() + 'px';
+        tileContainer.style.width = currentTileWidth + 'px';
+        tileContainer.style.height = currentTileHeight + 'px';
         
-        tester = _config;
+        // console.log('creating tile container:', $.data(tileContainer, 'tileY') );
+
         
         // tileContainer.style.color = 'red';
         tile = YourWorld.Tile.create(tileY, tileX, _config, tileContainer);
@@ -442,6 +456,7 @@ function handleNoGeolocation(errorFlag) {
 
         _state.numTiles++;
         if ((_state.numTiles % 1000) === 0) { // lower this?
+            console.log("CLEAN UP!!!!!");
             setTimeout(cleanUpTiles, 0);
         }
 
@@ -453,10 +468,23 @@ function handleNoGeolocation(errorFlag) {
 
         // We can actually grab the center cell, yay!
         var centerCell = FromLatLngToTileWithCells(map.getCenter(), map.getZoom());
+        
+        // console.log("gettile centerCell", getTile(centerCell[1], centerCell[0]));
+        console.log(" centerCell", centerCell);
+        // console.log("gettile 19297 24636:", getTile(19297, 124636));
 
+        console.log("tiles:", $(".tilecont").length);
+        // setSelected(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
         setSelected(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
+        
+        //set selected, pass el
+
         moveCursor('down', null);
         moveCursor('down', null);
+        moveCursor('down', null);
+
+        console.log('in probbably done loading-state.selected=', _state.selected);
+
 		_state.lastClick = _state.selected;
     }
 
@@ -470,7 +498,7 @@ function handleNoGeolocation(errorFlag) {
 
 	function FromLatLngToTileCoordinates(latLng, zoom) {
 
-		var TILE_SIZE = 256;
+		var TILE_SIZE = currentTileHeight;
 		/** @const */
 		var TILE_INITIAL_RESOLUTION = 2 * Math.PI * 6378137 / TILE_SIZE;
 		/** @const */
@@ -495,7 +523,7 @@ function handleNoGeolocation(errorFlag) {
 
 	function FromLatLngToTileWithCells(latLng, zoom) {
 
-		var TILE_SIZE = 256;
+		var TILE_SIZE = currentTileHeight;
 		/** @const */
 		var TILE_INITIAL_RESOLUTION = 2 * Math.PI * 6378137 / TILE_SIZE;
 		/** @const */
@@ -512,8 +540,10 @@ function handleNoGeolocation(errorFlag) {
 	    var py = (my + TILE_ORIGIN_SHIFT) / res;
 
 	    //Pixels to Tile Coords
-	    var tx = Math.floor(Math.ceil(px / TILE_SIZE) - 1);
-	    var ty = Math.pow(2, zoom) - 1 - Math.floor(Math.ceil(py / TILE_SIZE) - 1);
+	    var tx = Math.floor(Math.ceil(px / TILE_SIZE) - 1) * currentDivider;
+	    var ty = (Math.pow(2, zoom) - 1 - Math.floor(Math.ceil(py / TILE_SIZE) - 1)) * currentDivider;
+	    //var tx = Math.floor(Math.ceil(px / TILE_SIZE) - 1) * Math.pow(2, currentDivider);
+	    //var ty = (Math.pow(2, zoom) - 1 - Math.floor(Math.ceil(py / TILE_SIZE) - 1)) * Math.pow(2, currentDivider);
 
         //Characters
         var ux = px / TILE_SIZE;
@@ -583,16 +613,16 @@ function handleNoGeolocation(errorFlag) {
 		var center_XY_xy = FromLatLngToTileWithCells(map.getCenter(), z);
         //on Y
 		if (ne_XY_xy[1] > my_YX_yx[0] || my_YX_yx[0] > sw_XY_xy[1] ){
-			var me_Y = my_YX_yx[0]*_config.tileHeight() + _config.charHeight()*my_YX_yx[2];
-			var center_Y = center_XY_xy[1]*_config.tileHeight() + center_XY_xy[3]*_config.charHeight();
+			var me_Y = my_YX_yx[0]*currentTileHeight + charHeight*my_YX_yx[2];
+			var center_Y = center_XY_xy[1]*currentTileHeight + center_XY_xy[3]*charHeight;
 			var dif_Y = me_Y - center_Y;
 			// console.log("out of Y by: ", dif_Y );
 			map.panBy(0, dif_Y);
 		};
 		//on X
 		if (ne_XY_xy[0] < my_YX_yx[1] || my_YX_yx[1] < sw_XY_xy[0] ){
-			var me_X = my_YX_yx[1]*_config.tileWidth() + _config.charWidth()*my_YX_yx[3];
-			var center_X = center_XY_xy[0]*_config.tileWidth() + center_XY_xy[2]*_config.charWidth();
+			var me_X = my_YX_yx[1]*currentTileWidth + charWidth*my_YX_yx[3];
+			var center_X = center_XY_xy[0]*currentTileWidth + center_XY_xy[2]*charWidth;
 			var dif_X = me_X - center_X;
 			// console.log("out of X by: ", dif_X );
 			map.panBy(dif_X, 0);
@@ -621,8 +651,8 @@ function handleNoGeolocation(errorFlag) {
 
 				var upperLefTile = FromLatLngToTileCoordinates(upperLeft, z);
 				// console.log(tile);
-                var numDown = Math.ceil(_container.height()/_config.mapTileY());
-                var numAcross= Math.ceil(_container.width()/_config.mapTileX());
+                var numDown = Math.ceil(_container.height()/currentTileHeight);
+                var numAcross= Math.ceil(_container.width()/currentTileWidth);
                 
 
 				var minY = upperLefTile[1] - 1; // one tile of padding around what's visible
@@ -630,15 +660,20 @@ function handleNoGeolocation(errorFlag) {
 		        var maxY = minY + numDown + 2; // Add two because we might only see 1px of TL
 		        var maxX = minX + numAcross + 2;
 				// console.log([minY, minX, maxY, maxX]);
+
+                //console.log("_firstBoundCheck", _firstBoundCheck);
+
                 if (_firstBoundCheck)
                 {
-                    if ($(".tilecont").length)
+                    if ($(".tilecont").length)  //have the tiles loaded?
                         {
+                            // console.log($(".tilecont"));
                             if (_state.canWrite)
                             {
                                 probablyDoneLoading();
 
                             }
+
                             _firstBoundCheck=0;
                         }
 
@@ -652,10 +687,10 @@ function handleNoGeolocation(errorFlag) {
     
     var setCoords = function() {
         // Get real min+max, divide by 4 and floor, then set to coords UI
-        var minVisY = (_container.scrollTop() - _state.offsetY) / _config.tileHeight();
-        var minVisX = (_container.scrollLeft() - _state.offsetX) / _config.tileWidth();
-        var numDown = _container.height()/_config.tileHeight();
-        var numAcross = _container.width()/_config.tileWidth();
+        var minVisY = (_container.scrollTop() - _state.offsetY) / currentTileHeight;
+        var minVisX = (_container.scrollLeft() - _state.offsetX) / currentTileWidth;
+        var numDown = _container.height()/currentTileHeight;
+        var numAcross = _container.width()/currentTileWidth;
         var centerY = minVisY + numDown/2;
         var centerX = minVisX + numAcross/2;
         centerY = -Math.floor(centerY/4); // INVERT Y-axis to make natural, scale both by 4 ~screen
@@ -677,10 +712,10 @@ function handleNoGeolocation(errorFlag) {
 
 	var getCenterCoords = function() {
 		// Returns the Y,X coordinates, in Tile units, of the center of the screen;
-        var minVisY = (_container.scrollTop() - _state.offsetY) / _config.tileHeight();
-        var minVisX = (_container.scrollLeft() - _state.offsetX) / _config.tileWidth();
-        var numDown = _container.height()/_config.tileHeight();
-        var numAcross = _container.width()/_config.tileWidth();
+        var minVisY = (_container.scrollTop() - _state.offsetY) / currentTileHeight;
+        var minVisX = (_container.scrollLeft() - _state.offsetX) / currentTileWidth;
+        var numDown = _container.height()/currentTileHeight;
+        var numAcross = _container.width()/currentTileWidth;
         var centerY = minVisY + numDown/2;
         var centerX = minVisX + numAcross/2;
         // console.log('centercoords', centerY, centerX);
@@ -703,11 +738,11 @@ function handleNoGeolocation(errorFlag) {
     var getMandatoryTiles = function() {
         // A list of [tileY, tileX] pairs that must be rendered, in -->,V order
         // This is currently those visible in the container plus padding
-        return makeRectangle.apply(obj, getMandatoryBounds());
+        //return makeRectangle.apply(obj, getMandatoryBounds());
     };
 
     var renderMandatoryTiles = function() {
-        var bounds = getMandatoryBounds();
+        /*var bounds = getMandatoryBounds();
         if (_state.lastRender && (bounds[0] == _state.lastRender[0]) && 
             (bounds[1] == _state.lastRender[1]) && (bounds[2] == _state.lastRender[2]) && 
             (bounds[3] == _state.lastRender[3])) {
@@ -717,7 +752,7 @@ function handleNoGeolocation(errorFlag) {
         var coords = makeRectangle.apply(obj, bounds);
         for (var i=0; i<coords.length; i++) {
             getOrCreateTile(coords[i][0], coords[i][1]);
-        }
+        }*/
     };
     
     var makeLeftRoom = function(numPx) {
@@ -725,7 +760,7 @@ function handleNoGeolocation(errorFlag) {
         // while not visibly moving any content.
         // 
         // Returns the number of pixels of new space that were added
-        var room = _config.tileWidth() * 5;
+        var room = currentTileWidth * 5;
         if (numPx > room) {
             throw new Error('no big jumps yet');
         }
@@ -742,7 +777,7 @@ function handleNoGeolocation(errorFlag) {
         // while not visibly moving any content. (actually ignores numPx)
         // 
         // Returns the number of pixels of new space that were added
-        var room = _config.tileHeight() * 5;
+        var room = currentTileHeight * 5;
         if (numPx > room) {
             throw new Error('no big jumps yet');
         }
@@ -956,7 +991,7 @@ function handleNoGeolocation(errorFlag) {
             {
                 //console.log([tileX, maxLeftTile, charX, maxLeftChar]);
                 //console.log("panning left by ", _config.charWidth() * -1);
-                map.panBy(_config.charWidth() * -1, 0);
+                map.panBy(charWidth * -1, 0);
             }
         }
         else if (dir == 'right') 
@@ -968,7 +1003,7 @@ function handleNoGeolocation(errorFlag) {
             {
                 //console.log([tileX, maxRightTile, charX, maxRightChar]);
                 //console.log("panning right by ", _config.charWidth());
-                map.panBy(_config.charWidth(), 0);
+                map.panBy(charWidth, 0);
             }
         }
         else if (dir == 'up') 
@@ -980,7 +1015,7 @@ function handleNoGeolocation(errorFlag) {
             {
                 //console.log([tileY, charY, " vs ", maxTopTile, maxTopChar]);
                 //console.log("panning up by ", _config.charHeight() * -1);
-                map.panBy(0, _config.charHeight() * -1);
+                map.panBy(0, charHeight * -1);
             }
         }
         else if (dir == 'down') 
@@ -992,7 +1027,7 @@ function handleNoGeolocation(errorFlag) {
             {
                 //console.log([tileY, charY, " vs ", maxBottomTile, maxBottomChar]);
                 //console.log("panning down by ", _config.charHeight());
-                map.panBy(0, _config.charHeight());
+                map.panBy(0, charHeight);
             }
 		}
         
@@ -1359,7 +1394,7 @@ function handleNoGeolocation(errorFlag) {
 
     var setSelected = function(el) {
         // Sets the character TD element that is the active cursor position, or null
-        //console.log('selected', el);
+        console.log('selected', el);
 
         //// Setup
         // Unset current
@@ -1484,10 +1519,10 @@ function handleNoGeolocation(errorFlag) {
         _container.width($(window).width());
         _config = YourWorld.Config(_container);
 		// TODO: DRY container id, or some other solution. These styles are necessary for IE.
-        YourWorld.helpers.addCss('#yourworld table {height:' + _config.tileHeight() + 'px }');
-        YourWorld.helpers.addCss('#yourworld table {width:' + _config.tileWidth() + 'px }');
-        YourWorld.helpers.addCss('.tilecont {height:' + _config.tileHeight() + 'px }');
-        YourWorld.helpers.addCss('.tilecont {width:' + _config.tileWidth() + 'px }');
+        YourWorld.helpers.addCss('#yourworld table {height:' + currentTileHeight + 'px }');
+        YourWorld.helpers.addCss('#yourworld table {width:' + currentTileWidth + 'px }');
+        YourWorld.helpers.addCss('.tilecont {height:' + currentTileHeight + 'px }');
+        YourWorld.helpers.addCss('.tilecont {width:' + currentTileWidth + 'px }');
         // Initial tile render
         _state.offsetX = parseInt(_container.width()/2, 10);
         _state.offsetY = parseInt(_container.height()/2, 10);

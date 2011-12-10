@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.http import Http404
+from lib import log
 
 from lib.jsonfield import DictField
 
@@ -43,10 +44,15 @@ class World(models.Model):
         ordering = ['name']
         
     def __unicode__(self):
-        return self.name
+        try:
+            if self.name[0]=='u' and self.name[1]=='_':
+                return self.name[2:] + "'s Personal World"
+            return self.name
+        except:
+            return self.name
     
     def get_absolute_url(self):
-        MEDIA_ROOT
+        # MEDIA_ROOT # ?????????
         return '/' + self.name
 
 class Tile(models.Model):
@@ -62,6 +68,9 @@ class Tile(models.Model):
     color = models.CharField(default='0'*LEN,  max_length=LEN)
     echos = models.CharField(default='0'*LEN,  max_length=LEN)
     color = models.CharField(default='0'*LEN,  max_length=LEN)
+    cursors = models.CharField(default='0'*LEN,  max_length=LEN)
+    # sqlite> ALTER TABLE ywot_tile add cursors memo;
+
     tileY = models.IntegerField()
     tileX = models.IntegerField()
     properties = DictField(default={})
@@ -73,6 +82,9 @@ class Tile(models.Model):
     # - cell_props[charY][charX] = {}
     
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return "Tile in " +self.world.name 
 
     def save(self, *args, **kwargs):
         if self.new:
@@ -120,7 +132,12 @@ class Edit(models.Model):
     
     class Meta:
         ordering = ['time']
-    
+
+    def __unicode__(self):
+        if self.user:
+            return self.user.username + " on " + self.world.name 
+        else:
+            return "somebody on " + self.world.name 
 class Whitelist(models.Model):
     user = models.ForeignKey(User)
     world = models.ForeignKey(World)
@@ -129,10 +146,38 @@ class Whitelist(models.Model):
     class Meta:
         unique_together=[['user', 'world']]
     
-
+# Turns out we don't really need this
 class UserWorld(models.Model):
     world = models.ForeignKey(World, null=True, blank=True)
     user = models.ForeignKey(User, null=True, blank=True)
+
+
+
+def user_post_save(sender, instance, created, **kwargs):
+    if created:
+        world = World.objects.create(name='u_'+instance.username, public_readable=False, public_writable=False, owner=instance)
+        uworld = UserWorld.objects.create(world=world, user=instance)
+
+
+
+# def edit_post_save(sender, instance, created, **kwargs):
+#     if instance.user:
+#         personal_world_name ="u_"+instance.user.username
+#         if (instance.world.name != personal_world_name):
+#             personal_world= World.objects.get(name=personal_world_name)
+#             personal_edit = instance
+#             personal_edit.world = personal_world
+#             personal_edit.save()
+            # log.info('created a new personal world edit:')
+            # log.info(personal_edit)
+
+        # world = World.objects.create(name='user_'+instance.username, public_readable=False, public_writable=False, owner=instance)
+        # uworld = UserWorld.objects.create(world=world, user=instance)
+
+models.signals.post_save.connect(user_post_save, sender=User)
+
+# models.signals.post_save.connect(edit_post_save, sender=Edit)
+
 
 
 

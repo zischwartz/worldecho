@@ -1,5 +1,5 @@
 getTwitters('updates_container', { 
-  id: 'yourworldoftext', 
+  id: 'writtenworldorg', 
   count: 5, 
   enableLinks: true, 
   ignoreReplies: true,

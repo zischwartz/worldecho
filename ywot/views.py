@@ -13,7 +13,7 @@ from lib import log
 from ywot.models import Tile, World, Edit, Whitelist
 from ywot import permissions
 
-
+ 
 #
 # Helpers
 #
@@ -95,11 +95,15 @@ def response_403():
 # World Views
 #
 
+
 def yourworld(request, namespace):
     """Check permissions and route request."""
     # world, _ = World.get_or_create(namespace)
     world = get_object_or_404(World, name=namespace)
 
+    # if user is exists and is authenticated
+    # send edits should also send it to their world
+    # create a world when they create an account
 
     if 'color' in request.session:
         color = request.session['color']
@@ -116,7 +120,8 @@ def yourworld(request, namespace):
     if request.method == 'POST':
         if not can_write:
             return response_403()
-        return send_edits(request, world)
+        return send_edits(request, world) #well that's important and conversly put
+
     state = {
         'canWrite': can_write,
         'canAdmin': permissions.can_admin(request.user, world),
@@ -132,8 +137,6 @@ def yourworld(request, namespace):
         'properties': simplejson.dumps(world.properties),
 		'color': color,
         'world': world,
-
-
     })
     
 def fetch_updates(request, world):
@@ -184,29 +187,51 @@ def fetch_updates(request, world):
 
 
 def send_edits(request, world):
-    log.info("sending edits")
-
+    # log.info("sending edits")
+    if request.user.is_authenticated():
+        authd= True
+        worldU= World.objects.get(name="u_"+request.user.username)
+        assert permissions.can_write(request.user, worldU) # Checked by router
+    else:
+        authd= False
 
     assert permissions.can_write(request.user, world) # Checked by router
     response = []
     tiles = {} # a simple cache
+    tilesU = {} # a simple cache
     edits = [e.split(',', 6) for e in request.POST.getlist('edits')]
+
     for edit in edits:
         char = edit[5]
         color= edit[6]
         tileY, tileX, charY, charX, timestamp = map(int, edit[:5])
         assert len(char) == 1 # TODO: investigate these tracebacks
         keyname = "%d,%d" % (tileY, tileX)
-        if keyname in tiles:
+
+        if (keyname in tiles) or (keyname in tilesU):
             tile = tiles[keyname]
+            if authd:
+                tileU = tilesU[keyname]
         else:
             # TODO: select for update
             tile, _ = Tile.objects.get_or_create(world=world, tileY=tileY, tileX=tileX)
             tiles[keyname] = tile
+            # do same thing for personal world
+            if authd:
+                tileU, _U = Tile.objects.get_or_create(world=worldU, tileY=tileY, tileX=tileX)
+                tilesU[keyname] = tileU
+
         if tile.properties.get('protected'):
             if not permissions.can_admin(request.user, world):
                 continue    
+
         tile.set_char(charY, charX, char, color)
+        if authd:
+            tileU.set_char(charY, charX, char, color)
+
+
+# The edits are being recorded correctly, this is a tile issue it seems.
+
         # TODO: anything, please.
 
         # if tile.properties:
@@ -221,9 +246,9 @@ def send_edits(request, world):
         # response.append([tileY, tileX, charY, charX, timestamp, char, sessionid])
 
         response.append([tileY, tileX, charY, charX, timestamp, char, color])
+    
+    #end of for loop of edit in edits
 
-
-                
     if len(edits) < 200:
         for tile in tiles.values():
             tile.save()
@@ -232,6 +257,17 @@ def send_edits(request, world):
                             content=repr(edits),
                             ip=request.META['REMOTE_ADDR'],
                             )
+    # same as above, but for personal world
+    if authd:
+        if len(edits) < 200:
+            for tile in tilesU.values():
+                tile.save()            
+        Edit.objects.create(world=worldU, 
+                    user=request.user,
+                    content=repr(edits),
+                    ip=request.META['REMOTE_ADDR'],
+                    )
+
     return HttpResponse(simplejson.dumps(response))
 
 #

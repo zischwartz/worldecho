@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block header %}
-    <h1>Log in to Your World of Text</h1>
+    <h1>Log in to The Written World</h1>
 {% endblock %}
 {% block content %}
 {% if form.errors %}
@@ -21,6 +21,57 @@
 <input type="submit" value="login" />
 <a href="{% url registration_register %}">Don't have an account?</a>
 <input type="hidden" name="next" value="{{ next }}" />
+</form>
+
+
+<hr>
+<hr>
+<hr>
+<hr>
+<hr>
+
+
+<h1>Need an account?</h1>
+
+                </div>
+
+                <div class="span-14">
+                    
+<form action="/accounts/register/" method="POST">
+<table>
+<tr>
+    <td align="right" valign="top">Username:</td>
+    <td>
+        <input id="id_username" type="text" class="required" name="username" maxlength="30" /> <br/>
+        
+    </td>
+</tr>
+<tr>
+    <td align="right" valign="top">Email:</td>
+    <td>
+        <input id="id_email" type="text" class="required" name="email" maxlength="75" /> <br/>
+        
+    </td>
+</tr>
+<tr>
+    <td align="right" valign="top">Password:</td>
+    <td>
+        <input id="id_password1" type="password" class="required" name="password1" /> <br/>
+        
+    </td>
+</tr>
+<tr>
+    <td align="right" valign="top">Password (again):</td>
+    <td>
+        <input id="id_password2" type="password" class="required" name="password2" /> <br/>
+        
+    </td>
+</tr>
+<tr>
+    <td>&nbsp;</td>
+    <td><input type="submit" value="Register" /></td>
+</tr>
+</table>
 </form>
 
 {% endblock %}
