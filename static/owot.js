@@ -168,7 +168,7 @@ YourWorld.Config = function(container) {
     // obj.mapTileY = function() {return map_tile_y;};
 
     obj.mapTypeId = function() {return mapTypeId;};
-    obj.zoom = function() {return zoom;};
+    obj.zoom = function(currentDivider) {console.log(Math.log(currentDivider)/Math.log(2)); return zoom-(Math.log(currentDivider)/Math.log(2));};
     obj.mapTypeCustom = function() {return mapTypeCustom;};
     obj.mapTypeAsString = function() {return mapTypeAsString;};
     obj.disableDoubleClickZoom = function() {return disableDoubleClickZoom;};
@@ -225,7 +225,7 @@ YourWorld.World = function() {
 
 
     // THIS THING --------------------------------------------------------------------------
-    var currentDivider=2;
+    var currentDivider=4;
 
     var currentTileWidth= 256/currentDivider;
     var currentTileHeight= 256/currentDivider;
@@ -255,7 +255,7 @@ YourWorld.World = function() {
 
     var mapInitialize= function() {
         var myOptions = {
-            zoom:  _config.zoom(),
+            zoom:  _config.zoom(currentDivider),
             // zoom: 16,
             disableDoubleClickZoom : _config.disableDoubleClickZoom(),
             scrollwheel: false,
@@ -389,18 +389,20 @@ function handleNoGeolocation(errorFlag) {
         // div.style.width = this.tileSize.width + 'px';
         // div.style.height = this.tileSize.height + 'px';
 
-
+	//globalCoord = new google.maps.Point(coord.x*currentDivider, coord.y*currentDivider);
         // this actually doesn't make sense to me, why it's Y before X, but it seems to solve all our problems miraculously...
-        tile = getOrCreateTile(coord.y/currentDivider, coord.x/currentDivider);
+        tile = getOrCreateTile(coord.y, coord.x);
+        //tile = getOrCreateTile(globalCoord.y, globalCoord.x);
         
         // div.innerHTML+=tile.HTMLcontent();
         div = tile.HTMLnode();
-        div.style.fontSize = '8px';
+        div.style.fontSize = (16/currentDivider) + 'px';
 
         // console.log($.data(tile.HTMLnode(), 'tileY'));
 
         //for debug
         $(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
+        //$(div).append("<div style='position:absolute; color:red'>"+globalCoord+"</div>");
         // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = 'red';
         return div;
 
@@ -467,21 +469,22 @@ function handleNoGeolocation(errorFlag) {
         // We can actually grab the center cell, yay!
         var centerCell = FromLatLngToTileWithCells(map.getCenter(), map.getZoom());
         
-        // console.log("gettile centerCell", getTile(centerCell[1], centerCell[0]));
         console.log(" centerCell", centerCell);
+        console.log("gettile centerCell", getTile(centerCell[1], centerCell[0]));
         // console.log("gettile 19297 24636:", getTile(19297, 124636));
 
-        console.log("tiles:", $(".tilecont").length);
+        //console.log("tiles:", $(".tilecont").length);
         // setSelected(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
         setSelected(getTile(centerCell[1], centerCell[0]).getCell(centerCell[3], centerCell[2]));
         
         //set selected, pass el
 
-        moveCursor('down', null);
-        moveCursor('down', null);
-        moveCursor('down', null);
+	var i = 0;
+	for (i; i < currentDivider + 2; i++) {
+	  moveCursor('down', null);
+	}
 
-        console.log('in probbably done loading-state.selected=', _state.selected);
+        //console.log('in probbably done loading-state.selected=', _state.selected);
 
 		_state.lastClick = _state.selected;
     }
@@ -509,12 +512,12 @@ function handleNoGeolocation(errorFlag) {
 
 	    //Meters to Pixels
 	    var res = TILE_INITIAL_RESOLUTION / Math.pow(2, zoom);
-	    var px = (mx + TILE_ORIGIN_SHIFT) / res;
+	    var px = ((mx + TILE_ORIGIN_SHIFT) / res) * currentDivider;
 	    var py = (my + TILE_ORIGIN_SHIFT) / res;
 
 	    //Pixels to Tile Coords
 	    var tx = Math.floor(Math.ceil(px / TILE_SIZE) - 1);
-	    var ty = Math.pow(2, zoom) - 1 - Math.floor(Math.ceil(py / TILE_SIZE) - 1);
+	    var ty = (Math.pow(2, zoom) - 1 - Math.floor(Math.ceil(py / TILE_SIZE) - 1)) * currentDivider;
 
 	    return ([tx, ty]);
 	}
@@ -534,18 +537,20 @@ function handleNoGeolocation(errorFlag) {
 
 	    //Meters to Pixels
 	    var res = TILE_INITIAL_RESOLUTION / Math.pow(2, zoom);
-	    var px = (mx + TILE_ORIGIN_SHIFT) / res;
-	    var py = (my + TILE_ORIGIN_SHIFT) / res;
+	    var px = ((mx + TILE_ORIGIN_SHIFT) / res) * currentDivider;
+	    var py = ((my + TILE_ORIGIN_SHIFT) / res);
 
 	    //Pixels to Tile Coords
 	    var tx = Math.floor(Math.ceil(px / TILE_SIZE) - 1);
-	    var ty = Math.pow(2, zoom) - 1 - Math.floor(Math.ceil(py / TILE_SIZE) - 1);
+	    var ty = (Math.pow(2, zoom) - 1 - Math.floor(Math.ceil(py / TILE_SIZE) - 1)) * currentDivider;
+	    //var tx = Math.floor(Math.ceil(px / TILE_SIZE) - 1) * Math.pow(2, currentDivider);
+	    //var ty = (Math.pow(2, zoom) - 1 - Math.floor(Math.ceil(py / TILE_SIZE) - 1)) * Math.pow(2, currentDivider);
 
         //Characters
         var ux = px / TILE_SIZE;
         var remx = ux - Math.floor(ux);
         var cx = Math.floor(remx * _config.numCols());
-        var uy = py / TILE_SIZE;
+        var uy = (py * currentDivider) / TILE_SIZE;
         var remy = uy - Math.floor(uy);
         var cy = Math.floor((1 - remy) * _config.numRows());
 
@@ -628,8 +633,8 @@ function handleNoGeolocation(errorFlag) {
 
     var getMandatoryBounds = function() {    
 
-		if (map)
-        {
+	if (map)
+	{
 
             if (map.getBounds())
             {
@@ -645,19 +650,18 @@ function handleNoGeolocation(errorFlag) {
                 
                 var upperLeft = new google.maps.LatLng(topBound, leftBound);
 
-				var upperLefTile = FromLatLngToTileCoordinates(upperLeft, z);
-				// console.log(tile);
+		var upperLefTile = FromLatLngToTileCoordinates(upperLeft, z);
+		// console.log(tile);
                 var numDown = Math.ceil(_container.height()/currentTileHeight);
                 var numAcross= Math.ceil(_container.width()/currentTileWidth);
                 
+		var minY = upperLefTile[1] - 1; // one tile of padding around what's visible
+		var minX = upperLefTile[0] - 1;
+		var maxY = minY + numDown + 2; // Add two because we might only see 1px of TL
+		var maxX = minX + numAcross + 2;
+		// console.log([minY, minX, maxY, maxX]);
 
-				var minY = upperLefTile[1] - 1; // one tile of padding around what's visible
-		        var minX = upperLefTile[0] - 1;
-		        var maxY = minY + numDown + 2; // Add two because we might only see 1px of TL
-		        var maxX = minX + numAcross + 2;
-				// console.log([minY, minX, maxY, maxX]);
-
-                console.log("_firstBoundCheck", _firstBoundCheck);
+                //console.log("_firstBoundCheck", _firstBoundCheck);
 
                 if (_firstBoundCheck)
                 {
@@ -667,18 +671,14 @@ function handleNoGeolocation(errorFlag) {
                             if (_state.canWrite)
                             {
                                 probablyDoneLoading();
-
                             }
-
                             _firstBoundCheck=0;
-                        }
-
-                    
+                        }                    
                 }
-		        return [minY, minX, maxY, maxX];
+		
+		return [minY, minX, maxY, maxX];
             }
         }
-
     };
     
     var setCoords = function() {
@@ -727,18 +727,18 @@ function handleNoGeolocation(errorFlag) {
         var numAcross = _container.width();
         var centerY = minVisY + numDown/2;
         var centerX = minVisX + numAcross/2;
-        console.log('centercoords', centerY, centerX);
+        //console.log('centercoords', centerY, centerX);
         return [centerY, centerX];
     };
 
     var getMandatoryTiles = function() {
         // A list of [tileY, tileX] pairs that must be rendered, in -->,V order
         // This is currently those visible in the container plus padding
-        return makeRectangle.apply(obj, getMandatoryBounds());
+        //return makeRectangle.apply(obj, getMandatoryBounds());
     };
 
     var renderMandatoryTiles = function() {
-        var bounds = getMandatoryBounds();
+        /*var bounds = getMandatoryBounds();
         if (_state.lastRender && (bounds[0] == _state.lastRender[0]) && 
             (bounds[1] == _state.lastRender[1]) && (bounds[2] == _state.lastRender[2]) && 
             (bounds[3] == _state.lastRender[3])) {
@@ -748,7 +748,7 @@ function handleNoGeolocation(errorFlag) {
         var coords = makeRectangle.apply(obj, bounds);
         for (var i=0; i<coords.length; i++) {
             getOrCreateTile(coords[i][0], coords[i][1]);
-        }
+        }*/
     };
     
     var makeLeftRoom = function(numPx) {
@@ -1390,7 +1390,7 @@ function handleNoGeolocation(errorFlag) {
 
     var setSelected = function(el) {
         // Sets the character TD element that is the active cursor position, or null
-        console.log('selected', el);
+        //console.log('selected', el);
 
         //// Setup
         // Unset current
