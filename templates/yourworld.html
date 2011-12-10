@@ -9,11 +9,13 @@
 </head>
 <body>
 <div id="topbar" class="ui">
-	<div id="topbarAbout"> <a href="#">what is this?</a></div>
     <div id="topbar_inner">
         <span id="paused" class="ui-vis tab">Paused</span>
         <div id="announce" class="ui-vis"></div>
-        <span id="menu" class="ui-vis tab menu">Menu <span style="font-size:50%">▼</span></span>
+		<div id="login_btn" class="button"> <a  href="#">own a world</a></div>
+		<div id="takeme_btn" class="button"> <a class="travel" address="New York City" href="#">take me to NYC</a></div>
+
+        <!-- <span id="menu" class="ui-vis tab menu">Menu <span style="font-size:50%">▼</span></span> -->
     </div>
 </div>
 <div id="nav" class="ui menu ui-vis">
@@ -36,7 +38,8 @@
 
 <div id="aboutOverlay">
 	<div class="closeme"></div>
-	<center><img src="/static/writtenworld.png"></center>
+
+	<img class="logo" src="/static/writtenworld.png">
 <p>    
 Hi There, 
 </p><p>
@@ -58,14 +61,14 @@ That’s it. The rules of the site are for you to create (or ignore). So what ar
 <div id="loadingIndicator">
 	<div class="closeme"></div>
 	
-    <img src="/static/writtenworld.png">
-    <h1>{{ world.name|default:"Written World" }}</h1>
+    <img class="logo" src="/static/writtenworld.png">
+    <h1>{{ world.name|default:"" }}</h1>
 
     {{world.prompt|safe}}
 
 </div>
 
-
+<div id="about_btn" class="button"> <a href="#">about this thing</a></div>
 
 <div id="mapcanvas"></div>
 

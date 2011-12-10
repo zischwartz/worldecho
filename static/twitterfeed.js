@@ -1,8 +1,8 @@
 getTwitters('updates_container', { 
-  id: 'yourworldoftext', 
+  id: 'writtenworldorg', 
   count: 5, 
   enableLinks: true, 
   ignoreReplies: true,
   prefix: '',
-  template: '<div>“%text%” <span class="date">%time%</span></div>'
+  template: '<div>“%text%” <br><span class="date">%time% </span></div>'
 });

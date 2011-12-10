@@ -190,7 +190,6 @@ YourWorld.Config = function(container) {
     obj.restrictLatLng = function() {return restrictToLatLng}
     obj.restrictLocationString = function() {return restrictLocationString}
 
-
     return obj;
 };
 
@@ -600,11 +599,28 @@ function handleNoGeolocation(errorFlag) {
 		};
 	}
 
+
+
+	this.travelToLatLng = function(lat,lng){
+		var destination = new google.maps.LatLng(lat, lng);
+		map.panTo(destination);
+		console.log(getMandatoryBounds());
+		
+
+		
+        renderMandatoryTiles();
+	  // 	var XY_xy =  FromLatLngToTileWithCells(destination, map.getZoom());
+	//	var target = getCell(XY_xy[1], XY_xy[0], XY_xy[3], XY_xy[2]);
+	 //   setSelected(target);
+	return;
+	}
+
+
+
     var getMandatoryBounds = function() {    
 
 		if (map)
         {
-
             if (map.getBounds())
             {
                 mapBounds= map.getBounds();
@@ -1365,7 +1381,7 @@ function handleNoGeolocation(errorFlag) {
         // Unset current
         if (_state.selected) {
             _state.selected.style.backgroundColor = '';
-            $(_state.selected).removeClass("selected");
+            $(_state.selected).removeClass();
         }
         _state.selected = null;
         // Check DOM
@@ -1399,7 +1415,7 @@ function handleNoGeolocation(errorFlag) {
         
         // Hightlight and store
         _state.selected = el; 
-        $(_state.selected).addClass("selected")
+        $(_state.selected).addClass("selected c"+usercolor)
         // _state.selected.style.backgroundColor = 'yellow';
     };
 
@@ -1672,6 +1688,32 @@ function handleNoGeolocation(errorFlag) {
         
         $('#loading').hide();
         // console.log('initd');
+
+		$("a.travel").click(function(){
+			var address = $(this).attr("address");
+			var lat, lng;
+			geocoder = new google.maps.Geocoder();
+		   	geocoder.geocode(
+		   	{address : "New York"}, function (response) {
+				if (!response) {
+					alert(address + " not found");
+				} else {
+					var point = response[0].geometry.location;
+					var lat = point.lat().toFixed(5);
+		         	var lng = point.lng().toFixed(5);
+					console.log(lat+ " " + lng);
+		      	}
+		   });
+
+			travelToLatLng(lat,lng);
+
+		});
+		
+
+
+
+
+
 
 
     };
@@ -1953,11 +1995,12 @@ YourWorld.Tile = function() {
 
 $(document).ready(function() {
 
-	$("#topbarAbout > a").click(function(){
+	$("#about_btn > a").click(function(){
+		$("#loadingIndicator").fadeOut(300);	
 		$("#aboutOverlay").fadeIn(300);	
 	});
-
-
+	
+	
 	$(".closeme").click(function(){
 		$(this).parent().fadeOut()
 	});
