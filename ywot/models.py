@@ -67,7 +67,6 @@ class Tile(models.Model):
     content = models.CharField(default=' '*LEN,  max_length=LEN)
     color = models.CharField(default='0'*LEN,  max_length=LEN)
     echos = models.CharField(default='0'*LEN,  max_length=LEN)
-    color = models.CharField(default='0'*LEN,  max_length=LEN)
     # cursors = models.CharField(default='0'*LEN,  max_length=LEN)
     # sqlite> ALTER TABLE ywot_tile add cursors memo;
 

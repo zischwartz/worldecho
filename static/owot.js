@@ -1373,13 +1373,15 @@ function handleNoGeolocation(errorFlag) {
 
     var setSelected = function(el) {
         // Sets the character TD element that is the active cursor position, or null
-        //console.log('selected', el);
+        // console.log('selected', el);
+
 
         //// Setup
         // Unset current
         if (_state.selected) {
             _state.selected.style.backgroundColor = '';
-            $(_state.selected).removeClass();
+			// console.log("this is happeneding");
+            $(_state.selected).removeClass("selected c0 c1 c2 c3 c4 c5 c6 c7 c8 c9");
         }
         _state.selected = null;
         // Check DOM
@@ -1798,9 +1800,10 @@ YourWorld.Tile = function() {
 						c = YourWorld.helpers.escapeChar(c);
 						cell = obj.getCell(charY, charX);
 						cell.innerHTML = c;
-
-                        $(cell).removeClass();
+						// console.log('thissss');
+                        $(cell).removeClass("t0 t1 t2 t3 t4 t5 t6 t7 t8 t9");
                         $(cell).addClass("t"+colorid);
+						// console.log($(cell));
                         
                         // console.log('colorrrid', colorid);
 						
