@@ -119,11 +119,27 @@ class Tile(models.Model):
         assert len(self.content) == self.ROWS*self.COLS
         assert len(self.color) == self.ROWS*self.COLS
 
-	def has_content(self):
+	def get_density(self):
+		density =0
 		if self.content != ' '*LEN:
-			return True
+			return density
 		else:
-			return False
+			for c in self.content:
+				if c != ' ':
+					density+=1
+			return density
+            
+	def get_average_color(self):
+		csum =0
+		count=0
+		for c in self.color:
+			if c != 0:
+				count+=1
+				csum +=c
+		if count ==0:
+			return 0
+		return (csum/count)
+			
 		
     class Meta:
         unique_together=[['world', 'tileY', 'tileX']]

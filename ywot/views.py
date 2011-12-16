@@ -152,13 +152,13 @@ def fetch_updates(request, world):
 
     assert min_tileY < max_tileY
     assert min_tileX < max_tileX
-    assert ((max_tileY - min_tileY)*(max_tileX - min_tileX)) < 400
+    # assert ((max_tileY - min_tileY)*(max_tileX - min_tileX)) < 400 #reneable at some point
     
     # Set default info to null
     #not sure what this was trying to do, but it won't work for us with our float values for tiles
     # for tileY in xrange(min_tileY, max_tileY + 1): #+1 b/c of range bounds
-    #     for tileX in xrange(min_tileX, max_tileX + 1):
-    #         response["%d,%d" % (tileY, tileX)] = None
+        # for tileX in xrange(min_tileX, max_tileX + 1):
+            # response["%d,%d" % (tileY, tileX)] = None
             
     tiles = Tile.objects.filter(world=world,
                                 tileY__gte=min_tileY, tileY__lte=max_tileY,
@@ -178,12 +178,21 @@ def fetch_updates(request, world):
             # if t.properties:
                 # d['properties'] = t.properties
             response[tile_key] = d
+			
+        elif (int(request.GET.get('v', 0)) == 4): #for our zoomed out view!
+            d = {'content': t.get_density(), 'color' : t.get_average_color()}
+            # d = {'content': t.content.replace('\n', ' '), 'color' : t.color}
+            # if t.properties:
+                # d['properties'] = t.properties
+            response[tile_key] = d
         else:
             raise ValueError, 'Unknown JS version'
     
     # log.info(response)
     return HttpResponse(simplejson.dumps(response))
     
+
+
 
 
 def send_edits(request, world):

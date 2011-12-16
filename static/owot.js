@@ -199,6 +199,8 @@ var map;
 var overlay;
 var _tileByCoord = {}; // all tile objects indexed by Y and X
 
+var zoomMode = 0; //0 for normal/writeable, 1 for zoomed out, 2 for zoomed in (maybe)
+
 
 YourWorld.World = function() {
     // The whole wild world. Initialize with `init`.
@@ -271,7 +273,7 @@ YourWorld.World = function() {
             // mapTypeControlOptions: { mapTypeIds: [worldOption.bgTiletype, 'dark_map'] }
         }; //end options
       	
-		_currentZoom = _config.zoom();
+		_lastZoom = _config.zoom();
 	  
         map = new google.maps.Map(document.getElementById('mapcanvas'), myOptions);
         
@@ -339,39 +341,41 @@ YourWorld.World = function() {
 				 google.maps.event.addListener(map, 'zoom_changed', function(){
 				 	_unprocessedZoom=1;
 					 map.overlayMapTypes.clear();
-					 _tileByCoord = {};					
+					 _tileByCoord = {};		
+					 console.log('zoom changed');
+					 			
 				 });
 				 
 				 //zoom_changed , tilesloaded , idle
                  google.maps.event.addListener(map, 'tilesloaded', function() { 
-					 // console.log('idle');
+					 console.log('tilesloaded');
 					 if (_unprocessedZoom)
 					 {
-						 // console.log('idle & unprzzzzz');
-						 
-						 // map.overlayMapTypes.clear();
-						 // _tileByCoord = {};
-						 console.log("getZoom=",map.getZoom(), "currentzoom=", _currentZoom );
+						 console.log('tilesloaded & _unprocessedZoom');
+						 console.log("getZoom=",map.getZoom(), "lastZoom=", _lastZoom );
 					 	
 						 if (map.getZoom()==_config.zoom())
 						 {
+							 zoomMode=0;
 		                     map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(_config.mapTileY(), _config.mapTileX())));
 						 }
 					 
-						 else if (map.getZoom()<_currentZoom)
+						 else if (map.getZoom()<_lastZoom)
 						 {
+							 zoomMode=1;
 							 console.log('zoomed outttt');
-							 var diff =_currentZoom-map.getZoom();
+							 var diff =_lastZoom-map.getZoom();
 							 currentDivider = diff*2;
 							 currentTileHeight= currentTileHeight/currentDivider;
 							 currentTileWidth= currentTileWidth/currentDivider;
 		                     map.overlayMapTypes.insertAt(0, new CoordMapTypeZoomedOut(new google.maps.Size(currentTileHeight, currentTileWidth)));
 						 }
 						 
-						 else if (map.getZoom()>_currentZoom)
+						 else if (map.getZoom()>_lastZoom)
 						 {
+							 zoomMode=2;
 							 console.log('zoomed in');
-							 var diff =map.getZoom()-_currentZoom;
+							 var diff =map.getZoom()-_lastZoom;
 							 currentDivider = diff/2;
 							 currentTileHeight= currentTileHeight/currentDivider;
 							 currentTileWidth= currentTileWidth/currentDivider;
@@ -379,7 +383,7 @@ YourWorld.World = function() {
 						 }
 						 
 						 
-						 _currentZoom = map.getZoom();
+						 _lastZoom = map.getZoom();
 						 _unprocessedZoom=0;
 					 
 					  } //end if _unprocessedZoom
@@ -434,15 +438,12 @@ function handleNoGeolocation(errorFlag) {
 	
 	
 	CoordMapTypeZoomedOut.prototype.getTile = function(coord, zoom, ownerDocument) {
-        // console.log('Coordmaptype zoomed out ',coord);
-        // tile = getOrCreateZoomTile(coord.y, coord.x);
-        div = document.createElement('div');
-        // $.data(tileContainer, 'tileY', coord.y);
-        // $.data(tileContainer, 'tileX', coord.x);
-        div.className = 'tilezoom';
-        div.style.width = currentTileWidth + 'px';
-        div.style.height = currentTileHeight + 'px';
-		div.innerHTML= '.';
+        // console.log('Coordmaptype zoomed out gettile called ',coord);
+        
+		div = document.createElement('div');
+        tile = getOrCreateTile(coord.y, coord.x);
+
+        div = tile.HTMLnode();
         //for debug
         // $(div).append("<div style='position:absolute; color:yellow; font-size: 10px;'>Z"+coord+"</div>");
         // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = 'yellow';
@@ -485,23 +486,45 @@ function handleNoGeolocation(errorFlag) {
         tileContainer = document.createElement('div');
         $.data(tileContainer, 'tileY', tileY);
         $.data(tileContainer, 'tileX', tileX);
-        tileContainer.className = 'tilecont';
+
+		
         // tileContainer.style.top = (_config.tileHeight())*(tileY) + _state.offsetY + 'px';
         // tileContainer.style.left = (_config.tileWidth())*(tileX) + _state.offsetX + 'px';
-        tileContainer.style.width = _config.tileWidth() + 'px';
-        tileContainer.style.height = _config.tileHeight() + 'px';
+
         
         // tester = _config;
         
         // tileContainer.style.color = 'red';
-        tile = YourWorld.Tile.create(tileY, tileX, _config, tileContainer);
+		var isZoomTile=0;
+		
+		if (map.getZoom() < 16)
+		{
+			isZoomTile=1;
+			
+	        tileContainer.className = 'tilezoom';
+	        tileContainer.style.width = currentTileWidth + 'px';
+	        tileContainer.style.height = currentTileHeight + 'px';
+			
+		}
+		else
+		{
+	        tileContainer.className = 'tilecont';
+	        tileContainer.style.width = _config.tileWidth() + 'px';
+	        tileContainer.style.height = _config.tileHeight() + 'px';
+		}
+		
+
+		
+        tile = YourWorld.Tile.create(tileY, tileX, _config, tileContainer, isZoomTile);
 
         rememberTile(tileY, tileX, tile);
         // _container[0].appendChild(tileContainer); // a little faster than using jquery 
         //we're handling this in google maps getTile
 
+
+		// TODO lower this
         _state.numTiles++;
-        if ((_state.numTiles % 1000) === 0) { // lower this?
+        if ((_state.numTiles % 6000) === 0) { // lower this? was 1000
             setTimeout(cleanUpTiles, 0);
         }
 
@@ -510,7 +533,6 @@ function handleNoGeolocation(errorFlag) {
 
     var probablyDoneLoading = function()
     {
-
         // We can actually grab the center cell, yay!
         var centerCell = FromLatLngToTileWithCells(map.getCenter(), map.getZoom());
 
@@ -522,9 +544,39 @@ function handleNoGeolocation(errorFlag) {
 
     var getOrCreateTile = function(tileY, tileX) {
         // Returns the tile at given coords, creating if necessary
+		// console.log("getOrCreateTileING");
         return getTile(tileY, tileX) || createTile(tileY, tileX);
+		
+	// if zoom is 16
+	// if (map.getZoom()==16)
+	// 	{
+	//         return getTile(tileY, tileX) || createTile(tileY, tileX);
+	// 	}
+	// if (map.getZoom()<16)
+	// 	{
+	// 		console.log('get zoomed tileee');
+	// 		return getTile(tileY, tileX) || createZoomTile(tileY, tileX); //i guess we can use the regular getTile? cool
+	// 	}
     };
     
+	
+	//     var createZoomTile = function(tileY, tileX) {
+	// 	console.log('Creating Zoom Tile');
+	//         var tile, tileContainer;
+	//         tileContainer = document.createElement('div');
+	//         $.data(tileContainer, 'tileY', tileY);
+	//         $.data(tileContainer, 'tileX', tileX);
+	//         tileContainer.className = 'tilezoom';
+	//         tileContainer.style.width = currentTileWidth + 'px';
+	//         tileContainer.style.height = currentTileHeight + 'px';
+	//         // tileContainer.style.color = 'red';
+	//         tile = YourWorld.ZoomTile.create(tileY, tileX, _config, tileContainer);
+	// 	console.log(tile);
+	//         rememberTile(tileY, tileX, tile);
+	// 	
+	// 	return tile;
+	// 	
+	// }
 
 
 	function FromLatLngToTileCoordinates(latLng, zoom) {
@@ -1768,24 +1820,22 @@ function handleNoGeolocation(errorFlag) {
 			travelToLatLng(lat,lng);
 
 		});
-		
-
-
-
-
-
 
 
     };
 
     // Breaking the rules
     obj.getOrCreateTile = getOrCreateTile;
-
-
-    
+	
     return obj;
 
 }();
+
+//************************************************************************************************************************
+
+
+
+
 
 YourWorld.Tile = function() {
     // A single tile of text. 
@@ -1823,10 +1873,13 @@ YourWorld.Tile = function() {
 		if (!_defaultHTML) {
 			_defaultHTML = makeDefaultHTML(config);
 		}
+		
+		// console.log('getting default html, and zoommode is :');
+		// console.log(zoomMode);
 		return _defaultHTML;
 	};
 
-	obj.create = function(tileY, tileX, config, node) {
+	obj.create = function(tileY, tileX, config, node, isZoomTile) {
 		var obj = {};
 
 		// Private
@@ -1837,6 +1890,7 @@ YourWorld.Tile = function() {
 		var _pendingEdits = {}; // maps (flattened content index) -> (char, timestamp)
 		var _protected = false;
 		var _cellProps = null;
+		var _isZoomTile = isZoomTile;
 		
 		var updateHTML = function(newContent, highlight, colors) {
 			var c, charY, charX, cell;
