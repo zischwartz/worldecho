@@ -231,7 +231,7 @@ YourWorld.World = function() {
     var _menu = null; // The menu container object
     var _firstBoundCheck= 1;
     var _unprocessedZoom= 0;
-
+	var _zoomMode=0; // 0 is no zoom, 1 is zoomed out, 2 is in...
     // var map;
     var initialUserPos, pixelWorldCenter, pixelUser;
 
@@ -271,7 +271,7 @@ YourWorld.World = function() {
             // mapTypeControlOptions: { mapTypeIds: [worldOption.bgTiletype, 'dark_map'] }
         }; //end options
       	
-		_currentZoom = _config.zoom();
+		_lastZoom = _config.zoom();
 	  
         map = new google.maps.Map(document.getElementById('mapcanvas'), myOptions);
         
@@ -339,7 +339,7 @@ YourWorld.World = function() {
 				 google.maps.event.addListener(map, 'zoom_changed', function(){
 				 	_unprocessedZoom=1;
 					 map.overlayMapTypes.clear();
-					 _tileByCoord = {};					
+					 // _tileByCoord = {};					
 				 });
 				 
 				 //zoom_changed , tilesloaded , idle
@@ -349,38 +349,52 @@ YourWorld.World = function() {
 					 {
 						 // console.log('idle & unprzzzzz');
 						 
-						 // map.overlayMapTypes.clear();
-						 // _tileByCoord = {};
-						 console.log("getZoom=",map.getZoom(), "currentzoom=", _currentZoom );
+						 map.overlayMapTypes.clear();
+						 _tileByCoord = {};
+						 console.log("getZoom=",map.getZoom(), "lastZoom=", _lastZoom );
 					 	
 						 if (map.getZoom()==_config.zoom())
 						 {
-		                     map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(_config.mapTileY(), _config.mapTileX())));
+							 console.log('NORMAL MODE, UNZOOMED')
+							_zoomMode=0;
+		                    map.overlayMapTypes.insertAt(0, new CoordMapType(new google.maps.Size(_config.mapTileY(), _config.mapTileX())));
+						 	currentDivider=1;
+						 	currentTileHeight= _config.mapTileY();
+						 	currentTileWidth= _config.mapTileX();
+							
 						 }
 					 
-						 else if (map.getZoom()<_currentZoom)
+						 else
 						 {
-							 console.log('zoomed outttt');
-							 var diff =_currentZoom-map.getZoom();
-							 currentDivider = diff*2;
-							 currentTileHeight= currentTileHeight/currentDivider;
-							 currentTileWidth= currentTileWidth/currentDivider;
-		                     map.overlayMapTypes.insertAt(0, new CoordMapTypeZoomedOut(new google.maps.Size(currentTileHeight, currentTileWidth)));
-						 }
 						 
-						 else if (map.getZoom()>_currentZoom)
-						 {
-							 console.log('zoomed in');
-							 var diff =map.getZoom()-_currentZoom;
-							 currentDivider = diff/2;
-							 currentTileHeight= currentTileHeight/currentDivider;
-							 currentTileWidth= currentTileWidth/currentDivider;
-		                     map.overlayMapTypes.insertAt(0, new CoordMapTypeZoomedOut(new google.maps.Size(currentTileHeight, currentTileWidth)));
-						 }
+							 if (map.getZoom()<_lastZoom)
+							 {
+								 _zoomMode=1;
+								 console.log('zoomed outttt');
+								 var diff =_lastZoom-map.getZoom();
+								 currentDivider = diff*2;
+								 currentTileHeight= currentTileHeight/currentDivider;
+								 currentTileWidth= currentTileWidth/currentDivider;
+			                     map.overlayMapTypes.insertAt(0, new CoordMapTypeZoomedOut(new google.maps.Size(currentTileHeight, currentTileWidth)));
+							 }
+						 	
+							 if (map.getZoom()>_lastZoom)
+							 {
+								 _zoomMode=2;
+								 console.log('zoomed in');
+								 var diff =map.getZoom()-_lastZoom;
+								 currentDivider = diff/2;
+								 currentTileHeight= currentTileHeight/currentDivider;
+								 currentTileWidth= currentTileWidth/currentDivider;
+			                     map.overlayMapTypes.insertAt(0, new CoordMapTypeZoomedOut(new google.maps.Size(currentTileHeight, currentTileWidth)));
+							 }
 						 
+						 	
+						 }			 
 						 
-						 _currentZoom = map.getZoom();
+						 _lastZoom = map.getZoom();
 						 _unprocessedZoom=0;
+						 console.log('_zoomMode', _zoomMode);
 					 
 					  } //end if _unprocessedZoom
 
@@ -435,14 +449,14 @@ function handleNoGeolocation(errorFlag) {
 	
 	CoordMapTypeZoomedOut.prototype.getTile = function(coord, zoom, ownerDocument) {
         // console.log('Coordmaptype zoomed out ',coord);
-        // tile = getOrCreateZoomTile(coord.y, coord.x);
-        div = document.createElement('div');
-        // $.data(tileContainer, 'tileY', coord.y);
-        // $.data(tileContainer, 'tileX', coord.x);
-        div.className = 'tilezoom';
-        div.style.width = currentTileWidth + 'px';
-        div.style.height = currentTileHeight + 'px';
-		div.innerHTML= '.';
+        tile = getOrCreateTile(coord.y, coord.x);
+        div = tile.HTMLnode();
+
+	    // div = document.createElement('div');
+	    // div.className = 'tilezoom';
+	    // div.style.width = currentTileWidth + 'px';
+	    // div.style.height = currentTileHeight + 'px';
+		// div.innerHTML= '.';
         //for debug
         // $(div).append("<div style='position:absolute; color:yellow; font-size: 10px;'>Z"+coord+"</div>");
         // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = 'yellow';
@@ -485,25 +499,34 @@ function handleNoGeolocation(errorFlag) {
         tileContainer = document.createElement('div');
         $.data(tileContainer, 'tileY', tileY);
         $.data(tileContainer, 'tileX', tileX);
-        tileContainer.className = 'tilecont';
-        // tileContainer.style.top = (_config.tileHeight())*(tileY) + _state.offsetY + 'px';
-        // tileContainer.style.left = (_config.tileWidth())*(tileX) + _state.offsetX + 'px';
-        tileContainer.style.width = _config.tileWidth() + 'px';
-        tileContainer.style.height = _config.tileHeight() + 'px';
-        
-        // tester = _config;
-        
-        // tileContainer.style.color = 'red';
-        tile = YourWorld.Tile.create(tileY, tileX, _config, tileContainer);
+
+		var isZoomTile=0;
+		
+		if (_zoomMode)
+		{
+			isZoomTile=1;
+			
+	        tileContainer.className = 'tilezoom'; //and tilecont perhaps?
+	        tileContainer.style.width = currentTileWidth + 'px';
+	        tileContainer.style.height = currentTileHeight + 'px';	
+		}
+		else
+		{
+	        tileContainer.className = 'tilecont';
+	        tileContainer.style.width = _config.tileWidth() + 'px';
+	        tileContainer.style.height = _config.tileHeight() + 'px';
+		}		
+        tile = YourWorld.Tile.create(tileY, tileX, _config, tileContainer, isZoomTile);
 
         rememberTile(tileY, tileX, tile);
         // _container[0].appendChild(tileContainer); // a little faster than using jquery 
         //we're handling this in google maps getTile
-
         _state.numTiles++;
-        if ((_state.numTiles % 1000) === 0) { // lower this?
-            setTimeout(cleanUpTiles, 0);
-        }
+		// TODO rennable
+			//         if ((_state.numTiles % 5000) === 0) { // lower this? raise? was 1000
+			// console.log('CLEANING UP');
+			//             setTimeout(cleanUpTiles, 0);
+			//         }
 
         return tile;
     };
@@ -1826,7 +1849,7 @@ YourWorld.Tile = function() {
 		return _defaultHTML;
 	};
 
-	obj.create = function(tileY, tileX, config, node) {
+	obj.create = function(tileY, tileX, config, node, isZoomTile) {
 		var obj = {};
 
 		// Private
@@ -1837,48 +1860,70 @@ YourWorld.Tile = function() {
 		var _pendingEdits = {}; // maps (flattened content index) -> (char, timestamp)
 		var _protected = false;
 		var _cellProps = null;
+		var _isZoomTile = isZoomTile;
 		
-		var updateHTML = function(newContent, highlight, colors) {
-			var c, charY, charX, cell;
-			var contentPos = 0;
-			var sec = parseInt(new Date().getTime()/1000, 10);
-			if (_inkLimiter[0] != sec) {
-				_inkLimiter[0] = sec;
-				_inkLimiter[1] = 0;
-			}
-			for (charY=0; charY<config.numRows(); charY++) {
-				for (charX=0; charX<config.numCols(); charX++) {
-					if (_pendingEdits[contentPos] && _pendingEdits[contentPos].length) {
-						// Most recent pending edit:
-						c = _pendingEdits[contentPos][_pendingEdits[contentPos].length - 1][0];
-					} else {
-                        c = newContent[contentPos];
-						colorid = colors[contentPos];
-					}
-					if (c != _content[contentPos]) {
-						// Update the cell
-						c = YourWorld.helpers.escapeChar(c);
-						cell = obj.getCell(charY, charX);
-						cell.innerHTML = c;
-						// console.log('thissss');
-                        $(cell).removeClass("t0 t1 t2 t3 t4 t5 t6 t7 t8 t9");
-                        $(cell).addClass("t"+colorid);
-						// console.log($(cell));
+		if (isZoomTile)
+		{
+			var updateHTML = function(newContent, highlight, colors)
+			{
+				console.log('its a zoom tile!!!!!!!!!!!');
+				
+			}//end zoom updatehtml
+		}
+		
+		else
+		{
+			var updateHTML = function(newContent, highlight, colors) {
+				var c, charY, charX, cell;
+				var contentPos = 0;
+				var sec = parseInt(new Date().getTime()/1000, 10);
+				if (_inkLimiter[0] != sec) {
+					_inkLimiter[0] = sec;
+					_inkLimiter[1] = 0;
+				}
+				for (charY=0; charY<config.numRows(); charY++) {
+					for (charX=0; charX<config.numCols(); charX++) {
+						if (_pendingEdits[contentPos] && _pendingEdits[contentPos].length) {
+							// Most recent pending edit:
+							c = _pendingEdits[contentPos][_pendingEdits[contentPos].length - 1][0];
+						} else {
+	                        c = newContent[contentPos];
+							colorid = colors[contentPos];
+						}
+						if (c != _content[contentPos]) {
+							// Update the cell
+							c = YourWorld.helpers.escapeChar(c);
+							cell = obj.getCell(charY, charX);
+							cell.innerHTML = c;
+							// console.log('thissss');
+	                        $(cell).removeClass("t0 t1 t2 t3 t4 t5 t6 t7 t8 t9");
+	                        $(cell).addClass("t"+colorid);
+							// console.log($(cell));
                         
-                        // console.log('colorrrid', colorid);
+	                        // console.log('colorrrid', colorid);
 						
-						if (highlight && !cell.style.backgroundColor) {
-							// Don't highlight selected or it'll stay yellow
-							if (_inkLimiter[1] < 10) {
-								// $(cell).effect('highlight', {}, 500);  //removed because people didn't like it
-								_inkLimiter[1]++;
+							if (highlight && !cell.style.backgroundColor) {
+								// Don't highlight selected or it'll stay yellow
+								if (_inkLimiter[1] < 10) {
+									// $(cell).effect('highlight', {}, 500);  //removed because people didn't like it
+									_inkLimiter[1]++;
+								}
 							}
 						}
+						contentPos++;
 					}
-					contentPos++;
 				}
-			}
-		};
+			};
+		
+		
+		
+		
+		
+		
+		
+		} //end else of udpatehtml (not zoom tile)
+		
+
 		
 		var setContent = function(newContent, colors) {
 			// newContent is either a string, with a char for each cell, or `null` to mean blank
@@ -1918,7 +1963,6 @@ YourWorld.Tile = function() {
 		};
 
 		var setCellProps = function(cellProps) {
-
 			if (YourWorld.helpers.deepEquals(cellProps, _cellProps)) {
 				return;
 			}
@@ -2002,8 +2046,6 @@ YourWorld.Tile = function() {
 			// setContent((p && p.content) ? p.content : null);
 
             setContent(p && p.content, p.color);
-   
-
 			setProtected(p && p.properties && p.properties['protected'] || false);
 			setCellProps(p && p.properties && p.properties.cell_props || null);
 		};
@@ -2033,8 +2075,17 @@ YourWorld.Tile = function() {
 
 		// Init
 		// node.style.backgroundColor = '#eee';
-		node.innerHTML = getDefaultHTML(config);
-		_content = config.defaultContent();
+		if (isZoomTile)
+		{
+			node.innerHTML= '.';
+			_content = '0';
+		}
+		else
+		{
+			node.innerHTML = getDefaultHTML(config);
+			_content = config.defaultContent();
+		}
+
         _initted = true;
 		
         //breaking the rules
