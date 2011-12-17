@@ -371,9 +371,13 @@ YourWorld.World = function() {
 							 {
 								 _zoomMode=1;
 								 console.log('zoomed outttt');
-								 var diff =_lastZoom-map.getZoom();
-								 currentDivider = diff*2;
-								 currentTileHeight= currentTileHeight/currentDivider;
+                                 // THIS NEEDS TO BE relative to the default level, not the last one
+								 var diff =_config.zoom()-map.getZoom(); //was lastzooom
+								 currentDivider = diff*2; ///blarg you are dumb
+
+                                 console.log('currentDivider!-:', currentDivider);
+								 
+                                 currentTileHeight= currentTileHeight/currentDivider;
 								 currentTileWidth= currentTileWidth/currentDivider;
 			                     map.overlayMapTypes.insertAt(0, new CoordMapTypeZoomedOut(new google.maps.Size(currentTileHeight, currentTileWidth)));
 							 }
@@ -382,7 +386,7 @@ YourWorld.World = function() {
 							 {
 								 _zoomMode=2;
 								 console.log('zoomed in');
-								 var diff =map.getZoom()-_lastZoom;
+								 var diff =map.getZoom()-_config.zoom(); //was lastzooom
 								 currentDivider = diff/2;
 								 currentTileHeight= currentTileHeight/currentDivider;
 								 currentTileWidth= currentTileWidth/currentDivider;
@@ -440,7 +444,7 @@ function handleNoGeolocation(errorFlag) {
         div = tile.HTMLnode();
 
         //for debug
-        $(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
+        // $(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
         // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = 'red';
         return div;
 
@@ -451,14 +455,8 @@ function handleNoGeolocation(errorFlag) {
         // console.log('Coordmaptype zoomed out ',coord);
         tile = getOrCreateTile(coord.y, coord.x);
         div = tile.HTMLnode();
-
-	    // div = document.createElement('div');
-	    // div.className = 'tilezoom';
-	    // div.style.width = currentTileWidth + 'px';
-	    // div.style.height = currentTileHeight + 'px';
-		// div.innerHTML= '.';
-        //for debug
-        $(div).append("<div style='position:absolute; color:yellow; font-size: 10px;'>Z"+coord+"</div>");
+        console.log("div being passed to mapgetile: ", div);
+        // $(div).append("<div style='position:absolute; color:blue; font-size: 10px;'>Z"+coord+"</div>");
         // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = 'yellow';
         return div;
 	}
@@ -550,30 +548,31 @@ function handleNoGeolocation(errorFlag) {
     
 
 
-	function FromLatLngToTileCoordinates(latLng, zoom) {
+    function FromLatLngToTileCoordinates(latLng, zoom) {
 
-		var TILE_SIZE = 256;
-		/** @const */
-		var TILE_INITIAL_RESOLUTION = 2 * Math.PI * 6378137 / TILE_SIZE;
-		/** @const */
-		var TILE_ORIGIN_SHIFT = 2 * Math.PI * 6378137 / 2.0;
+        var TILE_SIZE = currentTileHeight;
+        /** @const */
+        var TILE_INITIAL_RESOLUTION = 2 * Math.PI * 6378137 / TILE_SIZE;
+        /** @const */
+        var TILE_ORIGIN_SHIFT = 2 * Math.PI * 6378137 / 2.0;
 
-	    //LatLng to Meters
-	    var mx = latLng.lng() * TILE_ORIGIN_SHIFT / 180.0;
-	    var my = (Math.log(Math.tan((90 + latLng.lat()) * Math.PI / 360.0))
-	        / (Math.PI / 180.0)) * TILE_ORIGIN_SHIFT / 180.0;
+        //LatLng to Meters
+        var mx = latLng.lng() * TILE_ORIGIN_SHIFT / 180.0;
+        var my = (Math.log(Math.tan((90 + latLng.lat()) * Math.PI / 360.0))
+            / (Math.PI / 180.0)) * TILE_ORIGIN_SHIFT / 180.0;
 
-	    //Meters to Pixels
-	    var res = TILE_INITIAL_RESOLUTION / Math.pow(2, zoom);
-	    var px = (mx + TILE_ORIGIN_SHIFT) / res;
-	    var py = (my + TILE_ORIGIN_SHIFT) / res;
+        //Meters to Pixels
+        var res = TILE_INITIAL_RESOLUTION / Math.pow(2, zoom);
+        var px = ((mx + TILE_ORIGIN_SHIFT) / res) * currentDivider;
+        var py = (my + TILE_ORIGIN_SHIFT) / res;
 
-	    //Pixels to Tile Coords
-	    var tx = Math.floor(Math.ceil(px / TILE_SIZE) - 1);
-	    var ty = Math.pow(2, zoom) - 1 - Math.floor(Math.ceil(py / TILE_SIZE) - 1);
+        //Pixels to Tile Coords
+        var tx = Math.floor(Math.ceil(px / TILE_SIZE) - 1);
+        var ty = (Math.pow(2, zoom) - 1 - Math.floor(Math.ceil(py / TILE_SIZE) - 1)) * currentDivider;
 
-	    return ([tx, ty]);
-	}
+        return ([tx, ty]);
+    }
+
 
 	function FromLatLngToTileWithCells(latLng, zoom) {
 
@@ -730,6 +729,7 @@ function handleNoGeolocation(errorFlag) {
 		        var minX = upperLefTile[0] - 1;
 		        var maxY = minY + numDown + 2; // Add two because we might only see 1px of TL
 		        var maxX = minX + numAcross + 2;
+
 				// console.log([minY, minX, maxY, maxX]);
                 if (_firstBoundCheck)
                 {
@@ -751,7 +751,23 @@ function handleNoGeolocation(errorFlag) {
 
     };
     
+
     var setCoords = function() {
+        // Get real min+max, divide by 4 and floor, then set to coords UI
+        var minVisY = (_container.scrollTop() - _state.offsetY) / currentTileHeight;
+        var minVisX = (_container.scrollLeft() - _state.offsetX) / currentTileWidth;
+        var numDown = _container.height()/currentTileHeight;
+        var numAcross = _container.width()/currentTileWidth;
+        var centerY = minVisY + numDown/2;
+        var centerX = minVisX + numAcross/2;
+        centerY = -Math.floor(centerY/4); // INVERT Y-axis to make natural, scale both by 4 ~screen
+        centerX = Math.floor(centerX/4);
+        $('#coord_Y').text(centerY);
+        $('#coord_X').text(centerX);
+    };
+
+
+    var setCoordsOLD = function() {
         // Get real min+max, divide by 4 and floor, then set to coords UI
         var minVisY = (_container.scrollTop() - _state.offsetY) / _config.tileHeight();
         var minVisX = (_container.scrollLeft() - _state.offsetX) / _config.tileWidth();
@@ -1895,10 +1911,22 @@ YourWorld.Tile = function() {
 		
 		if (isZoomTile)
 		{
-			var updateHTML = function(newContent, highlight, colors)
+			var updateHTML = function(newContent, highlight, color)
 			{
-				console.log('its a zoom tile!!!!!!!!!!!');
-				
+                // $node.addClass("awesome");
+                // node.innerHTML=newContent;
+				// console.log('its a zoom tile!!!!!!!!!!!');
+                // console.log('newContent', newContent);
+                // console.log(tileY,tileX);
+                // console.log('colors', color);
+               // $(node).css('backgroundColor', 'red');
+               $node.addClass("c"+color);
+               $node.css('opacity', newContent/(252*1));  // out of 252 because there are that many chars in a tile
+                // node.className="test";
+
+                // console.log(node);
+                // node = $node[0]
+
 			}//end zoom updatehtml
 		}
 		
@@ -1959,10 +1987,11 @@ YourWorld.Tile = function() {
 			// console.log('SetContent and newcontent was:');
 			// console.log(newContent);
 			
-            if (_isZoomTile)
-            {
-                console.log('setContent() and its a zoomtile');
-            }
+            // if (_isZoomTile)
+            // {
+            //     console.log('setContent() and its a zoomtile');
+
+            // }
 			// First convert content to a string:
 			if (newContent === null) {
 				newContent = config.defaultContent();
@@ -1977,6 +2006,7 @@ YourWorld.Tile = function() {
 				node.style.backgroundColor = '';
 			}
 
+            // console.log('does newC != _c? ', newContent != _content);
 			// Update the content
 			if (newContent != _content) {
 				updateHTML(newContent, highlight, colors);
@@ -2112,8 +2142,8 @@ YourWorld.Tile = function() {
 		// node.style.backgroundColor = '#eee';
 		if (isZoomTile)
 		{
-			node.innerHTML= '.';
-			_content = '0';
+			node.innerHTML= ' ';
+			_content = ' ';
 		}
 		else
 		{

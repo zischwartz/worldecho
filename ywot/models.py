@@ -129,6 +129,7 @@ class Tile(models.Model):
 				if c != ' ':
 					density+=1
 			return density
+			# return scale(density, (0, 252), (0, 100))
 
 	#average, meaning mode, not mean, ok?
 	def get_average_color(self):
@@ -215,6 +216,11 @@ models.signals.post_save.connect(user_post_save, sender=User)
 # models.signals.post_save.connect(edit_post_save, sender=Edit)
 
 
+def scale(val, src, dst):
+    """
+    Scale the given value from the scale of src to the scale of dst.
+    """
+    return ((val - src[0]) / (src[1]-src[0])) * (dst[1]-dst[0]) + dst[0]
 
 
 from django.contrib import admin

@@ -323,6 +323,15 @@ a.urlLink {
 
 .hidden {display:none;}
 
+
+
+.tilezoom
+{
+    background-color: white;
+    opacity: 0;
+}
+
+
 .t0 {color:#6bbd68;}
     .c0{background:#037700;}
 .t1 {color:#bd57b3;}
@@ -399,8 +408,3 @@ a.urlLink {
 }
 
 
-.tilezoom
-{
-/*	background-color: white;*/
-/*	opacity: 0.6;*/
-}
