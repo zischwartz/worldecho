@@ -440,7 +440,7 @@ function handleNoGeolocation(errorFlag) {
         div = tile.HTMLnode();
 
         //for debug
-        // $(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
+        $(div).append("<div style='position:absolute; color:red'>"+coord+"</div>");
         // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = 'red';
         return div;
 
@@ -458,7 +458,7 @@ function handleNoGeolocation(errorFlag) {
 	    // div.style.height = currentTileHeight + 'px';
 		// div.innerHTML= '.';
         //for debug
-        // $(div).append("<div style='position:absolute; color:yellow; font-size: 10px;'>Z"+coord+"</div>");
+        $(div).append("<div style='position:absolute; color:yellow; font-size: 10px;'>Z"+coord+"</div>");
         // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = 'yellow';
         return div;
 	}
@@ -950,22 +950,47 @@ function handleNoGeolocation(errorFlag) {
         if (!_firstBoundCheck)
         {
             clearTimeout(t);
-            // console.log('has bounds, fetching Updates');
-
-            jQuery.ajax({
-                type: 'GET',
-                url: window.location.pathname,
-                data: { fetch: 1, 
-                        min_tileY: bounds[0],
-                        min_tileX: bounds[1],
-                        max_tileY: bounds[2],
-                        max_tileX: bounds[3],
-                        v: 3 // version
-                        },
-                success: updateData,
-                dataType: 'json',
-                error: updateError
-            });            
+            console.log('has bounds, fetching Updates');
+			
+			if (_zoomMode)
+			{
+				console.log('you are zoomed and getting!');
+				
+	            jQuery.ajax({
+	                type: 'GET',
+	                url: window.location.pathname,
+	                data: { fetch: 1, 
+	                        min_tileY: bounds[0],
+	                        min_tileX: bounds[1],
+	                        max_tileY: bounds[2],
+	                        max_tileX: bounds[3],
+	                        v: 4 // version
+	                        },
+	                success: updateData,
+	                dataType: 'json',
+	                error: updateError
+	            });
+				
+				
+			}
+			else
+			{
+	            jQuery.ajax({
+	                type: 'GET',
+	                url: window.location.pathname,
+	                data: { fetch: 1, 
+	                        min_tileY: bounds[0],
+	                        min_tileX: bounds[1],
+	                        max_tileY: bounds[2],
+	                        max_tileX: bounds[3],
+	                        v: 3 // version
+	                        },
+	                success: updateData,
+	                dataType: 'json',
+	                error: updateError
+	            });
+			}	
+        
                
         }
         return;
@@ -1874,6 +1899,8 @@ YourWorld.Tile = function() {
 		else
 		{
 			var updateHTML = function(newContent, highlight, colors) {
+				console.log('normal updateHTMLing');
+				
 				var c, charY, charX, cell;
 				var contentPos = 0;
 				var sec = parseInt(new Date().getTime()/1000, 10);
@@ -1927,7 +1954,9 @@ YourWorld.Tile = function() {
 		
 		var setContent = function(newContent, colors) {
 			// newContent is either a string, with a char for each cell, or `null` to mean blank
-
+			console.log('SetContent and newcontent wasss');
+			console.log(newContent);
+			
 			// First convert content to a string:
 			if (newContent === null) {
 				newContent = config.defaultContent();

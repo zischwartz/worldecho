@@ -140,19 +140,20 @@ def yourworld(request, namespace):
     })
     
 def fetch_updates(request, world):
-    # log.info('fetching updates')
+	# log.info('fetching updates')
+	# log.info(request)
+	response = {}
+	min_tileY = int(request.GET['min_tileY'])
+	min_tileX = int(request.GET['min_tileX'])
+	max_tileY = int(request.GET['max_tileY'])
+	max_tileX = int(request.GET['max_tileX'])
+	response = {}
 
-    response = {}
-    min_tileY = int(request.GET['min_tileY'])
-    min_tileX = int(request.GET['min_tileX'])
-    max_tileY = int(request.GET['max_tileY'])
-    max_tileX = int(request.GET['max_tileX'])
-    response = {}
+	log.info(min_tileY)
 
-
-    assert min_tileY < max_tileY
-    assert min_tileX < max_tileX
-    assert ((max_tileY - min_tileY)*(max_tileX - min_tileX)) < 400
+	assert min_tileY < max_tileY
+	assert min_tileX < max_tileX
+	# assert ((max_tileY - min_tileY)*(max_tileX - min_tileX)) < 400
     
     # Set default info to null
     #not sure what this was trying to do, but it won't work for us with our float values for tiles
@@ -160,29 +161,44 @@ def fetch_updates(request, world):
     #     for tileX in xrange(min_tileX, max_tileX + 1):
     #         response["%d,%d" % (tileY, tileX)] = None
             
-    tiles = Tile.objects.filter(world=world,
-                                tileY__gte=min_tileY, tileY__lte=max_tileY,
-                                tileX__gte=min_tileX, tileX__lte=max_tileX)
-
-    for t in tiles:
-        tile_key = "%s,%s" % (t.tileY, t.tileX)
-        if (int(request.GET.get('v', 0)) == 2):
-            d = {'content': t.content, 'color' : t.color}
+	tiles = Tile.objects.filter(world=world,
+								tileY__gte=min_tileY, tileY__lte=max_tileY,
+								tileX__gte=min_tileX, tileX__lte=max_tileX)
+								
+	version = int(request.GET.get('v', 0))
+	log.info(version)
+	log.info(tiles)
+	for t in tiles:
+		tile_key = "%s,%s" % (t.tileY, t.tileX)
+		log.info(tile_key)
+		if (int(request.GET.get('v', 0)) == 2):
+			d = {'content': t.content, 'color' : t.color}
             # d = {'content': t.content.replace('\n', ' '), 'color' : t.color}
             # if 'protected' in t.properties: # We want to send *any* set value (case: reset to false)
                 # d['protected'] = t.properties['protected']
-            response[tile_key] = d
-        elif (int(request.GET.get('v', 0)) == 3):
-            d = {'content': t.content, 'color' : t.color}
+			response[tile_key] = d
+		elif (int(request.GET.get('v', 0)) == 3):
+			d = {'content': t.content, 'color' : t.color}
             # d = {'content': t.content.replace('\n', ' '), 'color' : t.color}
             # if t.properties:
                 # d['properties'] = t.properties
-            response[tile_key] = d
-        else:
-            raise ValueError, 'Unknown JS version'
+			response[tile_key] = d
+
+		elif (int(request.GET.get('v', 0)) == 4): #for our zoomed out view!
+			log.info('version4444!')		
+			d = {'content': 'hellonurse'} #t.get_density(), 'color' : t.get_average_color()}
+			log.info(d)
+            # d = {'content': t.content.replace('\n', ' '), 'color' : t.color}
+            # if t.properties:
+                # d['properties'] = t.properties
+			response[tile_key] = d
+			
+			
+		else:
+			raise ValueError, 'Unknown JS version'
     
     # log.info(response)
-    return HttpResponse(simplejson.dumps(response))
+	return HttpResponse(simplejson.dumps(response))
     
 
 
