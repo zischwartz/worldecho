@@ -708,7 +708,7 @@ function handleNoGeolocation(errorFlag) {
             {
                 mapBounds= map.getBounds();
 
-                //console.log(mapBounds);
+                // console.log('(in getmb) bounds are:', mapBounds);
 				var minVisY, maxVisY;
 				var minVisX, maxVisX;
                 var topBound = mapBounds.getNorthEast().lat();
@@ -719,10 +719,12 @@ function handleNoGeolocation(errorFlag) {
                 var upperLeft = new google.maps.LatLng(topBound, leftBound);
 
 				var upperLefTile = FromLatLngToTileCoordinates(upperLeft, z);
-				// console.log(tile);
-                var numDown = Math.ceil(_container.height()/_config.mapTileY());
-                var numAcross= Math.ceil(_container.width()/_config.mapTileX());
-                
+                // I think the problem is here.
+				// console.log(upperLefTile, 'upperLefTile');
+                var numDown = Math.ceil(_container.height()/currentTileHeight);
+                var numAcross= Math.ceil(_container.width()/currentTileWidth);
+
+                // console.log('currentTileWidth', currentTileWidth);
 
 				var minY = upperLefTile[1] - 1; // one tile of padding around what's visible
 		        var minX = upperLefTile[0] - 1;
@@ -875,6 +877,8 @@ function handleNoGeolocation(errorFlag) {
         setTimeout(fetchUpdates, 997);
         
         $.each(data, function(YX, properties) {
+            
+            // console.log(properties);
 
             var coords = YX.split(',');
             // console.log('coords', coords);
@@ -940,6 +944,8 @@ function handleNoGeolocation(errorFlag) {
         _ui.paused.hide();
         var bounds = getMandatoryBounds();
         //  maybe we can mess with this
+		
+		// console.log('current bounds are', bounds);
 
         if (_firstBoundCheck)
         {
@@ -950,11 +956,11 @@ function handleNoGeolocation(errorFlag) {
         if (!_firstBoundCheck)
         {
             clearTimeout(t);
-            console.log('has bounds, fetching Updates');
+            // console.log('has bounds, fetching Updates');
 			
 			if (_zoomMode)
 			{
-				console.log('you are zoomed and getting!');
+				// console.log('you are zoomed and getting!');
 				
 	            jQuery.ajax({
 	                type: 'GET',
@@ -1944,19 +1950,19 @@ YourWorld.Tile = function() {
 		
 		
 		
-		
-		
-		
-		
 		} //end else of udpatehtml (not zoom tile)
 		
 
 		
 		var setContent = function(newContent, colors) {
 			// newContent is either a string, with a char for each cell, or `null` to mean blank
-			console.log('SetContent and newcontent wasss');
-			console.log(newContent);
+			// console.log('SetContent and newcontent was:');
+			// console.log(newContent);
 			
+            if (_isZoomTile)
+            {
+                console.log('setContent() and its a zoomtile');
+            }
 			// First convert content to a string:
 			if (newContent === null) {
 				newContent = config.defaultContent();
