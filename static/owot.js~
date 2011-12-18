@@ -240,7 +240,7 @@ YourWorld.World = function() {
 
     //var timeSlider;
     var _sliderMode = true;
-    var _sliderMin = Math.floor(new Date().getTime()/1000)-30000;
+    var _sliderMin = Math.floor(new Date().getTime()/1000)-40000;
     var _sliderMax = Math.floor(new Date().getTime()/1000);
     var _sliderTimestamp = _sliderMin;
 

@@ -100,11 +100,6 @@ INSTALLED_APPS = (
     'ywot'
 )
 
-DEFAULT_FROM_EMAIL = SERVER_EMAIL = '"Written World" <no-reply@writtenworld.org>'
-ACCOUNT_ACTIVATION_DAYS = 3
-
-from email_details import *
-
 # You should change this
 LOG_DIRECTORY = './log/' 
 

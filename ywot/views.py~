@@ -186,7 +186,7 @@ def fetch_updates(request, world):
 	    timest = int(request.GET['timestamp'])
 	    #time = timest
 	    all_edit_times = Edit.objects.filter(world=world).order_by('time')
-	    #pdb.set_trace()
+	    pdb.set_trace()
 	    for a in all_edit_times:
 		if (timest >= int(a.time.strftime("%s"))):
 		    #time = int(a)
