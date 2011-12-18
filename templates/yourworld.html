@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
     <title>Written World</title>
+    <meta name=”viewport” content=”user-scalable=false” />
+
+
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale = 1.0" />
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8"> 
     <link type="text/css" rel="stylesheet" href="/static/yourworld.css?v=1">
 	<link rel="shortcut icon" href="/static/ww.png" />
@@ -9,11 +13,14 @@
 </head>
 <body>
 <div id="topbar" class="ui">
-	<div id="topbarAbout"> <a href="#">what is this?</a></div>
+  <!-- <div id="topbarAbout"> <a href="#">what is this?</a></div> -->
     <div id="topbar_inner">
         <span id="paused" class="ui-vis tab">Paused</span>
         <div id="announce" class="ui-vis"></div>
-        <span id="menu" class="ui-vis tab menu">Menu <span style="font-size:50%">▼</span></span>
+		<div id="login_btn" class="button"> <a  href="/accounts/login/">get your own world</a></div>
+		<!-- <div id="takeme_btn" class="button"> <a class="travel" address="New York City" href="#">take me to NYC</a></div> -->
+
+        <!-- <span id="menu" class="ui-vis tab menu">Menu <span style="font-size:50%">▼</span></span> -->
     </div>
 </div>
 <div id="nav" class="ui menu ui-vis">
@@ -30,13 +37,14 @@
 
 <!-- <h1 id="loading">Loading...</h1> -->
 <div id="geoReminder">
-    <h3>Finding your location..</h3> 
-        <p>If asked, please click <b>Allow</b> above to use your location.</p><p> Otherwise, you can't use the site.</p>
+	<span class="arrow"><img src="/static/geoarrow.png" /> </span>
+    <h3>Loading &amp; Finding Your Location...</h3> 
+        <p>You must allow us to use your location when your browser asks.</p><p> Otherwise, the site won't really work.</p>
 </div>
-
 <div id="aboutOverlay">
 	<div class="closeme"></div>
-	<center><img src="/static/writtenworld.png"></center>
+
+	<img class="logo" src="/static/writtenworld.png">
 <p>    
 Hi There, 
 </p><p>
@@ -58,14 +66,14 @@ That’s it. The rules of the site are for you to create (or ignore). So what ar
 <div id="loadingIndicator">
 	<div class="closeme"></div>
 	
-    <img src="/static/writtenworld.png">
-    <h1>{{ world.name|default:"Written World" }}</h1>
+    <img class="logo" src="/static/writtenworld.png">
+    <h1>{{ world.name|default:"" }}</h1>
 
     {{world.prompt|safe}}
 
 </div>
 
-
+<div id="about_btn" class="button"> <a href="/home/">about this thing</a></div>
 
 <div id="mapcanvas"></div>
 
@@ -92,6 +100,7 @@ var usercolor;
 <!-- END OUR CODE -->
 
 <script type="text/javascript" src="/static/jquery-ui-1.7.2.custom.min.js"></script>
+<script type="text/javascript" src="/static/BrowserDetect.js"></script>
 <!-- <script type="text/javascript" src="/static/jquery.scrollview.js"></script> -->
 <script type="text/javascript" src="/static/jquery.droppy.js"></script>
 <!-- <script type="text/javascript" src="/static/jquery.simplemodal-1.3.3.mod.js"></script> -->

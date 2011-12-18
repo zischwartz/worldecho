@@ -5,22 +5,30 @@
 {% endblock %}
 
 {% block header %}
-    <h1>About Your World of Text</h1>
+	<div class="text">
+		<img class="logo" src="/static/ww_big.png">
+    	<h1>About this project</h1>
+	</div>
 {% endblock %}
 
 {% block content %}
-    <div class="text">
-        <p>
-            <a href="/">Your World of Text</a> is an infinite
-            grid of text editable by any visitor. The changes made by other people
-            appear on your screen as they happen. Everyone starts in the same place, but
-            you can scroll through the world using your mouse.
-        </p>
-        <p>
-            Put any letters at the end of the URL to go to a new world. For
-            example, <a href="/forexample">http://yoursitehere.com/forexample</a>.
-            They all start off blank. You can also <a href="{% url profile %}">create a custom
-            world</a> for you and your friends.
-        </p>
-    </div>
+        <p>    
+		Hi There, 
+		</p><p>
+		We’re Zach Schwartz, Martín Bravo, Nara Kasbergen, Rachel Slaff, and Ruth Spencer, students in <a href="http://shirky.com/">Clay Shirky’s</a> Designing Conversational Spaces course at NYU’s <a href="http://itp.nyu.edu/itp/">ITP</a>. </p>
+		<p>
+		The Written World is an experiment, based on <a href="http://www.yourworldoftext.com/">yourworldoftext</a>. We’ve placed a free-form text canvas on top of Google maps and added geolocation* functionality to see what happens when we combine online chat with the pre-existing relationships that are inherent to physical location and real-world places. For now, we’ve limited WW to New York users, but will open it up to everyone soon.
+		</p>
+		<p>
+		You’ll automatically be positioned at your current location*. Want to travel? Type your way over to different areas or click and drag to scroll. To move the cursor, use the arrow keys, or double click.
+		</p><p>
+		That’s it. The rules of the site are for you to create (or ignore). So what are you waiting for? Go explore! 
+		</p><p>
+		<small>
+		*Geolocation is an experimental feature in html5 and may not work in all browsers, locations, operating systems, and weather systems. On our experience, <a href="http://www.firefox.com">Firefox</a> is the browser that works better. Sorry.</small>
+		</p>
+
+	<br>
+	<a href="/"> Go to the common world!</a>
+
 {% endblock %}

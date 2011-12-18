@@ -1,6 +1,7 @@
 /* Blueprint overrides: */
 body {
-    font-family: Verdana, "Helvetica Neue", Arial, Helvetica, sans-serif;
+/*    font-family: Verdana, "Helvetica Neue", Arial, Helvetica, sans-serif;*/
+overflow:auto!important;
 }
 .container {
     margin: 0;
@@ -13,7 +14,7 @@ ul, ol {
 
 body {
     padding-left: 2em;
-    background: #eee;
+    background: #fff;
 }
 
 #topbar {
@@ -32,9 +33,17 @@ li {
     margin-left: 2em;
 }
 
+.float_left {
+	float:left;
+	margin:0 30px 0 0;
+}
+
 #updates {
-    background: #ddf;
     overflow: hidden;
+	font-size:12px;
+	width:250px;
+	border-bottom:1px solid #000;
+	padding-bottom:-1px;
 }
 
 #updates ul, #updates ol {
@@ -45,13 +54,17 @@ li {
 
 #updates li {
     padding-top: .5em;
-    padding-bottom: .5em;
+	margin:0;
+	border-bottom:1px solid #999;
+	padding-bottom:5px;
 }
 
+#updates li:last-child {
+	border-bottom:none;
+}
 #updates_title {
-    font-style: italic;
-    text-align: center;
-    font-size: 80%;
+    font-weight	: bold;
+	border-bottom:1px solid #000;
 }
 
 #updates_container {
@@ -59,9 +72,10 @@ li {
 }
  
 .text {
+	font-size:14px;
     text-align: left;
     padding-left: 2em;
-    max-width: 360px; /* 9 cols, 30em */
+    max-width: 500px; /* 9 cols, 30em */
 }
 
 .date {

@@ -5,4 +5,4 @@
 *.pyc
 *.ai
 local_settings.py
-
+email_details.py
