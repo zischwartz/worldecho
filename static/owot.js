@@ -262,7 +262,7 @@ YourWorld.World = function() {
             // draggable: false,
             // disableDefaultUI: true,
             panControl: true, 
-            zoomControl: true,
+            zoomControl: false,
             streetViewControl: false,
             mapTypeControl:false,
 
@@ -2172,10 +2172,10 @@ YourWorld.Tile = function() {
 
 $(document).ready(function() {
 
-	$("#about_btn > a").click(function(){
-		$("#loadingIndicator").fadeOut(300);	
-		$("#aboutOverlay").fadeIn(300);	
-	});
+	// $("#about_btn > a").click(function(){
+	// 	$("#loadingIndicator").fadeOut(300);	
+	// 	$("#aboutOverlay").fadeIn(300);	
+	// });
 	
 	$("#geoReminder").addClass(BrowserDetect.browser);
 	$(".closeme").click(function(){
