@@ -199,7 +199,7 @@ def fetch_updates(request, world):
 		else:
 			raise ValueError, 'Unknown JS version'
 	
-	log.info(response)
+	# log.info(response)
 	return HttpResponse(simplejson.dumps(response))
 	
 
