@@ -1,11 +1,10 @@
 {% extends "base.html" %}
-{% block header %}
-    <h1>Log in to The Written World</h1>
-{% endblock %}
+
 {% block content %}
 {% if form.errors %}
     <p>Your username and password didn't match. Please try again.</p>
 {% endif %}
+    <h1>Log In</h1>
 <form method="post" action="{% url django.contrib.auth.views.login %}">{% csrf_token %}
 <table>
 <tr>
@@ -17,25 +16,29 @@
     <td>{{ form.password }}</td>
 </tr>
 </table>
-
+<br>
 <input type="submit" value="login" />
-<a href="{% url registration_register %}">Don't have an account?</a>
+<!-- <a href="{% url registration_register %}">Don't have an account?</a> -->
 <input type="hidden" name="next" value="{{ next }}" />
 </form>
 
+                <!-- </div> -->
 
+<br><br><br><br>
 <hr>
 <hr>
+<br>
 <hr>
 <hr>
+<br>
 <hr>
+<hr>
+<br><br><br>
+
+<h1>Get an Account</h1>
 
 
-<h1>Need an account?</h1>
-
-                </div>
-
-                <div class="span-14">
+<div class="span-14">
                     
 <form action="/accounts/register/" method="POST">
 <table>
@@ -73,6 +76,9 @@
 </tr>
 </table>
 </form>
+<br>
+<p> <b> Why? </b>An account gives you your own world. Everything you write in the common world gets saved to your world, but not vice versa. You can share your personal world with other people, or keep it private.</p>
 
+</div> 
 {% endblock %}
 
