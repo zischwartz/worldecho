@@ -77,15 +77,64 @@ img
 
 #geoReminder
 {
+	z-index:10;
+	position:absolute;
+	width:100%;
     background-color: #ff4d4d;
    text-align: center;
-
-    padding: 20px;
+	height:50%;
+    padding: 20px 0;
 
 }
 	#geoReminder h3 {
 		color:#fff;
+		font-size:30px;
+		margin-bottom:20px;
 	}
+	#geoReminder .arrow {
+		position:absolute;
+
+	}
+	.Chrome .arrow {
+		right:20px;		
+	}
+	.Safari .arrow {
+		left:60%;
+		top:150px;
+		
+	}
+	.Firefox .arrow {
+		left:260px;
+		top:90px;
+	}
+
+	@-webkit-keyframes bounce {
+	        0%   { margin-top: 0px;}
+	        50%  { margin-top: 40px; }
+	        100% { margin-top: 0px;}
+	}
+	@-moz-keyframes bounce {
+        0%   { margin-top: 0px;}
+        50%  { margin-top: 40px; }
+        100% { margin-top: 0px;}	
+	}
+	@-ms-keyframes bounce {
+        0%   { margin-top: 0px;}
+        50%  { margin-top: 40px; }
+        100% { margin-top: 0px;}
+	}
+	.arrow {
+	     -webkit-animation: bounce 1s ease-in-out infinite;
+	     -moz-animation:    bounce 1s ease-in-out infinite;
+	     -ms-animation:     bounce 1s infinite;
+	}
+
+
+
+
+
+
+
 
 /*
 td {
@@ -100,7 +149,9 @@ td {
 	background:#fff;
 	z-index:1;
     width: 45%;
-    margin: 10% 25%;
+	margin: 0 25% 0 25%;
+    top: 20%;
+
     padding: 2.5%;
 
 	-moz-box-shadow: 0 0px 5px #888;
@@ -396,7 +447,6 @@ a.urlLink {
 @-ms-keyframes fi {
         0%   { opacity: 0; }
         100% { opacity: 1; }
-
 }
 
 
@@ -406,5 +456,8 @@ a.urlLink {
      -moz-animation:    fi 2s ;
      -ms-animation:     fi 2s ;
 }
+
+
+
 
 

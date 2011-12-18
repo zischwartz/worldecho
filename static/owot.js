@@ -2177,7 +2177,7 @@ $(document).ready(function() {
 		$("#aboutOverlay").fadeIn(300);	
 	});
 	
-	
+	$("#geoReminder").addClass(BrowserDetect.browser);
 	$(".closeme").click(function(){
 		$(this).parent().fadeOut()
 	});
