@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.http import Http404
 from lib import log
-from collections import Counter	
+# from collections import Counter	
 
 from lib.jsonfield import DictField
 
@@ -133,15 +133,15 @@ class Tile(models.Model):
 
 	#average, meaning mode, not mean, ok?
 	def get_average_color(self):
-		common=Counter(self.color).most_common(2) #get the two most common chars
-
-		if len(common) ==1:  			#if theres only one common color, return it
-			return int(common[0][0])
-		else:
-			if common[0][0] == '0':
-				return int(common[1][0])  #if the most common is 0, return the second most common
-			else:
-				return int(common[0][0]) #otherwise return the most common
+		return 0
+		# common=Counter(self.color).most_common(2) #get the two most common chars
+		# if len(common) ==1:  			#if theres only one common color, return it
+		# 	return int(common[0][0])
+		# else:
+		# 	if common[0][0] == '0':
+		# 		return int(common[1][0])  #if the most common is 0, return the second most common
+		# 	else:
+		# 		return int(common[0][0]) #otherwise return the most common
 
 
 	# def get_average_color(self):
