@@ -188,8 +188,6 @@ def fetch_updates(request, world):
 			# log.info('Version 4!')		
 			d = {'content': t.get_density(), 'color' : t.get_average_color()}
 			
-			if t.get_density():
-				log.info(d)
 			# d = {'content': t.content.replace('\n', ' '), 'color' : t.color}
 			# if t.properties:
 				# d['properties'] = t.properties
@@ -199,7 +197,7 @@ def fetch_updates(request, world):
 		else:
 			raise ValueError, 'Unknown JS version'
 	
-	log.info(response)
+	# log.info(response)
 	return HttpResponse(simplejson.dumps(response))
 	
 

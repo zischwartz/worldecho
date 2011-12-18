@@ -455,7 +455,7 @@ function handleNoGeolocation(errorFlag) {
         // console.log('Coordmaptype zoomed out ',coord);
         tile = getOrCreateTile(coord.y, coord.x);
         div = tile.HTMLnode();
-        console.log("div being passed to mapgetile: ", div);
+
         // $(div).append("<div style='position:absolute; color:blue; font-size: 10px;'>Z"+coord+"</div>");
         // div.style.borderStyle = 'solid';  div.style.borderWidth = '1px'; div.style.borderColor = 'yellow';
         return div;
@@ -506,7 +506,9 @@ function handleNoGeolocation(errorFlag) {
 			
 	        tileContainer.className = 'tilezoom'; //and tilecont perhaps?
 	        tileContainer.style.width = currentTileWidth + 'px';
-	        tileContainer.style.height = currentTileHeight + 'px';	
+	        tileContainer.style.height = currentTileHeight + 'px';
+            tileContainer.id = 't'+tileY+'_'+tileX;
+
 		}
 		else
 		{
@@ -521,10 +523,11 @@ function handleNoGeolocation(errorFlag) {
         //we're handling this in google maps getTile
         _state.numTiles++;
 		// TODO rennable
-			//         if ((_state.numTiles % 5000) === 0) { // lower this? raise? was 1000
-			// console.log('CLEANING UP');
-			//             setTimeout(cleanUpTiles, 0);
-			//         }
+		if ((_state.numTiles % 5000) === 0) { // lower this? raise? was 1000
+
+			console.log('CLEANING UP');
+			 setTimeout(cleanUpTiles, 0);
+			 }
 
         return tile;
     };
@@ -1841,11 +1844,6 @@ function handleNoGeolocation(errorFlag) {
 		
 
 
-
-
-
-
-
     };
 
     // Breaking the rules
@@ -1913,19 +1911,30 @@ YourWorld.Tile = function() {
 		{
 			var updateHTML = function(newContent, highlight, color)
 			{
-                // $node.addClass("awesome");
-                // node.innerHTML=newContent;
-				// console.log('its a zoom tile!!!!!!!!!!!');
-                // console.log('newContent', newContent);
+                console.log('number of zoomtiles');
+                n = $(".zoomtile").length;
+                console.log(n);
+
+                el = $('#t'+tileY+'_'+tileX);
+                console.log('#t'+tileY+'_'+tileX);
+                console.log(el);
+                console.log('zoomtile updateHTMLing');
+
+                el.addClass('AWESOME');
+
+                console.log('newContent', newContent);
                 // console.log(tileY,tileX);
                 // console.log('colors', color);
                // $(node).css('backgroundColor', 'red');
-               $node.addClass("c"+color);
-               $node.css('opacity', newContent/(252*1));  // out of 252 because there are that many chars in a tile
-                // node.className="test";
 
-                // console.log(node);
-                // node = $node[0]
+               el.addClass("c"+color);
+               el.css('opacity', newContent/252);  // out of 252 because there are that many chars in a tile
+               
+               // console.log('the $node');
+               // console.log($node);
+
+               // console.log('the node');
+               // console.log(node);
 
 			}//end zoom updatehtml
 		}
@@ -1987,11 +1996,11 @@ YourWorld.Tile = function() {
 			// console.log('SetContent and newcontent was:');
 			// console.log(newContent);
 			
-            // if (_isZoomTile)
-            // {
-            //     console.log('setContent() and its a zoomtile');
+            if (_isZoomTile)
+            {
+                console.log('setContent() and its a zoomtile');
 
-            // }
+            }
 			// First convert content to a string:
 			if (newContent === null) {
 				newContent = config.defaultContent();
@@ -2006,7 +2015,6 @@ YourWorld.Tile = function() {
 				node.style.backgroundColor = '';
 			}
 
-            // console.log('does newC != _c? ', newContent != _content);
 			// Update the content
 			if (newContent != _content) {
 				updateHTML(newContent, highlight, colors);
@@ -2145,6 +2153,7 @@ YourWorld.Tile = function() {
 			node.innerHTML= ' ';
 			_content = ' ';
 		}
+
 		else
 		{
 			node.innerHTML = getDefaultHTML(config);
