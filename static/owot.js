@@ -281,7 +281,7 @@ YourWorld.World = function() {
         if(navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 $("#geoReminder").fadeOut();
-				setTimeout(function(){ $("#loadingIndicator").fadeOut(200) }, 5000);
+				setTimeout(function(){ $("#loadingIndicator").fadeOut(200) }, 9000);
 
                 initialUserPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
 				
