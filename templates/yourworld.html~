@@ -114,7 +114,7 @@ var usercolor;
 </script>
 
 
-<script type="text/javascript" src="/static/ui.slider.js"></script>
+<script type="text/javascript" src="/static/jquery.ui.slider.js"></script>
 <script type="text/javascript" src="/static/owot-slider.js"></script>
 
 

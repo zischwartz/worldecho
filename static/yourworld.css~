@@ -391,7 +391,7 @@ a.urlLink {
 }
 
 #slidercontainer {
-  width: 400px;
+  width: 200px;
   height: 24px;
   padding-left: 24px;
   position: absolute;

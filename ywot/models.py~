@@ -132,7 +132,6 @@ class Edit(models.Model):
     
     class Meta:
         ordering = ['time']
-        unique_together=[['world', 'time']]
 
     def __unicode__(self):
         if self.user:
