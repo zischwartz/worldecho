@@ -17,16 +17,17 @@
             <div class="span-19">
                 <div id="topbar" class="span-19 last">
                     {% if user.is_authenticated %}
-                        Logged in as {{ user }}:
+                        Logged in as <a href="{% url profile %}">{{ user }}</a>
                     {% endif %}
-                    <a href="{% url home %}">Home</a>
                     {% if user.is_authenticated %}
                         | <a href="{% url profile %}">Your Worlds</a>
                         | <a href="{% url logout %}">Logout</a>
                     {% else %}
+                        <a href="{% url home %}">Home</a>
                         | <a href="{% url auth_login %}">Login</a>
-                        | <a href="{% url auth_login %}">Register</a>
                     {% endif %}
+                        | <a href="/">World</a> 
+
                 </div>
 
                 <div class="span-19 last">
